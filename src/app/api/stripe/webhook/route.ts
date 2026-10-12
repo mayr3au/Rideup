@@ -51,6 +51,7 @@ async function syncSubscription(sub: Stripe.Subscription, userIdHint?: string | 
     stripe_subscription_id: ended ? null : sub.id,
     subscription_status: sub.status,
     plan: ended ? "free" : planFromPriceId(item?.price.id),
+    current_period_start: item?.current_period_start ? new Date(item.current_period_start * 1000).toISOString() : null,
     current_period_end: item?.current_period_end ? new Date(item.current_period_end * 1000).toISOString() : null,
   };
 

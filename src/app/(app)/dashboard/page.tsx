@@ -1,122 +1,126 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { requireSession, effectivePlan } from "@/lib/auth";
-import { FREE_LIMITS } from "@/lib/plans";
-import { TRICKS, LEVELS } from "@/lib/tricks";
-import type { TrickProgress, VideoAnalysis } from "@/lib/types";
+import { getQuota } from "@/lib/usage";
+import { getProgressData } from "@/lib/progress";
+import { PLANS } from "@/lib/plans";
+import { courseForTrick } from "@/lib/courses";
 
 export const metadata: Metadata = { title: "Tableau de bord" };
 
 export default async function Dashboard({ searchParams }: { searchParams: Promise<{ abonnement?: string }> }) {
   const { abonnement } = await searchParams;
-  const { supabase, profile } = await requireSession();
+  const { supabase, user, profile } = await requireSession();
   const plan = effectivePlan(profile);
 
-  const [{ data: progress }, { data: analyses, count: analysisCount }] = await Promise.all([
-    supabase.from("trick_progress").select("*").returns<TrickProgress[]>(),
-    supabase
-      .from("video_analyses")
-      .select("*", { count: "exact" })
-      .order("created_at", { ascending: false })
-      .limit(3)
-      .returns<VideoAnalysis[]>(),
-  ]);
-
-  const validated = new Set((progress ?? []).filter((p) => p.status === "valide").map((p) => p.trick_id));
-  const nextTrick = TRICKS.find((t) => !validated.has(t.id));
+  const [quota, data] = await Promise.all([getQuota(supabase, profile, plan, "analyses"), getProgressData(supabase, user.id)]);
   const firstName = profile.full_name?.split(" ")[0];
+  const pct = quota.limit ? Math.min(100, (quota.used / quota.limit) * 100) : 100;
+  const next = data.working[0] ?? data.nextTrick;
+  const course = next ? courseForTrick(next.id) : undefined;
 
   return (
-    <div className="space-y-10">
+    <div className="space-y-8">
       {abonnement === "ok" && (
         <p role="status" className="rounded-xl border border-lagoon/40 bg-lagoon/10 p-4">
-          Ton abonnement est actif. L&apos;activation peut prendre quelques secondes : recharge la page si ta formule
-          n&apos;apparaît pas encore.
+          Ton abonnement est actif. S&apos;il n&apos;apparaît pas encore, recharge la page dans quelques secondes.
         </p>
       )}
 
-      <div>
-        <h1 className="text-4xl font-bold sm:text-5xl">{firstName ? `Salut ${firstName}` : "Salut"}</h1>
-        <p className="mt-2 text-slate">
-          {profile.level
-            ? `Niveau ${LEVELS.find((l) => l.id === profile.level)?.label.toLowerCase()}, ${validated.size} figure${validated.size > 1 ? "s" : ""} validée${validated.size > 1 ? "s" : ""} sur ${TRICKS.length}.`
-            : "Commence par configurer ton profil pour que le coach s'adapte à ton niveau."}
-        </p>
-      </div>
+      <h1 className="text-4xl font-bold sm:text-5xl">{firstName ? `Salut ${firstName}` : "Salut"}</h1>
 
-      {!profile.onboarded ? (
-        <section className="panel border-2 !border-kite p-6">
-          <h2 className="text-2xl font-bold">Configure ton profil rider</h2>
-          <p className="mt-2 text-slate">Ton niveau, ton matériel et tes objectifs : deux minutes, et ta roadmap est prête.</p>
-          <Link href="/coach" className="btn btn-primary mt-5">
-            Configurer mon profil
-          </Link>
+      {!profile.onboarded && (
+        <section className="panel border-2 !border-kite p-5">
+          <h2 className="text-2xl font-bold">Crée ton profil rider</h2>
+          <p className="mt-1 text-slate">Niveau, poids, matériel : c&apos;est ce qui rend les analyses et le Spot Finder justes pour toi.</p>
+          <Link href="/profil" className="btn btn-primary mt-4">Créer mon profil</Link>
         </section>
-      ) : (
-        nextTrick && (
-          <section className="panel p-6">
-            <p className="text-slate">Prochaine figure de ta roadmap</p>
-            <h2 className="mt-1 text-3xl font-bold">{nextTrick.name}</h2>
-            <p className="mt-2 max-w-xl text-slate">{nextTrick.summary}</p>
-            <div className="mt-5 flex flex-wrap gap-3">
-              <Link href={`/analyse?figure=${nextTrick.id}`} className="btn btn-primary">
-                Analyser un clip
-              </Link>
-              <Link href="/coach" className="btn btn-ghost">
-                Voir ma roadmap
-              </Link>
-            </div>
-          </section>
-        )
       )}
+
+      <section className="rounded-2xl bg-deep p-5 text-salt sm:p-6">
+        <div className="flex flex-wrap items-end justify-between gap-4">
+          <div>
+            <p className="text-salt/70">{plan === "free" ? "Essai gratuit" : `${PLANS[plan].name} · cette période`}</p>
+            <p className="mt-1 font-display text-4xl font-extrabold">
+              {quota.remaining}
+              <span className="text-xl font-semibold text-salt/70"> analyse{quota.remaining > 1 ? "s" : ""} restante{quota.remaining > 1 ? "s" : ""}</span>
+            </p>
+          </div>
+          <Link href="/analyse" className="btn btn-kite">Analyser une figure</Link>
+        </div>
+        <div className="mt-4 h-2 overflow-hidden rounded-full bg-salt/15" role="progressbar" aria-valuenow={quota.used} aria-valuemin={0} aria-valuemax={quota.limit} aria-label="Analyses utilisées">
+          <div className="h-full rounded-full bg-kite" style={{ width: `${pct}%` }} />
+        </div>
+        <p className="mt-2 text-sm text-salt/70">
+          {quota.used} sur {quota.limit} utilisée{quota.used > 1 ? "s" : ""}
+          {plan === "free" && (
+            <>
+              {" · "}
+              <Link href="/tarifs" className="underline">Passer à Progress</Link>
+            </>
+          )}
+        </p>
+      </section>
 
       <section>
-        <div className="flex items-baseline justify-between gap-4">
-          <h2 className="text-2xl font-bold">Dernières analyses</h2>
-          {(analysisCount ?? 0) > 0 && (
-            <Link href="/analyse" className="text-lagoon hover:underline">
-              Tout voir ({analysisCount})
-            </Link>
-          )}
-        </div>
-        {analyses && analyses.length > 0 ? (
-          <ul className="mt-4 divide-y divide-line border-y border-line">
-            {analyses.map((a) => (
-              <li key={a.id}>
-                <Link href={`/analyse/${a.id}`} className="flex items-center justify-between gap-4 py-4 hover:text-lagoon">
-                  <span>
-                    <span className="font-semibold">{a.result?.figure ?? "Analyse"}</span>
-                    <span className="ml-2 text-sm text-slate">
-                      {new Date(a.created_at).toLocaleDateString("fr-FR", { day: "numeric", month: "long" })}
-                    </span>
-                  </span>
-                  <span className="font-display text-lg font-bold">
-                    {a.status === "termine" && a.result ? `${a.result.note}/10` : a.status === "erreur" ? "Échec" : "En cours"}
-                  </span>
-                </Link>
+        <h2 className="text-2xl font-bold">Pour ta prochaine session</h2>
+        {data.priorities.length ? (
+          <ol className="mt-3 space-y-2">
+            {data.priorities.map((p, i) => (
+              <li key={i} className="panel p-4">
+                <p className="font-semibold">{p.title}</p>
+                <p className="mt-1 text-slate">{p.detail}</p>
               </li>
             ))}
-          </ul>
+          </ol>
         ) : (
-          <div className="mt-4 rounded-2xl border border-dashed border-line p-6">
-            <p>Aucune analyse pour l&apos;instant. Filme 20 secondes de ta prochaine session et envoie le clip.</p>
-            <Link href="/analyse" className="btn btn-primary mt-4">
-              Envoyer un clip
-            </Link>
-          </div>
+          <p className="mt-2 text-slate">Analyse ta première figure : tes priorités apparaîtront ici.</p>
         )}
       </section>
 
-      {plan === "free" && (
-        <section className="rounded-2xl bg-deep p-6 text-salt">
-          <h2 className="text-2xl font-bold">Tu es sur l&apos;essai gratuit</h2>
-          <p className="mt-2 text-salt/75">
-            {FREE_LIMITS.analyses} analyse et {FREE_LIMITS.coachMessages} messages au coach inclus. Passe au Standard
-            pour des analyses illimitées et un coach sans limite.
+      <div className="grid gap-4 md:grid-cols-2">
+        {next && (
+          <section className="panel p-5">
+            <p className="text-sm text-slate">{data.working.length ? "Figure en cours" : "Prochaine figure"}</p>
+            <h2 className="mt-1 text-2xl font-bold">{next.name}</h2>
+            <p className="mt-1 text-slate">{next.summary}</p>
+            <div className="mt-4 flex flex-wrap gap-x-4 gap-y-2">
+              <Link href={`/analyse?figure=${next.id}`} className="text-lagoon underline">Analyser une tentative</Link>
+              {course && <Link href={`/cours/${course.slug}`} className="text-lagoon underline">Lire le cours</Link>}
+            </div>
+          </section>
+        )}
+        <section className="panel p-5">
+          <p className="text-sm text-slate">Où rider</p>
+          <h2 className="mt-1 text-2xl font-bold">Spot Finder</h2>
+          <p className="mt-1 text-slate">
+            {plan === "free"
+              ? "Le meilleur spot selon le vent, ton niveau et ton matériel, avec Progress."
+              : "Les créneaux ridables autour de toi pour les 7 prochains jours."}
           </p>
-          <Link href="/tarifs" className="btn btn-kite mt-5">
-            Voir les formules
+          <Link href={plan === "free" ? "/week-end" : "/spots"} className="mt-4 inline-block text-lagoon underline">
+            {plan === "free" ? "Voir les spots du week-end" : "Trouver un spot"}
           </Link>
+        </section>
+      </div>
+
+      {data.recentAttempts.length > 0 && (
+        <section>
+          <div className="flex items-baseline justify-between">
+            <h2 className="text-2xl font-bold">Dernières analyses</h2>
+            <Link href="/historique" className="text-lagoon hover:underline">Historique</Link>
+          </div>
+          <ul className="mt-3 divide-y divide-line border-y border-line">
+            {data.recentAttempts.slice(-3).reverse().map((a, i) => (
+              <li key={i} className="flex items-center justify-between gap-4 py-3">
+                <span>
+                  <span className="font-semibold">{a.figure}</span>
+                  <span className="ml-2 text-sm text-slate">{a.date}</span>
+                </span>
+                <span className="font-display text-lg font-bold">{a.note}/10</span>
+              </li>
+            ))}
+          </ul>
         </section>
       )}
     </div>

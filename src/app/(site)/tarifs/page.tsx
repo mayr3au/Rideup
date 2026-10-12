@@ -1,41 +1,46 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { getSession, effectivePlan } from "@/lib/auth";
-import { FREE_LIMITS, PLANS, type PaidPlan } from "@/lib/plans";
+import { createClient } from "@/lib/supabase/server";
+import { getPlanSettings } from "@/lib/usage";
+import { PLANS, type PaidPlan } from "@/lib/plans";
 
 export const metadata: Metadata = {
   title: "Tarifs",
-  description: "Standard à 9,99 € ou Premium à 15,99 € par mois, sans engagement.",
+  description: "Progress à 14,99 € (20 analyses vidéo par mois) ou Elite à 29,99 € (60 analyses), sans engagement.",
 };
 
 export default async function PricingPage() {
   const session = await getSession();
   const current = effectivePlan(session?.profile);
+  const settings = await getPlanSettings(session?.supabase ?? (await createClient()));
 
   return (
-    <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6">
-      <h1 className="max-w-3xl text-5xl font-extrabold sm:text-6xl">Choisis comment tu veux progresser</h1>
+    <div className="mx-auto max-w-5xl px-4 py-14 sm:px-6">
+      <h1 className="max-w-3xl text-5xl font-extrabold sm:text-6xl">Choisis ton rythme de progression</h1>
       <p className="mt-4 max-w-2xl text-lg text-slate">
-        Sans engagement, résiliable en deux clics depuis ton espace. Le compte gratuit inclut{" "}
-        {FREE_LIMITS.analyses} analyse vidéo et {FREE_LIMITS.coachMessages} messages au coach pour tester.
+        Sans engagement, résiliable en deux clics. À l&apos;inscription, {settings.free.monthly_analyses} analyse
+        {settings.free.monthly_analyses > 1 ? "s" : ""} offerte{settings.free.monthly_analyses > 1 ? "s" : ""} pour essayer.
       </p>
 
-      <div className="mt-12 grid gap-6 md:grid-cols-2">
+      <div className="mt-10 grid gap-5 md:grid-cols-2">
         {(Object.keys(PLANS) as PaidPlan[]).map((key) => {
           const plan = PLANS[key];
-          const isCurrent = current === key;
+          const n = settings[key].monthly_analyses;
+          const elite = key === "elite";
           return (
-            <section
-              key={key}
-              className={`panel flex flex-col p-8 ${key === "premium" ? "border-2 !border-kite" : ""}`}
-            >
+            <section key={key} className={`panel flex flex-col p-6 sm:p-8 ${elite ? "border-2 !border-kite" : ""}`}>
               <h2 className="text-3xl font-bold">{plan.name}</h2>
               <p className="mt-1 text-slate">{plan.tagline}</p>
               <p className="mt-6">
                 <span className="font-display text-5xl font-extrabold">{plan.price}</span>
                 <span className="text-slate"> par mois</span>
               </p>
-              <ul className="mt-6 flex-1 space-y-2.5">
+              <p className="mt-4 text-lg font-semibold">
+                {n} analyses vidéo par mois
+                <span className="block text-base font-normal text-slate">Environ {Math.round(n / 4.3)} par semaine</span>
+              </p>
+              <ul className="mt-5 flex-1 space-y-2.5">
                 {plan.features.map((f) => (
                   <li key={f} className="flex gap-2">
                     <span aria-hidden="true" className="text-lagoon">✓</span>
@@ -44,23 +49,18 @@ export default async function PricingPage() {
                 ))}
               </ul>
 
-              {isCurrent ? (
-                <Link href="/compte" className="btn btn-ghost mt-8">
-                  Ta formule actuelle
-                </Link>
+              {current === key ? (
+                <Link href="/compte" className="btn btn-ghost mt-8">Ta formule actuelle</Link>
               ) : session ? (
                 <form action="/api/checkout" method="post" className="mt-8">
                   <input type="hidden" name="plan" value={key} />
-                  <button className={`btn w-full ${key === "premium" ? "btn-kite" : "btn-primary"}`}>
-                    {current === "free" ? `Passer au ${plan.name}` : `Changer pour ${plan.name}`}
+                  <button className={`btn w-full ${elite ? "btn-kite" : "btn-primary"}`}>
+                    {current === "free" ? `Choisir ${plan.name}` : `Passer à ${plan.name}`}
                   </button>
                 </form>
               ) : (
-                <Link
-                  href="/inscription"
-                  className={`btn mt-8 ${key === "premium" ? "btn-kite" : "btn-primary"}`}
-                >
-                  Créer un compte
+                <Link href="/inscription" className={`btn mt-8 ${elite ? "btn-kite" : "btn-primary"}`}>
+                  Commencer avec une analyse offerte
                 </Link>
               )}
             </section>
@@ -68,10 +68,21 @@ export default async function PricingPage() {
         })}
       </div>
 
-      <p className="mt-6 text-sm text-slate">
-        Paiement sécurisé par Stripe. Le Spot Finder et les spots du week-end arrivent bientôt pour les abonnés
-        Premium.
-      </p>
+      <div className="mt-12 grid gap-8 text-[0.95rem] sm:grid-cols-3">
+        <div>
+          <h2 className="font-semibold">Une analyse, c&apos;est quoi ?</h2>
+          <p className="mt-1 text-slate">Un passage de 20 secondes maximum que tu choisis dans ta vidéo, analysé phase par phase.</p>
+        </div>
+        <div>
+          <h2 className="font-semibold">Et si je renvoie le même clip ?</h2>
+          <p className="mt-1 text-slate">Le même passage déjà analysé te redonne le résultat, sans décompter d&apos;analyse.</p>
+        </div>
+        <div>
+          <h2 className="font-semibold">Si l&apos;analyse échoue ?</h2>
+          <p className="mt-1 text-slate">Elle n&apos;est pas décomptée. Tu peux relancer avec le même clip.</p>
+        </div>
+      </div>
+      <p className="mt-8 text-sm text-slate">Paiement sécurisé par Stripe. Prix TTC.</p>
     </div>
   );
 }

@@ -8,14 +8,16 @@ export function SiteFooter() {
         <div className="max-w-sm">
           <Logo />
           <p className="mt-3 text-slate">
-            Coaching kitesurf en ligne : analyse vidéo de tes figures, roadmap de progression et coach disponible à
-            toute heure.
+            Coaching kitesurf par IA : analyse vidéo de tes figures, suivi de progression et Spot Finder selon le vent,
+            ton niveau et ton matériel.
           </p>
         </div>
         <div>
           <p className="font-semibold">Plateforme</p>
           <ul className="mt-3 space-y-2 text-slate">
             <li><Link href="/tarifs" className="hover:text-deep">Tarifs</Link></li>
+            <li><Link href="/cours" className="hover:text-deep">Cours de kitesurf</Link></li>
+            <li><Link href="/week-end" className="hover:text-deep">Spots du week-end</Link></li>
             <li><Link href="/inscription" className="hover:text-deep">Créer un compte</Link></li>
             <li><Link href="/connexion" className="hover:text-deep">Connexion</Link></li>
           </ul>

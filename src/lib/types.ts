@@ -8,12 +8,19 @@ export type Profile = {
   level: Level | null;
   discipline: string | null;
   stance: "regular" | "goofy" | null;
-  home_spot: string | null;
+  weight_kg: number | null;
   quiver: string | null;
   goals: string | null;
+  home_label: string | null;
+  home_lat: number | null;
+  home_lng: number | null;
+  radius_km: number;
+  wind_alerts: boolean;
   onboarded: boolean;
   plan: Plan;
+  plan_override: Exclude<Plan, "free"> | null;
   subscription_status: string | null;
+  current_period_start: string | null;
   current_period_end: string | null;
   stripe_customer_id: string | null;
   is_admin: boolean;
@@ -35,14 +42,21 @@ export type CoachMessage = {
   created_at: string;
 };
 
+export type PhaseNote = { phase: "approche" | "appel" | "vol" | "reception"; note: number; commentaire: string };
+
 export type AnalysisResult = {
   figure: string;
+  figure_id: string | null;
   note: number;
   resume: string;
+  visibilite: "bonne" | "partielle" | "faible";
+  phases: PhaseNote[];
   points_forts: string[];
-  erreurs: { probleme: string; correction: string }[];
+  erreurs: { code: string; probleme: string; correction: string; gravite: "majeure" | "moyenne" | "mineure" }[];
   drills: string[];
+  priorite_session: string;
   securite: string | null;
+  evolution?: string | null; // Elite : comparaison avec les tentatives précédentes
 };
 
 export type VideoAnalysis = {
@@ -51,8 +65,37 @@ export type VideoAnalysis = {
   trick: string | null;
   notes: string | null;
   video_path: string | null;
+  clip_hash: string | null;
+  seg_start: number;
+  seg_end: number;
+  depth: "standard" | "approfondie";
+  cache_key: string | null;
+  reused_from: string | null;
+  counted: boolean;
   status: "en-attente" | "termine" | "erreur";
   result: AnalysisResult | null;
   error: string | null;
   created_at: string;
+};
+
+export type Spot = {
+  id: string;
+  name: string;
+  country: string;
+  region: string | null;
+  lat: number;
+  lng: number;
+  sea_bearing: number;
+  water: "flat" | "chop" | "vagues";
+  min_level: "debutant" | "intermediaire" | "avance";
+  notes: string | null;
+  active: boolean;
+};
+
+export type ProgramDay = { titre: string; objectif: string; exercices: string[] };
+export type Program = {
+  focus: string;
+  diagnostic: string;
+  sessions: ProgramDay[];
+  criteres_reussite: string[];
 };

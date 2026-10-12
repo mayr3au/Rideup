@@ -1,7 +1,7 @@
--- RIDE'UP — schéma initial
--- À exécuter dans Supabase : SQL Editor → coller → Run (ou `supabase db push`).
+-- RIDE'UP — schéma complet
+-- Supabase : SQL Editor → coller ce fichier → Run. Puis exécuter supabase/seed_spots.sql.
 
--- ───────────────────────── Profils ─────────────────────────
+-- ═════════════════════════ Profils ═════════════════════════
 create table if not exists public.profiles (
   id uuid primary key references auth.users (id) on delete cascade,
   email text,
@@ -9,13 +9,20 @@ create table if not exists public.profiles (
   level text check (level in ('debutant', 'intermediaire', 'avance', 'expert')),
   discipline text,
   stance text check (stance in ('regular', 'goofy')),
-  home_spot text,
-  quiver text,
+  weight_kg integer check (weight_kg between 25 and 200),
+  quiver text,                       -- texte libre, ex. "9 m, 12 m, twin-tip 138"
   goals text,
+  home_label text,                   -- ville ou spot de départ
+  home_lat double precision,
+  home_lng double precision,
+  radius_km integer not null default 100 check (radius_km between 5 and 2000),
+  wind_alerts boolean not null default true,
   onboarded boolean not null default false,
-  -- Champs gérés uniquement par le serveur (webhook Stripe)
-  plan text not null default 'free' check (plan in ('free', 'standard', 'premium')),
+  -- Champs gérés uniquement par le serveur (webhook Stripe / admin)
+  plan text not null default 'free' check (plan in ('free', 'progress', 'elite')),
+  plan_override text check (plan_override in ('progress', 'elite')), -- accès offert par l'admin
   subscription_status text,
+  current_period_start timestamptz,
   current_period_end timestamptz,
   stripe_customer_id text unique,
   stripe_subscription_id text,
@@ -25,18 +32,17 @@ create table if not exists public.profiles (
 
 alter table public.profiles enable row level security;
 
-create policy "profil lisible par son propriétaire"
-  on public.profiles for select using (auth.uid() = id);
+create policy "profil : lecture propriétaire" on public.profiles
+  for select using (auth.uid() = id);
+create policy "profil : modification propriétaire" on public.profiles
+  for update using (auth.uid() = id) with check (auth.uid() = id);
 
-create policy "profil modifiable par son propriétaire"
-  on public.profiles for update using (auth.uid() = id) with check (auth.uid() = id);
-
--- L'utilisateur ne peut modifier QUE ces colonnes (pas le plan, pas is_admin).
+-- L'utilisateur ne peut modifier QUE ces colonnes (ni le plan, ni is_admin).
 revoke update on public.profiles from authenticated, anon;
-grant update (full_name, level, discipline, stance, home_spot, quiver, goals, onboarded)
+grant update (full_name, level, discipline, stance, weight_kg, quiver, goals,
+              home_label, home_lat, home_lng, radius_km, wind_alerts, onboarded)
   on public.profiles to authenticated;
 
--- Création automatique du profil à l'inscription
 create or replace function public.handle_new_user()
 returns trigger language plpgsql security definer set search_path = public as $$
 begin
@@ -48,10 +54,26 @@ $$;
 
 drop trigger if exists on_auth_user_created on auth.users;
 create trigger on_auth_user_created
-  after insert on auth.users
-  for each row execute function public.handle_new_user();
+  after insert on auth.users for each row execute function public.handle_new_user();
 
--- ───────────────────────── Progression des figures ─────────────────────────
+-- ═════════════════════════ Réglages des offres (éditables dans l'admin) ═════════════════════════
+create table if not exists public.plan_settings (
+  plan text primary key check (plan in ('free', 'progress', 'elite')),
+  monthly_analyses integer not null,      -- pour 'free' : total à vie (essai)
+  monthly_coach_messages integer not null,
+  updated_at timestamptz not null default now()
+);
+
+alter table public.plan_settings enable row level security;
+create policy "offres : lecture publique" on public.plan_settings for select using (true);
+
+insert into public.plan_settings (plan, monthly_analyses, monthly_coach_messages) values
+  ('free', 1, 10),
+  ('progress', 20, 300),
+  ('elite', 60, 600)
+on conflict (plan) do nothing;
+
+-- ═════════════════════════ Progression ═════════════════════════
 create table if not exists public.trick_progress (
   user_id uuid not null references auth.users (id) on delete cascade,
   trick_id text not null,
@@ -59,14 +81,23 @@ create table if not exists public.trick_progress (
   updated_at timestamptz not null default now(),
   primary key (user_id, trick_id)
 );
-
 alter table public.trick_progress enable row level security;
+create policy "progression : propriétaire" on public.trick_progress
+  for all using (auth.uid() = user_id) with check (auth.uid() = user_id);
 
-create policy "progression : accès propriétaire"
-  on public.trick_progress for all
-  using (auth.uid() = user_id) with check (auth.uid() = user_id);
+-- Programme de progression personnalisé (Elite), généré par l'IA
+create table if not exists public.programs (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid not null references auth.users (id) on delete cascade,
+  content jsonb not null,
+  created_at timestamptz not null default now()
+);
+create index if not exists programs_user on public.programs (user_id, created_at desc);
+alter table public.programs enable row level security;
+create policy "programmes : lecture propriétaire" on public.programs
+  for select using (auth.uid() = user_id);
 
--- ───────────────────────── Chat coach ─────────────────────────
+-- ═════════════════════════ Chat coach ═════════════════════════
 create table if not exists public.coach_messages (
   id uuid primary key default gen_random_uuid(),
   user_id uuid not null references auth.users (id) on delete cascade,
@@ -74,53 +105,116 @@ create table if not exists public.coach_messages (
   content text not null,
   created_at timestamptz not null default now()
 );
-
-create index if not exists coach_messages_user_created on public.coach_messages (user_id, created_at);
-
+create index if not exists coach_messages_user on public.coach_messages (user_id, created_at);
 alter table public.coach_messages enable row level security;
+create policy "messages : lecture propriétaire" on public.coach_messages
+  for select using (auth.uid() = user_id);
+create policy "messages : suppression propriétaire" on public.coach_messages
+  for delete using (auth.uid() = user_id);
 
-create policy "messages lisibles par le propriétaire"
-  on public.coach_messages for select using (auth.uid() = user_id);
-create policy "messages supprimables par le propriétaire"
-  on public.coach_messages for delete using (auth.uid() = user_id);
--- Les insertions passent par l'API (service_role) pour garder le décompte fiable.
-
--- ───────────────────────── Analyses vidéo ─────────────────────────
+-- ═════════════════════════ Analyses vidéo ═════════════════════════
 create table if not exists public.video_analyses (
   id uuid primary key default gen_random_uuid(),
   user_id uuid not null references auth.users (id) on delete cascade,
   trick text,
   notes text,
   video_path text,
+  clip_hash text,                   -- SHA-256 du fichier, calculé dans le navigateur
+  seg_start numeric(7, 2) not null default 0,
+  seg_end numeric(7, 2) not null default 0,
+  depth text not null default 'standard' check (depth in ('standard', 'approfondie')),
+  cache_key text,                   -- empreinte clip + passage + figure + profondeur
+  reused_from uuid references public.video_analyses (id) on delete set null,
+  counted boolean not null default true, -- false = réutilisée ou en échec : hors quota
   status text not null default 'en-attente' check (status in ('en-attente', 'termine', 'erreur')),
   result jsonb,
   error text,
+  model text,
+  cost_usd numeric(10, 5),
   created_at timestamptz not null default now()
 );
-
-create index if not exists video_analyses_user_created on public.video_analyses (user_id, created_at desc);
-
+create index if not exists video_analyses_user on public.video_analyses (user_id, created_at desc);
+create index if not exists video_analyses_cache on public.video_analyses (user_id, cache_key);
 alter table public.video_analyses enable row level security;
+create policy "analyses : lecture propriétaire" on public.video_analyses
+  for select using (auth.uid() = user_id);
+create policy "analyses : suppression propriétaire" on public.video_analyses
+  for delete using (auth.uid() = user_id);
 
-create policy "analyses lisibles par le propriétaire"
-  on public.video_analyses for select using (auth.uid() = user_id);
-create policy "analyses supprimables par le propriétaire"
-  on public.video_analyses for delete using (auth.uid() = user_id);
+-- Erreurs détectées, codifiées : sert au suivi des erreurs récurrentes
+create table if not exists public.analysis_errors (
+  id bigint generated always as identity primary key,
+  analysis_id uuid not null references public.video_analyses (id) on delete cascade,
+  user_id uuid not null references auth.users (id) on delete cascade,
+  trick_id text,
+  code text not null,
+  created_at timestamptz not null default now()
+);
+create index if not exists analysis_errors_user on public.analysis_errors (user_id, created_at desc);
+alter table public.analysis_errors enable row level security;
+create policy "erreurs : lecture propriétaire" on public.analysis_errors
+  for select using (auth.uid() = user_id);
 
--- ───────────────────────── Stockage des clips ─────────────────────────
+-- ═════════════════════════ Dépenses IA (lecture admin uniquement) ═════════════════════════
+create table if not exists public.ai_usage (
+  id bigint generated always as identity primary key,
+  user_id uuid references auth.users (id) on delete set null,
+  kind text not null check (kind in ('analyse', 'coach', 'programme')),
+  model text not null,
+  input_tokens integer not null,
+  output_tokens integer not null,
+  cost_usd numeric(10, 5) not null,
+  created_at timestamptz not null default now()
+);
+create index if not exists ai_usage_created on public.ai_usage (created_at desc);
+alter table public.ai_usage enable row level security; -- aucune policy : service_role seulement
+
+-- ═════════════════════════ Spots ═════════════════════════
+create table if not exists public.spots (
+  id text primary key,                     -- slug
+  name text not null,
+  country text not null,
+  region text,
+  lat double precision not null,
+  lng double precision not null,
+  sea_bearing integer not null check (sea_bearing between 0 and 359), -- direction plage → large, en degrés
+  water text not null default 'chop' check (water in ('flat', 'chop', 'vagues')),
+  min_level text not null default 'debutant' check (min_level in ('debutant', 'intermediaire', 'avance')),
+  notes text,
+  active boolean not null default true,
+  created_at timestamptz not null default now()
+);
+alter table public.spots enable row level security;
+create policy "spots : lecture publique" on public.spots for select using (active);
+
+create table if not exists public.favorite_spots (
+  user_id uuid not null references auth.users (id) on delete cascade,
+  spot_id text not null references public.spots (id) on delete cascade,
+  created_at timestamptz not null default now(),
+  primary key (user_id, spot_id)
+);
+alter table public.favorite_spots enable row level security;
+create policy "favoris : propriétaire" on public.favorite_spots
+  for all using (auth.uid() = user_id) with check (auth.uid() = user_id);
+
+-- Alertes vent déjà envoyées (évite les doublons)
+create table if not exists public.wind_alerts_sent (
+  user_id uuid not null references auth.users (id) on delete cascade,
+  spot_id text not null references public.spots (id) on delete cascade,
+  day date not null,
+  sent_at timestamptz not null default now(),
+  primary key (user_id, spot_id, day)
+);
+alter table public.wind_alerts_sent enable row level security;
+
+-- ═════════════════════════ Stockage des clips ═════════════════════════
 insert into storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
-values ('clips', 'clips', false, 104857600, array['video/mp4', 'video/quicktime', 'video/webm'])
+values ('clips', 'clips', false, 209715200, array['video/mp4', 'video/quicktime', 'video/webm'])
 on conflict (id) do nothing;
 
--- Chaque utilisateur range ses clips dans un dossier à son id : clips/<user_id>/...
-create policy "clips : upload dans son dossier"
-  on storage.objects for insert to authenticated
+create policy "clips : upload dans son dossier" on storage.objects for insert to authenticated
   with check (bucket_id = 'clips' and (storage.foldername(name))[1] = auth.uid()::text);
-
-create policy "clips : lecture de son dossier"
-  on storage.objects for select to authenticated
+create policy "clips : lecture de son dossier" on storage.objects for select to authenticated
   using (bucket_id = 'clips' and (storage.foldername(name))[1] = auth.uid()::text);
-
-create policy "clips : suppression de son dossier"
-  on storage.objects for delete to authenticated
+create policy "clips : suppression de son dossier" on storage.objects for delete to authenticated
   using (bucket_id = 'clips' and (storage.foldername(name))[1] = auth.uid()::text);

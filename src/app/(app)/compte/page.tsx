@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { requireSession, effectivePlan } from "@/lib/auth";
 import { PLANS } from "@/lib/plans";
-import { ProfileForm } from "@/components/profile-form";
 
 export const metadata: Metadata = { title: "Compte" };
 
@@ -17,12 +16,20 @@ const STATUS_LABEL: Record<string, string> = {
 
 export default async function AccountPage() {
   const { user, profile } = await requireSession();
+  if (profile.plan_override) {
+    return (
+      <div className="max-w-3xl">
+        <h1 className="text-4xl font-bold sm:text-5xl">Abonnement</h1>
+        <p className="mt-4 text-lg">Ton accès {PLANS[profile.plan_override].name} t&apos;est offert par RIDE&apos;UP.</p>
+      </div>
+    );
+  }
   const plan = effectivePlan(profile);
 
   return (
     <div className="max-w-3xl space-y-14">
       <section>
-        <h1 className="text-4xl font-bold sm:text-5xl">Ton compte</h1>
+        <h1 className="text-4xl font-bold sm:text-5xl">Abonnement</h1>
         <p className="mt-2 text-slate">{user.email}</p>
 
         <div className="panel mt-8 p-6">
@@ -64,11 +71,10 @@ export default async function AccountPage() {
         </div>
       </section>
 
-      <section id="profil" className="scroll-mt-8">
-        <h2 className="text-3xl font-bold">Profil rider</h2>
-        <div className="mt-6">
-          <ProfileForm profile={profile} submitLabel="Enregistrer" />
-        </div>
+      <section>
+        <h2 className="text-2xl font-bold">Profil rider</h2>
+        <p className="mt-2 text-slate">Niveau, poids, matériel, ville et alertes vent.</p>
+        <Link href="/profil" className="btn btn-ghost mt-4">Modifier mon profil</Link>
       </section>
 
       <section>

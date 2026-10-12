@@ -3,7 +3,8 @@ import Link from "next/link";
 import { requireSession } from "@/lib/auth";
 import { LEVELS, TRICKS } from "@/lib/tricks";
 import type { CoachMessage, TrickProgress } from "@/lib/types";
-import { ProfileForm } from "@/components/profile-form";
+import { redirect } from "next/navigation";
+import { courseForTrick } from "@/lib/courses";
 import { CoachChat } from "@/components/coach-chat";
 import { clearChat, setTrickStatus } from "./actions";
 
@@ -12,19 +13,7 @@ export const metadata: Metadata = { title: "Coach" };
 export default async function CoachPage() {
   const { supabase, profile } = await requireSession();
 
-  if (!profile.onboarded) {
-    return (
-      <div className="max-w-3xl">
-        <h1 className="text-4xl font-bold sm:text-5xl">Ton profil rider</h1>
-        <p className="mt-3 text-lg text-slate">
-          Le coach s&apos;en sert pour adapter ta roadmap et ses conseils. Tu pourras tout modifier ensuite.
-        </p>
-        <div className="mt-10">
-          <ProfileForm profile={profile} submitLabel="Créer ma roadmap" />
-        </div>
-      </div>
-    );
-  }
+  if (!profile.onboarded) redirect("/profil");
 
   const [{ data: progress }, { data: messages }] = await Promise.all([
     supabase.from("trick_progress").select("*").returns<TrickProgress[]>(),
@@ -44,7 +33,7 @@ export default async function CoachPage() {
       <section>
         <div className="flex items-baseline justify-between gap-4">
           <h1 className="text-4xl font-bold">Ta roadmap</h1>
-          <Link href="/compte#profil" className="text-lagoon hover:underline">
+          <Link href="/profil" className="text-lagoon hover:underline">
             Modifier mon profil
           </Link>
         </div>
@@ -85,6 +74,16 @@ export default async function CoachPage() {
                               {k}
                             </li>
                           ))}
+                          <li className="flex flex-wrap gap-x-4 pt-1">
+                            {courseForTrick(t.id) && (
+                              <Link href={`/cours/${courseForTrick(t.id)!.slug}`} className="text-lagoon underline">
+                                Lire le cours
+                              </Link>
+                            )}
+                            <Link href={`/analyse?figure=${t.id}`} className="text-lagoon underline">
+                              Analyser une tentative
+                            </Link>
+                          </li>
                         </ul>
                       )}
                     </li>

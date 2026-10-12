@@ -1,53 +1,70 @@
-export type Plan = "free" | "standard" | "premium";
+export type Plan = "free" | "progress" | "elite";
+export type PaidPlan = Exclude<Plan, "free">;
 
+/** Contenu commercial des formules. Les quotas, eux, viennent de la table plan_settings (admin). */
 export const PLANS = {
-  standard: {
-    name: "Standard",
-    price: "9,99 €",
-    tagline: "Pour progresser chaque session.",
-    priceEnv: "STRIPE_PRICE_STANDARD",
+  progress: {
+    name: "Progress",
+    price: "14,99 €",
+    priceEnv: "STRIPE_PRICE_PROGRESS",
+    tagline: "Pour progresser chaque semaine.",
     features: [
-      "Analyses vidéo illimitées (clips de 20 s)",
-      "Coach personnel et roadmap de figures",
-      "Cours en ligne, du water start au freestyle",
-      "Historique de toutes tes analyses",
+      "Analyse des sauts et des figures",
+      "Identification des erreurs techniques",
+      "Conseils personnalisés pour progresser",
+      "Historique et suivi des analyses",
+      "Coach et roadmap de figures",
+      "Accès au Spot Finder",
+      "Objectifs de progression",
     ],
   },
-  premium: {
-    name: "Premium",
-    price: "15,99 €",
-    tagline: "Pour rider plus souvent, et au bon endroit.",
-    priceEnv: "STRIPE_PRICE_PREMIUM",
+  elite: {
+    name: "Elite",
+    price: "29,99 €",
+    priceEnv: "STRIPE_PRICE_ELITE",
+    tagline: "Pour les riders qui s'entraînent sérieusement.",
     features: [
-      "Tout le plan Standard",
-      "Spot Finder selon le vent, ton quiver et ton niveau",
-      "Meilleurs spots du week-end",
-      "Conseils sécurité et matériel sur mesure",
-      "Analyses vidéo traitées en priorité",
+      "Tout ce qui est inclus dans Progress",
+      "Analyse technique plus approfondie",
+      "Comparaison des figures et des sessions",
+      "Détection de l'évolution de tes erreurs",
+      "Programme de progression personnalisé",
+      "Suivi des figures maîtrisées et à travailler",
+      "Analyses traitées en priorité",
+      "Alerte quand du vent est prévu sur tes spots favoris",
     ],
   },
 } as const;
 
-export type PaidPlan = keyof typeof PLANS;
-
-/** Essai gratuit : ce qu'un compte sans abonnement peut utiliser. */
-export const FREE_LIMITS = {
-  analyses: 1,
-  coachMessages: 10,
+export type PlanSettings = {
+  plan: Plan;
+  monthly_analyses: number;
+  monthly_coach_messages: number;
 };
 
-/** Garde-fou anti-abus sur les plans payants (par 24 h). */
-export const DAILY_FAIR_USE = {
-  analyses: 20,
-  coachMessages: 150,
+/** Valeurs par défaut si la table plan_settings est vide. */
+export const DEFAULT_SETTINGS: Record<Plan, PlanSettings> = {
+  free: { plan: "free", monthly_analyses: 1, monthly_coach_messages: 10 },
+  progress: { plan: "progress", monthly_analyses: 20, monthly_coach_messages: 300 },
+  elite: { plan: "elite", monthly_analyses: 60, monthly_coach_messages: 600 },
 };
+
+/** Ce qui change concrètement dans l'analyse selon la formule. */
+export const ANALYSIS_DEPTH = {
+  free: { depth: "standard", sheets: 2, maxTokens: 1800, compare: false },
+  progress: { depth: "standard", sheets: 2, maxTokens: 1800, compare: false },
+  elite: { depth: "approfondie", sheets: 4, maxTokens: 3200, compare: true },
+} as const;
+
+export const FRAMES_PER_SHEET = 12; // grille 4 × 3
+export const MAX_SEGMENT_SECONDS = 20;
 
 export function isActive(status: string | null | undefined) {
   return status === "active" || status === "trialing";
 }
 
-export function planRank(plan: Plan) {
-  return plan === "premium" ? 2 : plan === "standard" ? 1 : 0;
+export function hasSpotFinder(plan: Plan) {
+  return plan !== "free";
 }
 
 export function priceIdFor(plan: PaidPlan) {
@@ -57,8 +74,11 @@ export function priceIdFor(plan: PaidPlan) {
 }
 
 export function planFromPriceId(priceId: string | null | undefined): Plan {
-  if (!priceId) return "free";
-  if (priceId === process.env.STRIPE_PRICE_PREMIUM) return "premium";
-  if (priceId === process.env.STRIPE_PRICE_STANDARD) return "standard";
+  if (priceId && priceId === process.env.STRIPE_PRICE_ELITE) return "elite";
+  if (priceId && priceId === process.env.STRIPE_PRICE_PROGRESS) return "progress";
   return "free";
+}
+
+export function formatQuota(n: number) {
+  return `${n} analyse${n > 1 ? "s" : ""}`;
 }

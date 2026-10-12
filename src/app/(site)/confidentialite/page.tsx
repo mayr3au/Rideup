@@ -8,7 +8,8 @@ export default function Page() {
     <LegalPage title="Politique de confidentialité">
       <h2>Données collectées</h2>
       <p>
-        Adresse e-mail et prénom (compte), informations de pratique que tu renseignes (niveau, matériel, objectifs),
+        Adresse e-mail et prénom (compte), informations de pratique que tu renseignes (niveau, poids, matériel, objectifs,
+        ville de départ, spots favoris),
         vidéos envoyées et leurs analyses, messages échangés avec le coach. Les paiements sont traités par Stripe :
         RIDE&apos;UP ne voit jamais ton numéro de carte.
       </p>
@@ -19,7 +20,9 @@ export default function Page() {
       <h2>Sous-traitants</h2>
       <p>
         Supabase (base de données et stockage), Vercel (hébergement), Stripe (paiement), Anthropic (analyse des images
-        extraites de tes vidéos et réponses du coach). Ces prestataires n&apos;utilisent pas tes données à leurs
+        extraites du passage choisi de tes vidéos et réponses du coach), Resend (e-mails d&apos;alerte vent). Seules des
+        images du passage sélectionné sont transmises à Anthropic, jamais la vidéo complète. Ta ville de départ sert
+        uniquement à calculer la distance des spots. Ces prestataires n&apos;utilisent pas tes données à leurs
         propres fins.
       </p>
       <h2>Durée de conservation</h2>

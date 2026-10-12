@@ -1,12 +1,15 @@
 import Link from "next/link";
 import { LEVELS, TRICKS } from "@/lib/tricks";
 import { PLANS } from "@/lib/plans";
+import { DEFAULT_SETTINGS } from "@/lib/plans";
 
 export default function Home() {
   return (
     <>
       <Hero />
       <HowItWorks />
+      <Progress />
+      <SpotFinderTeaser />
       <Roadmap />
       <PricingTeaser />
       <Faq />
@@ -44,8 +47,8 @@ function Hero() {
             Filme ta figure. On te dit exactement quoi corriger.
           </h1>
           <p className="mt-6 max-w-[34rem] text-lg text-slate">
-            Envoie un clip de 20 secondes depuis la plage. Ton coach décortique la carre, l&apos;envoi du kite et ta
-            position en l&apos;air, puis te donne les drills pour la prochaine session.
+            Importe ta vidéo, garde les 20 secondes de ta figure. Le coach IA décortique l&apos;approche, l&apos;appel, le
+            saut et la réception, puis te dit quoi travailler à ta prochaine session.
           </p>
           <div className="mt-8 flex flex-wrap gap-3">
             <Link href="/inscription" className="btn btn-primary">
@@ -98,13 +101,13 @@ function SampleAnalysis() {
 
 function HowItWorks() {
   const steps = [
-    { title: "Filme 20 secondes", text: "Un pote sur la plage, un téléphone, et ta figure du début à la réception." },
-    { title: "Dis ce que tu tentes", text: "Choisis la figure et ce qui coince. Plus tu es précis, plus la correction l'est." },
-    { title: "Repars avec un plan", text: "Ce qui marche, les erreurs dans l'ordre d'importance, et les drills à faire." },
+    { title: "Importe ta session", text: "Un pote sur la plage et un téléphone suffisent. Importe la vidéo telle quelle." },
+    { title: "Garde le bon passage", text: "Sélectionne au doigt les 20 secondes max de ta figure : approche, appel, saut, réception." },
+    { title: "Repars avec un plan", text: "Note par phase, erreurs dans l'ordre d'importance, corrections concrètes et exercices." },
   ];
   return (
     <section id="analyse" className="mx-auto max-w-6xl scroll-mt-8 px-4 py-20 sm:px-6">
-      <h2 className="max-w-2xl text-4xl font-bold sm:text-5xl">Une analyse vidéo, du clip à la session suivante</h2>
+      <h2 className="max-w-2xl text-4xl font-bold sm:text-5xl">De ta vidéo à ta prochaine session</h2>
       <ol className="mt-12 grid gap-8 sm:grid-cols-3">
         {steps.map((s, i) => (
           <li key={s.title} className="border-t-2 border-deep pt-5">
@@ -151,6 +154,72 @@ function Roadmap() {
   );
 }
 
+function Progress() {
+  const items = [
+    { title: "Erreurs récurrentes", text: "Chaque erreur est classée. Tu vois ce qui revient d'une session à l'autre, et ce qui disparaît." },
+    { title: "Priorités claires", text: "Une ou deux choses à travailler à la prochaine session, pas une liste de vingt conseils." },
+    { title: "Suivi par figure", text: "Tentatives, meilleure note, progression : figure par figure, de ton water start à ton premier raley." },
+  ];
+  return (
+    <section className="mx-auto max-w-6xl px-4 pb-20 sm:px-6">
+      <h2 className="max-w-2xl text-4xl font-bold sm:text-5xl">Un suivi qui se souvient de tes sessions</h2>
+      <div className="mt-10 grid gap-8 sm:grid-cols-3">
+        {items.map((it) => (
+          <div key={it.title}>
+            <h3 className="text-2xl font-bold">{it.title}</h3>
+            <p className="mt-2 text-slate">{it.text}</p>
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function SpotFinderTeaser() {
+  const rows = [
+    { name: "Spot A · 24 km", wind: 18, kite: "12 m", window: "13h–18h", ok: true },
+    { name: "Spot B · 41 km", wind: 22, kite: "9 m", window: "11h–16h", ok: true },
+    { name: "Spot C · 8 km", wind: 0, kite: "", window: "Vent offshore", ok: false },
+  ];
+  return (
+    <section className="border-y border-line bg-spray">
+      <div className="mx-auto grid max-w-6xl items-center gap-10 px-4 py-20 sm:px-6 lg:grid-cols-2">
+        <div>
+          <h2 className="text-4xl font-bold sm:text-5xl">Le bon spot, le bon kite, le bon créneau</h2>
+          <p className="mt-5 text-lg text-slate">
+            Le Spot Finder croise le vent prévu, son orientation sur chaque plage, ton niveau, ton poids et tes kites dans le
+            rayon que tu choisis. Il te dit où aller, à quelle heure, et quelle taille sortir.
+          </p>
+          <div className="mt-8 flex flex-wrap gap-3">
+            <Link href="/tarifs" className="btn btn-primary">Inclus dès Progress</Link>
+            <Link href="/week-end" className="btn btn-ghost">Spots les plus ventés ce week-end</Link>
+          </div>
+        </div>
+        <figure className="panel p-4" aria-label="Exemple de résultats du Spot Finder">
+          <ol className="space-y-2">
+            {rows.map((r) => (
+              <li key={r.name} className={`flex items-center justify-between rounded-xl border p-4 ${r.ok ? "border-line" : "border-dashed border-line opacity-70"}`}>
+                <div>
+                  <p className="font-semibold">{r.name}</p>
+                  <p className="text-sm text-slate">{r.window}</p>
+                </div>
+                {r.ok ? (
+                  <p className="text-right">
+                    <span className="font-display text-2xl font-extrabold">{r.wind}</span> <span className="text-sm text-slate">nds</span>
+                    <span className="block text-sm text-lagoon-dark">Kite {r.kite}</span>
+                  </p>
+                ) : (
+                  <span className="rounded-full bg-deep/5 px-3 py-1 text-sm text-slate">Pas ridable</span>
+                )}
+              </li>
+            ))}
+          </ol>
+        </figure>
+      </div>
+    </section>
+  );
+}
+
 function PricingTeaser() {
   return (
     <section className="mx-auto max-w-6xl px-4 py-20 sm:px-6">
@@ -159,7 +228,7 @@ function PricingTeaser() {
         {(Object.keys(PLANS) as (keyof typeof PLANS)[]).map((key) => {
           const plan = PLANS[key];
           return (
-            <div key={key} className={`panel p-7 ${key === "premium" ? "border-2 !border-kite" : ""}`}>
+            <div key={key} className={`panel p-7 ${key === "elite" ? "border-2 !border-kite" : ""}`}>
               <div className="flex items-baseline justify-between">
                 <h3 className="text-2xl font-bold">{plan.name}</h3>
                 <p>
@@ -167,9 +236,9 @@ function PricingTeaser() {
                   <span className="text-slate"> / mois</span>
                 </p>
               </div>
-              <p className="mt-1 text-slate">{plan.tagline}</p>
+              <p className="mt-1 font-semibold">{DEFAULT_SETTINGS[key].monthly_analyses} analyses vidéo par mois</p>
               <ul className="mt-5 space-y-2">
-                {plan.features.map((f) => (
+                {plan.features.slice(0, 5).map((f) => (
                   <li key={f} className="flex gap-2">
                     <span aria-hidden="true" className="text-lagoon">✓</span>
                     {f}
@@ -181,7 +250,7 @@ function PricingTeaser() {
         })}
       </div>
       <Link href="/tarifs" className="btn btn-primary mt-8">
-        Choisir ma formule
+        Comparer les formules
       </Link>
     </section>
   );
@@ -192,6 +261,10 @@ function Faq() {
     {
       q: "Quelle qualité de vidéo faut-il ?",
       a: "Un téléphone suffit. Filme de côté, à une trentaine de mètres, en gardant le rider et le kite dans le cadre si possible.",
+    },
+    {
+      q: "Pourquoi 20 secondes maximum ?",
+      a: "Une figure dure quelques secondes. En gardant seulement l'approche, l'appel, le saut et la réception, l'analyse se concentre sur ce qui compte et reste précise.",
     },
     {
       q: "L'analyse remplace-t-elle un moniteur ?",

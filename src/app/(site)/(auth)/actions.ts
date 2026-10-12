@@ -60,7 +60,7 @@ export async function signUp(_: FormState, formData: FormData): Promise<FormStat
     password: parsed.data.password,
     options: {
       data: { full_name: parsed.data.full_name },
-      emailRedirectTo: `${await siteUrl()}/auth/callback?next=/coach`,
+      emailRedirectTo: `${await siteUrl()}/auth/callback?next=/profil`,
     },
   });
   if (error) {
@@ -71,7 +71,7 @@ export async function signUp(_: FormState, formData: FormData): Promise<FormStat
   }
 
   // Confirmation d'e-mail désactivée dans Supabase : la session existe déjà.
-  if (data.session) redirect("/coach");
+  if (data.session) redirect("/profil");
 
   return { message: `C'est presque fini : clique sur le lien envoyé à ${parsed.data.email} pour activer ton compte.` };
 }

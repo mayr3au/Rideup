@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { requireSession } from "@/lib/auth";
-import { trickById } from "@/lib/tricks";
+import { errorLabel, trickById } from "@/lib/tricks";
 import type { VideoAnalysis } from "@/lib/types";
 import { ConfirmButton } from "@/components/confirm-button";
 import { deleteAnalysis } from "../actions";
@@ -10,8 +10,22 @@ import { setTrickStatus } from "../../coach/actions";
 
 export const metadata: Metadata = { title: "Résultat d'analyse" };
 
-export default async function AnalysisDetail({ params }: { params: Promise<{ id: string }> }) {
+const PHASE_LABEL = { approche: "Approche", appel: "Appel", vol: "En l'air", reception: "Réception" } as const;
+const GRAVITE_STYLE = {
+  majeure: "border-danger",
+  moyenne: "border-kite",
+  mineure: "border-line",
+} as const;
+
+export default async function AnalysisDetail({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ id: string }>;
+  searchParams: Promise<{ deja?: string }>;
+}) {
   const { id } = await params;
+  const { deja } = await searchParams;
   const { supabase } = await requireSession();
 
   const { data: a } = await supabase.from("video_analyses").select("*").eq("id", id).single<VideoAnalysis>();
@@ -23,22 +37,31 @@ export default async function AnalysisDetail({ params }: { params: Promise<{ id:
 
   const trick = a.trick ? trickById(a.trick) : undefined;
   const r = a.result;
+  const start = Number(a.seg_start);
+  const end = Number(a.seg_end);
 
   return (
-    <div className="max-w-4xl">
-      <Link href="/analyse" className="text-lagoon hover:underline">
-        Toutes mes analyses
+    <div className="mx-auto max-w-4xl">
+      <Link href="/historique" className="text-lagoon hover:underline">
+        Historique
       </Link>
 
-      <div className="mt-6 flex flex-wrap items-end justify-between gap-4">
+      {deja && (
+        <p role="status" className="mt-4 rounded-xl border border-lagoon/40 bg-lagoon/10 p-4">
+          Ce passage a déjà été analysé : voici le résultat, sans nouvelle analyse décomptée.
+        </p>
+      )}
+
+      <div className="mt-4 flex flex-wrap items-end justify-between gap-4">
         <div>
           <p className="text-slate">
             {new Date(a.created_at).toLocaleDateString("fr-FR", { weekday: "long", day: "numeric", month: "long" })}
+            {a.depth === "approfondie" && " · analyse approfondie"}
           </p>
-          <h1 className="text-5xl font-extrabold">{r?.figure ?? trick?.name ?? "Analyse"}</h1>
+          <h1 className="text-4xl font-extrabold sm:text-5xl">{r?.figure ?? trick?.name ?? "Analyse"}</h1>
         </div>
         {r && (
-          <p className="font-display text-6xl font-extrabold">
+          <p className="font-display text-6xl font-extrabold leading-none">
             {r.note}
             <span className="text-2xl text-slate">/10</span>
           </p>
@@ -47,26 +70,23 @@ export default async function AnalysisDetail({ params }: { params: Promise<{ id:
 
       {a.status === "erreur" && (
         <p role="alert" className="mt-6 rounded-xl border border-danger/40 bg-danger/5 p-4">
-          Cette analyse a échoué et n&apos;a pas été décomptée. Renvoie le clip depuis la page Analyse vidéo.
-        </p>
-      )}
-      {a.status === "en-attente" && (
-        <p className="mt-6 rounded-xl border border-line bg-spray p-4">
-          Analyse interrompue avant la fin. Si ça dure, renvoie le clip.
+          Cette analyse a échoué et n&apos;a pas été décomptée. Relance-la depuis la page Analyse.
         </p>
       )}
 
-      <div className="mt-8 grid gap-8 md:grid-cols-[1fr_1.2fr]">
-        <div>
+      <div className="mt-6 grid gap-8 md:grid-cols-[1fr_1.25fr]">
+        <div className="md:sticky md:top-6 md:self-start">
           {signed?.signedUrl ? (
-            <video src={signed.signedUrl} controls playsInline className="w-full rounded-2xl bg-deep" />
+            <video src={`${signed.signedUrl}#t=${start},${end}`} controls playsInline className="w-full rounded-2xl bg-deep" />
           ) : (
-            <div className="rounded-2xl bg-deep/5 p-6 text-slate">Clip indisponible.</div>
+            <div className="rounded-2xl bg-deep/5 p-6 text-slate">Vidéo indisponible.</div>
           )}
-          {a.notes && (
-            <p className="mt-4 text-[0.95rem]">
-              <span className="font-semibold">Ce qui coinçait : </span>
-              <span className="text-slate">{a.notes}</span>
+          <p className="mt-2 text-sm text-slate">
+            Passage analysé : {start.toFixed(1)} s → {end.toFixed(1)} s
+          </p>
+          {r && r.visibilite !== "bonne" && (
+            <p className="mt-3 rounded-xl bg-kite/20 p-3 text-[0.95rem]">
+              Visibilité {r.visibilite} : filme plus près, de côté, avec le kite dans le cadre pour une analyse plus fine.
             </p>
           )}
         </div>
@@ -82,14 +102,46 @@ export default async function AnalysisDetail({ params }: { params: Promise<{ id:
               </div>
             )}
 
+            <section className="rounded-2xl bg-deep p-5 text-salt">
+              <h2 className="text-sm font-semibold text-kite">Priorité pour ta prochaine session</h2>
+              <p className="mt-1 text-lg font-semibold">{r.priorite_session}</p>
+            </section>
+
+            {r.evolution && (
+              <section>
+                <h2 className="text-2xl font-bold">Par rapport à tes tentatives précédentes</h2>
+                <p className="mt-2">{r.evolution}</p>
+              </section>
+            )}
+
+            {r.phases?.length > 0 && (
+              <section>
+                <h2 className="text-2xl font-bold">Phase par phase</h2>
+                <dl className="mt-4 space-y-3">
+                  {r.phases.map((p) => (
+                    <div key={p.phase} className="grid grid-cols-[5.5rem_1fr] gap-3">
+                      <dt>
+                        <span className="block font-semibold">{PHASE_LABEL[p.phase]}</span>
+                        <span className="font-display text-lg font-bold">{p.note}/10</span>
+                      </dt>
+                      <dd className="text-slate">{p.commentaire}</dd>
+                    </div>
+                  ))}
+                </dl>
+              </section>
+            )}
+
             {r.erreurs.length > 0 && (
               <section>
                 <h2 className="text-2xl font-bold">À corriger, dans cet ordre</h2>
                 <ol className="mt-4 space-y-4">
                   {r.erreurs.map((e, i) => (
-                    <li key={i} className="border-l-4 border-kite pl-4">
+                    <li key={i} className={`border-l-4 pl-4 ${GRAVITE_STYLE[e.gravite] ?? "border-kite"}`}>
+                      <p className="text-sm text-slate">
+                        {errorLabel(e.code)} · {e.gravite}
+                      </p>
                       <p className="font-semibold">{e.probleme}</p>
-                      <p className="mt-1 text-slate">{e.correction}</p>
+                      <p className="mt-1">{e.correction}</p>
                     </li>
                   ))}
                 </ol>
@@ -111,12 +163,12 @@ export default async function AnalysisDetail({ params }: { params: Promise<{ id:
             )}
 
             {r.drills.length > 0 && (
-              <section className="rounded-2xl bg-deep p-6 text-salt">
-                <h2 className="text-2xl font-bold">Pour ta prochaine session</h2>
+              <section>
+                <h2 className="text-2xl font-bold">Exercices</h2>
                 <ul className="mt-3 space-y-2">
                   {r.drills.map((d) => (
                     <li key={d} className="flex gap-2">
-                      <span aria-hidden="true" className="text-kite">•</span>
+                      <span aria-hidden="true" className="text-lagoon">•</span>
                       {d}
                     </li>
                   ))}
@@ -132,16 +184,21 @@ export default async function AnalysisDetail({ params }: { params: Promise<{ id:
           <form action={setTrickStatus}>
             <input type="hidden" name="trick" value={trick.id} />
             <input type="hidden" name="status" value="valide" />
-            <button className="btn btn-primary">Valider « {trick.name} » dans ma roadmap</button>
+            <button className="btn btn-primary">Marquer « {trick.name} » comme maîtrisée</button>
           </form>
+        )}
+        {trick && (
+          <Link href={`/analyse?figure=${trick.id}`} className="btn btn-ghost">
+            Nouvelle tentative
+          </Link>
         )}
         <Link href="/coach" className="btn btn-ghost">
           En parler au coach
         </Link>
-        <form action={deleteAnalysis} className="ml-auto">
+        <form action={deleteAnalysis} className="sm:ml-auto">
           <input type="hidden" name="id" value={a.id} />
-          <ConfirmButton message="Supprimer définitivement cette analyse et le clip ?" className="btn text-danger hover:bg-danger/5">
-            Supprimer l&apos;analyse et le clip
+          <ConfirmButton message="Supprimer définitivement cette analyse ?" className="btn text-danger hover:bg-danger/5">
+            Supprimer
           </ConfirmButton>
         </form>
       </div>

@@ -41,6 +41,42 @@ export const DISCIPLINES = [
   { id: "wave", label: "Vague" },
 ] as const;
 
+/**
+ * Taxonomie des erreurs techniques. L'IA doit classer chaque erreur dans un de ces codes :
+ * c'est ce qui permet de suivre les erreurs récurrentes d'une analyse à l'autre.
+ */
+export const ERROR_CODES = {
+  "vitesse-insuffisante": { label: "Pas assez de vitesse à l'approche", phase: "approche" },
+  "carre-faible": { label: "Carre insuffisante avant l'appel", phase: "approche" },
+  "carre-relachee": { label: "Carre relâchée au moment de l'envoi", phase: "appel" },
+  "envoi-kite-tardif": { label: "Kite envoyé trop tard", phase: "appel" },
+  "envoi-kite-brutal": { label: "Kite envoyé trop fort ou trop loin", phase: "appel" },
+  "kite-trop-haut": { label: "Kite trop haut / au zénith", phase: "vol" },
+  "kite-trop-bas": { label: "Kite trop bas pour la figure", phase: "appel" },
+  "pas-de-pop": { label: "Pas de pop sur la carre", phase: "appel" },
+  "barre-loin": { label: "Barre trop loin du corps", phase: "vol" },
+  "bras-tendus": { label: "Bras tendus, barre qui pivote", phase: "vol" },
+  "regard": { label: "Regard qui ne guide pas la rotation", phase: "vol" },
+  "epaules-ouvertes": { label: "Épaules qui ouvrent trop tôt", phase: "vol" },
+  "rotation-incomplete": { label: "Rotation incomplète", phase: "vol" },
+  "corps-etendu": { label: "Corps trop étendu en l'air", phase: "vol" },
+  "jambes-tendues": { label: "Jambes tendues, planche loin du corps", phase: "vol" },
+  "planche-mal-orientee": { label: "Planche mal orientée", phase: "vol" },
+  "kite-pas-renvoye": { label: "Kite pas renvoyé pour la réception", phase: "reception" },
+  "reception-arriere": { label: "Réception en arrière / sur les fesses", phase: "reception" },
+  "reception-jambes-raides": { label: "Réception jambes raides", phase: "reception" },
+  "reception-nose": { label: "Réception sur l'avant de la planche", phase: "reception" },
+  "poids-avant": { label: "Poids trop sur l'avant", phase: "approche" },
+  "posture-cassee": { label: "Posture cassée (fesses en arrière)", phase: "approche" },
+  "autre": { label: "Autre point technique", phase: "vol" },
+} as const;
+
+export type ErrorCode = keyof typeof ERROR_CODES;
+
+export function errorLabel(code: string) {
+  return (ERROR_CODES as Record<string, { label: string }>)[code]?.label ?? "Autre point technique";
+}
+
 export function trickById(id: string) {
   return TRICKS.find((t) => t.id === id);
 }
