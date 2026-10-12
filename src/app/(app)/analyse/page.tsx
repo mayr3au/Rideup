@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { requireSession, effectivePlan } from "@/lib/auth";
-import { getQuota } from "@/lib/usage";
+import { getQuota, sweepStaleAnalyses } from "@/lib/usage";
 import { ANALYSIS_DEPTH } from "@/lib/plans";
 import { trickById } from "@/lib/tricks";
 import { AnalyseUploader } from "@/components/analyse-uploader";
@@ -12,6 +12,7 @@ export default async function AnalysePage({ searchParams }: { searchParams: Prom
   const { figure } = await searchParams;
   const { supabase, profile } = await requireSession();
   const plan = effectivePlan(profile);
+  await sweepStaleAnalyses(profile.id);
   const quota = await getQuota(supabase, profile, plan, "analyses");
   const deep = ANALYSIS_DEPTH[plan].depth === "approfondie";
 
@@ -29,6 +30,7 @@ export default async function AnalysePage({ searchParams }: { searchParams: Prom
             defaultTrick={figure && trickById(figure) ? figure : undefined}
             remaining={quota.remaining}
             deep={deep}
+            sheetCount={ANALYSIS_DEPTH[plan].sheets}
           />
         ) : (
           <div className="panel p-6">

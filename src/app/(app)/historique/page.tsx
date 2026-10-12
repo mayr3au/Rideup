@@ -13,7 +13,7 @@ export default async function HistoryPage({ searchParams }: { searchParams: Prom
   let q = supabase
     .from("video_analyses")
     .select("id, trick, status, result, created_at, seg_start, seg_end, depth")
-    .neq("status", "en-attente")
+    .in("status", ["termine", "erreur"])
     .order("created_at", { ascending: false })
     .limit(100);
   if (figure) q = q.eq("trick", figure);

@@ -10,7 +10,7 @@ export async function POST(request: NextRequest) {
   const plan = String(form.get("plan")) as PaidPlan;
   const origin = new URL(request.url).origin;
 
-  if (!(plan in PLANS)) {
+  if (!Object.hasOwn(PLANS, plan)) {
     return NextResponse.redirect(`${origin}/tarifs`, { status: 303 });
   }
 
@@ -20,8 +20,14 @@ export async function POST(request: NextRequest) {
   }
   const { user, profile } = session;
 
-  // Déjà abonné : changement de formule via le portail Stripe.
-  if (effectivePlan(profile) !== "free" && profile.stripe_customer_id) {
+  // Déjà abonné (même impayé) : changement de formule via le portail Stripe, jamais un 2e abonnement.
+  const { data: billing } = await createAdminClient()
+    .from("profiles")
+    .select("stripe_subscription_id")
+    .eq("id", user.id)
+    .single();
+  const hasSubscription = Boolean(billing?.stripe_subscription_id) && profile.subscription_status !== "canceled";
+  if ((effectivePlan(profile) !== "free" || hasSubscription) && profile.stripe_customer_id) {
     const portal = await stripe().billingPortal.sessions.create({
       customer: profile.stripe_customer_id,
       return_url: `${origin}/compte`,

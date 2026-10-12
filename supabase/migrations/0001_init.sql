@@ -126,7 +126,7 @@ create table if not exists public.video_analyses (
   cache_key text,                   -- empreinte clip + passage + figure + profondeur
   reused_from uuid references public.video_analyses (id) on delete set null,
   counted boolean not null default true, -- false = réutilisée ou en échec : hors quota
-  status text not null default 'en-attente' check (status in ('en-attente', 'termine', 'erreur')),
+  status text not null default 'en-attente' check (status in ('en-attente', 'en-cours', 'termine', 'erreur')),
   result jsonb,
   error text,
   model text,
@@ -154,6 +154,37 @@ create index if not exists analysis_errors_user on public.analysis_errors (user_
 alter table public.analysis_errors enable row level security;
 create policy "erreurs : lecture propriétaire" on public.analysis_errors
   for select using (auth.uid() = user_id);
+
+-- ═════════════════════════ Consommation (quotas) ═════════════════════════
+-- Registre géré uniquement par le serveur : supprimer une analyse ou effacer le chat
+-- ne rend pas de quota. Une analyse en échec retire sa ligne (côté serveur).
+create table if not exists public.usage_events (
+  id bigint generated always as identity primary key,
+  user_id uuid not null references auth.users (id) on delete cascade,
+  kind text not null check (kind in ('analyse', 'coach')),
+  ref uuid,                         -- id de l'analyse concernée
+  created_at timestamptz not null default now()
+);
+create index if not exists usage_events_user on public.usage_events (user_id, kind, created_at);
+alter table public.usage_events enable row level security; -- aucune policy : service_role seulement
+
+-- Réserve une unité de quota de façon atomique (verrou par utilisateur : pas de course possible).
+create or replace function public.reserve_usage(p_user uuid, p_kind text, p_limit integer, p_since timestamptz, p_ref uuid)
+returns boolean language plpgsql security definer set search_path = public as $$
+declare used integer;
+begin
+  perform pg_advisory_xact_lock(hashtextextended(p_user::text || p_kind, 0));
+  select count(*) into used from public.usage_events
+    where user_id = p_user and kind = p_kind and (p_since is null or created_at >= p_since);
+  if used >= p_limit then
+    return false;
+  end if;
+  insert into public.usage_events (user_id, kind, ref) values (p_user, p_kind, p_ref);
+  return true;
+end;
+$$;
+revoke all on function public.reserve_usage(uuid, text, integer, timestamptz, uuid) from public, anon, authenticated;
+grant execute on function public.reserve_usage(uuid, text, integer, timestamptz, uuid) to service_role;
 
 -- ═════════════════════════ Dépenses IA (lecture admin uniquement) ═════════════════════════
 create table if not exists public.ai_usage (
@@ -212,8 +243,20 @@ insert into storage.buckets (id, name, public, file_size_limit, allowed_mime_typ
 values ('clips', 'clips', false, 209715200, array['video/mp4', 'video/quicktime', 'video/webm'])
 on conflict (id) do nothing;
 
+drop policy if exists "clips : upload dans son dossier" on storage.objects;
+drop policy if exists "clips : lecture de son dossier" on storage.objects;
+drop policy if exists "clips : suppression de son dossier" on storage.objects;
+
+-- Upload autorisé uniquement pour un clip rattaché à une analyse réservée par l'utilisateur.
 create policy "clips : upload dans son dossier" on storage.objects for insert to authenticated
-  with check (bucket_id = 'clips' and (storage.foldername(name))[1] = auth.uid()::text);
+  with check (
+    bucket_id = 'clips'
+    and (storage.foldername(name))[1] = auth.uid()::text
+    and exists (
+      select 1 from public.video_analyses va
+      where va.video_path = name and va.user_id = auth.uid() and va.status in ('en-attente', 'en-cours', 'termine')
+    )
+  );
 create policy "clips : lecture de son dossier" on storage.objects for select to authenticated
   using (bucket_id = 'clips' and (storage.foldername(name))[1] = auth.uid()::text);
 create policy "clips : suppression de son dossier" on storage.objects for delete to authenticated

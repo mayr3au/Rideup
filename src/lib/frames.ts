@@ -13,11 +13,21 @@ export function loadVideo(src: string): Promise<HTMLVideoElement> {
     video.preload = "auto";
     video.muted = true;
     video.playsInline = true;
-    video.crossOrigin = "anonymous";
-    video.src = src;
-    video.onloadeddata = () => resolve(video);
-    video.onerror = () =>
+    video.setAttribute("playsinline", "");
+    const timer = setTimeout(
+      () => reject(new Error("Lecture du clip impossible. Exporte-le en MP4 (H.264) et réessaie.")),
+      15000,
+    );
+    video.onloadedmetadata = () => {
+      clearTimeout(timer);
+      resolve(video);
+    };
+    video.onerror = () => {
+      clearTimeout(timer);
       reject(new Error("Ton navigateur ne sait pas lire ce format. Exporte le clip en MP4 (H.264) et réessaie."));
+    };
+    video.src = src;
+    video.load(); // nécessaire sur iOS Safari pour un élément vidéo hors de la page
   });
 }
 
@@ -35,16 +45,36 @@ export async function clipFingerprint(file: File) {
   return [...new Uint8Array(digest)].map((b) => b.toString(16).padStart(2, "0")).join("");
 }
 
-function seek(video: HTMLVideoElement, time: number) {
+type FrameVideo = HTMLVideoElement & { requestVideoFrameCallback?: (cb: () => void) => number };
+
+/** Se place sur `time` et attend que l'image soit réellement décodée (Safari émet « seeked » trop tôt). */
+function seek(video: FrameVideo, time: number) {
+  const target = Math.min(time, Math.max(0, video.duration - 0.05));
   return new Promise<void>((resolve, reject) => {
+    if (Math.abs(video.currentTime - target) < 0.01 && video.readyState >= 2) {
+      resolve();
+      return;
+    }
     const timer = setTimeout(() => reject(new Error("Lecture du clip trop lente. Réessaie.")), 10000);
-    const done = () => {
+    const finish = () => {
       clearTimeout(timer);
-      video.removeEventListener("seeked", done);
       resolve();
     };
-    video.addEventListener("seeked", done);
-    video.currentTime = Math.min(time, Math.max(0, video.duration - 0.05));
+    const onSeeked = () => {
+      video.removeEventListener("seeked", onSeeked);
+      if (video.requestVideoFrameCallback) {
+        // Image présentée : sûre à dessiner. Filet de sécurité si aucune image n'arrive.
+        const fallback = setTimeout(finish, 300);
+        video.requestVideoFrameCallback(() => {
+          clearTimeout(fallback);
+          finish();
+        });
+      } else {
+        setTimeout(finish, 60);
+      }
+    };
+    video.addEventListener("seeked", onSeeked);
+    video.currentTime = target;
   });
 }
 

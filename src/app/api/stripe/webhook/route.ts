@@ -32,9 +32,12 @@ export async function POST(request: NextRequest) {
     }
     case "customer.subscription.created":
     case "customer.subscription.updated":
-    case "customer.subscription.deleted":
-      await syncSubscription(event.data.object);
+    case "customer.subscription.deleted": {
+      // Les événements Stripe peuvent arriver dans le désordre : on relit l'état actuel.
+      const sub = await stripe().subscriptions.retrieve(event.data.object.id);
+      await syncSubscription(sub);
       break;
+    }
   }
 
   return NextResponse.json({ received: true });
@@ -43,6 +46,12 @@ export async function POST(request: NextRequest) {
 async function syncSubscription(sub: Stripe.Subscription, userIdHint?: string | null) {
   const db = createAdminClient();
   const customerId = typeof sub.customer === "string" ? sub.customer : sub.customer.id;
+
+  // Un abonnement terminé ne doit pas écraser un autre abonnement encore actif du même client.
+  if (sub.status === "canceled" || sub.status === "incomplete_expired") {
+    const { data: current } = await db.from("profiles").select("stripe_subscription_id").eq("stripe_customer_id", customerId).maybeSingle();
+    if (current?.stripe_subscription_id && current.stripe_subscription_id !== sub.id) return;
+  }
   const item = sub.items.data[0];
   const ended = sub.status === "canceled" || sub.status === "incomplete_expired";
 

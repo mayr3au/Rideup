@@ -72,7 +72,7 @@ export type VideoAnalysis = {
   cache_key: string | null;
   reused_from: string | null;
   counted: boolean;
-  status: "en-attente" | "termine" | "erreur";
+  status: "en-attente" | "en-cours" | "termine" | "erreur";
   result: AnalysisResult | null;
   error: string | null;
   created_at: string;

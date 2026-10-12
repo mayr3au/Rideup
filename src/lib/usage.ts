@@ -2,6 +2,7 @@ import "server-only";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { periodStart } from "@/lib/auth";
 import { DEFAULT_SETTINGS, type Plan, type PlanSettings } from "@/lib/plans";
+import { createAdminClient } from "@/lib/supabase/admin";
 import type { Profile, TrickProgress } from "@/lib/types";
 import type { RiderHistory } from "@/lib/ai";
 
@@ -13,24 +14,68 @@ export async function getPlanSettings(db: SupabaseClient): Promise<Record<Plan, 
 }
 
 type Kind = "analyses" | "coachMessages";
+const LEDGER_KIND = { analyses: "analyse", coachMessages: "coach" } as const;
 
-/** Consommation de la période en cours et limite de la formule. */
-export async function getQuota(db: SupabaseClient, profile: Profile, plan: Plan, kind: Kind) {
-  const settings = (await getPlanSettings(db))[plan];
-  const limit = kind === "analyses" ? settings.monthly_analyses : settings.monthly_coach_messages;
+async function limitFor(plan: Plan, kind: Kind) {
+  const settings = (await getPlanSettings(createAdminClient()))[plan];
+  return kind === "analyses" ? settings.monthly_analyses : settings.monthly_coach_messages;
+}
 
-  let q =
-    kind === "analyses"
-      ? db.from("video_analyses").select("id", { count: "exact", head: true }).eq("user_id", profile.id).eq("counted", true).neq("status", "erreur")
-      : db.from("coach_messages").select("id", { count: "exact", head: true }).eq("user_id", profile.id).eq("role", "user");
+/** Essai gratuit : total à vie. Formules payantes : période d'abonnement en cours. */
+function since(profile: Profile, plan: Plan) {
+  return plan === "free" ? null : periodStart(profile);
+}
 
-  // Essai gratuit : total à vie. Formules payantes : période en cours.
-  const since = plan === "free" ? null : periodStart(profile);
-  if (since) q = q.gte("created_at", since.toISOString());
-
+/**
+ * Consommation lue dans le registre usage_events, que l'utilisateur ne peut pas modifier :
+ * supprimer une analyse ou effacer le chat ne rend pas de quota.
+ */
+export async function getQuota(_db: SupabaseClient, profile: Profile, plan: Plan, kind: Kind) {
+  const db = createAdminClient();
+  const limit = await limitFor(plan, kind);
+  const from = since(profile, plan);
+  let q = db
+    .from("usage_events")
+    .select("id", { count: "exact", head: true })
+    .eq("user_id", profile.id)
+    .eq("kind", LEDGER_KIND[kind]);
+  if (from) q = q.gte("created_at", from.toISOString());
   const { count } = await q;
   const used = count ?? 0;
-  return { used, limit, remaining: Math.max(0, limit - used), allowed: used < limit, since };
+  return { used, limit, remaining: Math.max(0, limit - used), allowed: used < limit, since: from };
+}
+
+/** Réserve une unité de quota de façon atomique (fonction SQL avec verrou par utilisateur). */
+export async function reserveQuota(profile: Profile, plan: Plan, kind: Kind, ref?: string) {
+  const db = createAdminClient();
+  const limit = await limitFor(plan, kind);
+  const { data, error } = await db.rpc("reserve_usage", {
+    p_user: profile.id,
+    p_kind: LEDGER_KIND[kind],
+    p_limit: limit,
+    p_since: since(profile, plan)?.toISOString() ?? null,
+    p_ref: ref ?? null,
+  });
+  if (error) throw new Error(`Réservation de quota impossible : ${error.message}`);
+  return { allowed: data === true, limit };
+}
+
+/** Rend le quota d'une analyse qui a échoué ou a été annulée. */
+export async function releaseAnalysis(analysisId: string) {
+  await createAdminClient().from("usage_events").delete().eq("kind", "analyse").eq("ref", analysisId);
+}
+
+/** Analyses bloquées (onglet fermé, réseau coupé) depuis plus de 10 min : échec, quota rendu. */
+export async function sweepStaleAnalyses(userId: string) {
+  const db = createAdminClient();
+  const { data } = await db
+    .from("video_analyses")
+    .update({ status: "erreur", counted: false, error: "Interrompue" })
+    .eq("user_id", userId)
+    .in("status", ["en-attente", "en-cours"])
+    .lt("created_at", new Date(Date.now() - 10 * 60 * 1000).toISOString())
+    .select("id");
+  for (const row of data ?? []) await releaseAnalysis(row.id);
 }
 
 /** Historique utile au coach : progression et erreurs récurrentes des 15 dernières analyses. */

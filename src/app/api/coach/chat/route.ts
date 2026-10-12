@@ -2,7 +2,7 @@ import { NextResponse, type NextRequest } from "next/server";
 import { z } from "zod";
 import { getSession, effectivePlan } from "@/lib/auth";
 import { coachReply } from "@/lib/ai";
-import { getQuota, getRiderHistory } from "@/lib/usage";
+import { getRiderHistory, reserveQuota } from "@/lib/usage";
 import { createAdminClient } from "@/lib/supabase/admin";
 import type { CoachMessage } from "@/lib/types";
 
@@ -19,7 +19,8 @@ export async function POST(request: NextRequest) {
   if (!parsed.success) return NextResponse.json({ error: "Message vide ou trop long (2000 caractères max)." }, { status: 400 });
 
   const plan = effectivePlan(profile);
-  const quota = await getQuota(supabase, profile, plan, "coachMessages");
+  const ref = crypto.randomUUID();
+  const quota = await reserveQuota(profile, plan, "coachMessages", ref);
   if (!quota.allowed) {
     return NextResponse.json(
       {
@@ -51,6 +52,7 @@ export async function POST(request: NextRequest) {
     reply = await coachReply(profile, history, [...messages, { role: "user", content: parsed.data.message }]);
   } catch (e) {
     console.error("coach", e);
+    await createAdminClient().from("usage_events").delete().eq("kind", "coach").eq("ref", ref);
     return NextResponse.json({ error: "Le coach ne répond pas pour le moment. Réessaie dans un instant." }, { status: 502 });
   }
 

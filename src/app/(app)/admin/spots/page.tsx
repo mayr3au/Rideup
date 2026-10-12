@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { requireAdmin } from "@/lib/auth";
 import type { Spot } from "@/lib/types";
 import { AdminForm } from "@/components/admin-form";
 import { saveSpot, toggleSpot } from "../actions";
@@ -8,6 +9,7 @@ export const metadata: Metadata = { title: "Admin · Spots" };
 
 export default async function AdminSpots({ searchParams }: { searchParams: Promise<{ edit?: string }> }) {
   const { edit } = await searchParams;
+  await requireAdmin();
   const db = createAdminClient();
   const { data: spots } = await db.from("spots").select("*").order("country").order("name").returns<Spot[]>();
   const current = spots?.find((s) => s.id === edit);

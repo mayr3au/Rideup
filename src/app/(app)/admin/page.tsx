@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { requireAdmin } from "@/lib/auth";
 
 export const metadata: Metadata = { title: "Admin" };
 
@@ -7,6 +8,7 @@ const usd = (n: number) => `${n.toFixed(2).replace(".", ",")} $`;
 const eur = (n: number) => `${n.toFixed(2).replace(".", ",")} €`;
 
 export default async function AdminOverview() {
+  await requireAdmin();
   const db = createAdminClient();
   const since30 = new Date(Date.now() - 30 * 24 * 3600 * 1000);
   const since7 = new Date(Date.now() - 7 * 24 * 3600 * 1000).toISOString();

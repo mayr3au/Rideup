@@ -16,10 +16,12 @@ export function AnalyseUploader({
   defaultTrick,
   remaining,
   deep,
+  sheetCount,
 }: {
   defaultTrick?: string;
   remaining: number;
   deep: boolean;
+  sheetCount: number;
 }) {
   const router = useRouter();
   const [file, setFile] = useState<File | null>(null);
@@ -60,6 +62,16 @@ export function AnalyseUploader({
       const clipHash = await clipFingerprint(file);
       const ext = file.type === "video/quicktime" ? "mov" : file.type === "video/webm" ? "webm" : "mp4";
 
+      // Les images sont extraites AVANT de réserver l'analyse : si le clip est illisible,
+      // rien n'est décompté.
+      setStep("images");
+      setProgress(0);
+      const video = await loadVideo(src);
+      const { sheets, times } = await buildContactSheets(video, seg.start, seg.end, sheetCount, (d, t) =>
+        setProgress(Math.round((d / t) * 100)),
+      );
+
+      setStep("analyse");
       const res = await fetch("/api/analyses", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -85,17 +97,15 @@ export function AnalyseUploader({
         return;
       }
       analysisId = created.id;
+      if (created.sheets !== sheetCount) {
+        throw new Error("Ta formule vient de changer : recharge la page puis relance l'analyse.");
+      }
 
-      setStep("images");
-      setProgress(0);
-      const video = await loadVideo(src);
-      const { sheets, times } = await buildContactSheets(video, seg.start, seg.end, created.sheets, (d, t) =>
-        setProgress(Math.round((d / t) * 100)),
-      );
-
-      setStep("analyse");
       const upload = created.needsUpload
-        ? createClient().storage.from("clips").upload(created.videoPath, file, { contentType: file.type, upsert: false })
+        ? createClient()
+            .storage.from("clips")
+            .upload(created.videoPath, file, { contentType: file.type, upsert: false })
+            .catch((e: unknown) => ({ error: e }))
         : Promise.resolve({ error: null });
 
       const run = fetch(`/api/analyses/${created.id}/run`, {
@@ -106,13 +116,11 @@ export function AnalyseUploader({
 
       const [up, runRes] = await Promise.all([upload, run]);
       const done = await runRes.json();
-      if (!runRes.ok) {
-        analysisId = null; // le serveur a déjà marqué l'échec
-        throw new Error(done.error);
-      }
+      analysisId = null; // le serveur a pris en charge l'analyse (réussie ou marquée en échec)
       if (up.error) {
         await fetch(`/api/analyses/${created.id}`, { method: "POST", body: JSON.stringify({ action: "video-missing" }) });
       }
+      if (!runRes.ok) throw new Error(done.error);
 
       router.push(`/analyse/${created.id}`);
       router.refresh();

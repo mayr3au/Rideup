@@ -14,7 +14,8 @@ export const maxDuration = 300;
  * et envoie un e-mail récapitulatif des créneaux ridables encore jamais signalés.
  */
 export async function GET(request: NextRequest) {
-  if (request.headers.get("authorization") !== `Bearer ${process.env.CRON_SECRET}`) {
+  const secret = process.env.CRON_SECRET;
+  if (!secret || request.headers.get("authorization") !== `Bearer ${secret}`) {
     return new NextResponse("Non autorisé", { status: 401 });
   }
 

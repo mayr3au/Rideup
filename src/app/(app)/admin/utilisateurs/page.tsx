@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { requireAdmin } from "@/lib/auth";
 import { setPlanOverride } from "../actions";
 
 export const metadata: Metadata = { title: "Admin · Utilisateurs" };
@@ -17,20 +18,30 @@ type Row = {
 
 export default async function AdminUsers({ searchParams }: { searchParams: Promise<{ q?: string }> }) {
   const { q } = await searchParams;
+  await requireAdmin();
   const db = createAdminClient();
   const monthStart = new Date();
   monthStart.setUTCDate(1);
   monthStart.setUTCHours(0, 0, 0, 0);
 
-  let query = db
-    .from("profiles")
-    .select("id, email, full_name, plan, plan_override, subscription_status, created_at, is_admin")
-    .order("created_at", { ascending: false })
-    .limit(100);
-  if (q) query = query.or(`email.ilike.%${q.replace(/[%,()]/g, "")}%,full_name.ilike.%${q.replace(/[%,()]/g, "")}%`);
-  const { data: users } = await query.returns<Row[]>();
+  const cols = "id, email, full_name, plan, plan_override, subscription_status, created_at, is_admin";
+  const term = (q ?? "").replace(/[%_\\]/g, "").trim().slice(0, 80);
+  let users: Row[] = [];
+  if (term) {
+    // Deux requêtes paramétrées plutôt qu'un filtre .or() construit à la main
+    const [byEmail, byName] = await Promise.all([
+      db.from("profiles").select(cols).ilike("email", `%${term}%`).limit(100).returns<Row[]>(),
+      db.from("profiles").select(cols).ilike("full_name", `%${term}%`).limit(100).returns<Row[]>(),
+    ]);
+    const seen = new Map<string, Row>();
+    for (const u of [...(byEmail.data ?? []), ...(byName.data ?? [])]) seen.set(u.id, u);
+    users = [...seen.values()].sort((a, b) => b.created_at.localeCompare(a.created_at));
+  } else {
+    const { data } = await db.from("profiles").select(cols).order("created_at", { ascending: false }).limit(100).returns<Row[]>();
+    users = data ?? [];
+  }
 
-  const ids = (users ?? []).map((u) => u.id);
+  const ids = users.map((u) => u.id);
   const [{ data: usage }, { data: analyses }] = ids.length
     ? await Promise.all([
         db.from("ai_usage").select("user_id, cost_usd").in("user_id", ids).gte("created_at", monthStart.toISOString()),
@@ -64,7 +75,7 @@ export default async function AdminUsers({ searchParams }: { searchParams: Promi
             </tr>
           </thead>
           <tbody className="divide-y divide-line">
-            {(users ?? []).map((u) => (
+            {users.map((u) => (
               <tr key={u.id}>
                 <td className="py-3 pr-3">
                   <p className="font-semibold">{u.full_name || "—"}{u.is_admin && <span className="ml-2 text-sm text-lagoon">admin</span>}</p>

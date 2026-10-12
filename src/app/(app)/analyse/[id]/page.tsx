@@ -74,6 +74,13 @@ export default async function AnalysisDetail({
         </p>
       )}
 
+      {(a.status === "en-attente" || a.status === "en-cours") && (
+        <p role="status" className="mt-6 rounded-xl border border-line bg-spray p-4">
+          Analyse en cours. Recharge la page dans un instant. Si elle reste bloquée plus de 10 minutes, elle sera
+          annulée et ne sera pas décomptée.
+        </p>
+      )}
+
       <div className="mt-6 grid gap-8 md:grid-cols-[1fr_1.25fr]">
         <div className="md:sticky md:top-6 md:self-start">
           {signed?.signedUrl ? (

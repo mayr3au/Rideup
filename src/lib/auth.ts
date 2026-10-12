@@ -1,5 +1,5 @@
 import "server-only";
-import { redirect } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { isActive, type Plan } from "@/lib/plans";
 import type { Profile } from "@/lib/types";
@@ -38,4 +38,11 @@ export function periodStart(profile: Profile) {
   monthStart.setUTCHours(0, 0, 0, 0);
   if (start && !profile.plan_override && Date.now() - start.getTime() < 32 * 24 * 3600 * 1000) return start;
   return monthStart;
+}
+
+/** À appeler en tête de chaque page et action d'administration (ne pas se fier au seul layout). */
+export async function requireAdmin() {
+  const session = await requireSession();
+  if (!session.profile.is_admin) notFound();
+  return session;
 }

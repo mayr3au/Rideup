@@ -2,7 +2,7 @@ import { NextResponse, type NextRequest } from "next/server";
 import { createHash } from "node:crypto";
 import { z } from "zod";
 import { getSession, effectivePlan } from "@/lib/auth";
-import { getQuota } from "@/lib/usage";
+import { releaseAnalysis, reserveQuota, sweepStaleAnalyses } from "@/lib/usage";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { ANALYSIS_DEPTH, MAX_SEGMENT_SECONDS } from "@/lib/plans";
 import { TRICKS } from "@/lib/tricks";
@@ -24,7 +24,7 @@ const body = z
  * Étape 1 de l'analyse.
  * - Si le même passage du même clip a déjà été analysé (même figure, même profondeur) : on renvoie
  *   l'analyse existante, sans appel IA et sans décompter le quota.
- * - Sinon : vérification du quota, réservation de l'analyse, et chemin d'upload du clip
+ * - Sinon : réservation atomique du quota, création de l'analyse, et chemin d'upload du clip
  *   (réutilisé si ce clip a déjà été envoyé).
  */
 export async function POST(request: NextRequest) {
@@ -38,6 +38,7 @@ export async function POST(request: NextRequest) {
   }
   const b = parsed.data;
   const plan = effectivePlan(profile);
+  await sweepStaleAnalyses(user.id);
   const depth = ANALYSIS_DEPTH[plan];
 
   const cacheKey = createHash("sha256")
@@ -55,15 +56,16 @@ export async function POST(request: NextRequest) {
     .maybeSingle();
   if (cached) return NextResponse.json({ reusedId: cached.id });
 
-  // 2. Quota
-  const quota = await getQuota(supabase, profile, plan, "analyses");
+  // 2. Quota, réservé de façon atomique (pas de course possible entre deux requêtes)
+  const id = crypto.randomUUID();
+  const quota = await reserveQuota(profile, plan, "analyses", id);
   if (!quota.allowed) {
     return NextResponse.json(
       {
         error:
           plan === "free"
             ? "Ton analyse d'essai est utilisée. Choisis une formule pour continuer."
-            : `Tu as utilisé tes ${quota.limit} analyses de la période. ${plan === "progress" ? "Passe à Elite pour en avoir 60, ou attends" : "Attends"} le renouvellement de ton abonnement.`,
+            : `Tu as utilisé tes ${quota.limit} analyses de la période. ${plan === "progress" ? "Passe à Elite pour en avoir davantage, ou attends" : "Attends"} le renouvellement de ton abonnement.`,
         upgrade: plan !== "elite",
       },
       { status: 429 },
@@ -75,11 +77,11 @@ export async function POST(request: NextRequest) {
     .from("video_analyses")
     .select("video_path")
     .eq("clip_hash", b.clipHash)
+    .eq("status", "termine")
     .not("video_path", "is", null)
     .limit(1)
     .maybeSingle();
 
-  const id = crypto.randomUUID();
   const videoPath = sameClip?.video_path ?? `${user.id}/${b.clipHash.slice(0, 16)}-${id.slice(0, 8)}.${b.extension}`;
 
   const { error } = await createAdminClient().from("video_analyses").insert({
@@ -95,13 +97,15 @@ export async function POST(request: NextRequest) {
     cache_key: cacheKey,
     status: "en-attente",
   });
-  if (error) return NextResponse.json({ error: "Création de l'analyse impossible." }, { status: 500 });
+  if (error) {
+    await releaseAnalysis(id);
+    return NextResponse.json({ error: "Création de l'analyse impossible." }, { status: 500 });
+  }
 
   return NextResponse.json({
     id,
     videoPath,
     needsUpload: !sameClip,
     sheets: depth.sheets,
-    remaining: quota.remaining - 1,
   });
 }

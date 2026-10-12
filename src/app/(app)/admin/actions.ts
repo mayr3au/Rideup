@@ -1,14 +1,12 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { notFound } from "next/navigation";
 import { z } from "zod";
-import { requireSession } from "@/lib/auth";
+import { requireAdmin as checkAdmin } from "@/lib/auth";
 import { createAdminClient } from "@/lib/supabase/admin";
 
 async function requireAdmin() {
-  const { profile } = await requireSession();
-  if (!profile.is_admin) notFound();
+  await checkAdmin();
   return createAdminClient();
 }
 

@@ -1,8 +1,8 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { z } from "zod";
-import { getSession, effectivePlan } from "@/lib/auth";
+import { getSession } from "@/lib/auth";
 import { analyseClip, MODEL, type PreviousAttempt } from "@/lib/ai";
-import { getRiderHistory } from "@/lib/usage";
+import { getRiderHistory, releaseAnalysis } from "@/lib/usage";
 import { ANALYSIS_DEPTH, FRAMES_PER_SHEET } from "@/lib/plans";
 import { createAdminClient } from "@/lib/supabase/admin";
 import type { AnalysisResult, VideoAnalysis } from "@/lib/types";
@@ -22,20 +22,29 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
   const session = await getSession();
   if (!session?.profile) return NextResponse.json({ error: "Non connecté." }, { status: 401 });
   const { supabase, user, profile } = session;
-
-  const { data: analysis } = await supabase.from("video_analyses").select("*").eq("id", id).single<VideoAnalysis>();
-  if (!analysis) return NextResponse.json({ error: "Analyse introuvable." }, { status: 404 });
-  if (analysis.status !== "en-attente") return NextResponse.json({ error: "Analyse déjà traitée." }, { status: 409 });
-
   const db = createAdminClient();
+
+  // Prise en charge atomique : une seule exécution possible, et l'annulation n'est plus acceptée ensuite.
+  const { data: claimed } = await db
+    .from("video_analyses")
+    .update({ status: "en-cours" })
+    .eq("id", id)
+    .eq("user_id", user.id)
+    .eq("status", "en-attente")
+    .select("*")
+    .returns<VideoAnalysis[]>();
+  const analysis = claimed?.[0];
+  if (!analysis) return NextResponse.json({ error: "Analyse introuvable ou déjà traitée." }, { status: 409 });
+
   const fail = async (status: number, message: string, log?: unknown) => {
     if (log) console.error("analyse", log);
     await db.from("video_analyses").update({ status: "erreur", counted: false, error: message }).eq("id", id);
+    await releaseAnalysis(id);
     return NextResponse.json({ error: message }, { status });
   };
 
-  const plan = effectivePlan(profile);
-  const depth = ANALYSIS_DEPTH[plan];
+  // Profondeur figée à la réservation (un changement de formule entre-temps ne casse rien)
+  const depth = analysis.depth === "approfondie" ? ANALYSIS_DEPTH.elite : ANALYSIS_DEPTH.progress;
   const parsed = body.safeParse(await request.json().catch(() => null));
   if (!parsed.success || parsed.data.sheets.length !== depth.sheets || parsed.data.frameTimes.length !== depth.sheets * FRAMES_PER_SHEET) {
     return fail(400, "Les images du clip n'ont pas pu être lues. Réessaie : cette tentative n'est pas décomptée.");
@@ -86,8 +95,9 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
   const trickId = analysis.trick ?? result.figure_id;
   await db
     .from("video_analyses")
-    .update({ status: "termine", result, model: MODEL, cost_usd: cost, trick: trickId })
-    .eq("id", id);
+    .update({ status: "termine", counted: true, result, model: MODEL, cost_usd: cost, trick: trickId })
+    .eq("id", id)
+    .eq("status", "en-cours");
 
   if (result.erreurs.length) {
     await db.from("analysis_errors").insert(

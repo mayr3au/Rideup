@@ -47,7 +47,10 @@ export function ClipTrimmer({
 
   function onLoaded() {
     const d = videoRef.current?.duration ?? 0;
-    if (!Number.isFinite(d) || d <= 0) return;
+    if (!Number.isFinite(d) || d < MIN_SEGMENT) {
+      onChange(0, 0, d || 0); // clip trop court : le bouton d'analyse reste désactivé
+      return;
+    }
     setDuration(d);
     onChange(0, Math.round(Math.min(d, MAX_SEGMENT_SECONDS) * 10) / 10, d);
   }
@@ -200,7 +203,7 @@ export function ClipTrimmer({
               disabled={disabled}
               onClick={() => {
                 const t = videoRef.current?.currentTime ?? 0;
-                set(Math.min(start, t - MIN_SEGMENT), t);
+                set(Math.max(Math.min(start, t - MIN_SEGMENT), t - MAX_SEGMENT_SECONDS), t);
               }}
               className="btn btn-ghost !px-3 !py-3 text-[0.95rem]"
             >

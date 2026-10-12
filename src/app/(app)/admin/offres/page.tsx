@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { requireAdmin } from "@/lib/auth";
 import { getPlanSettings } from "@/lib/usage";
 import { PLANS } from "@/lib/plans";
 import { AdminForm } from "@/components/admin-form";
@@ -12,6 +13,7 @@ const PRICE = { free: 0, progress: 14.99, elite: 29.99 } as const;
 const EUR_PER_USD = 0.92;
 
 export default async function AdminOffers() {
+  await requireAdmin();
   const db = createAdminClient();
   const settings = await getPlanSettings(db);
 
