@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
-// Polices auto-hébergées (pas d'appel à Google Fonts)
-import "@fontsource-variable/bricolage-grotesque";
-import "@fontsource-variable/instrument-sans";
+// Police auto-hébergée (pas d'appel à Google Fonts)
+import "@fontsource-variable/plus-jakarta-sans";
 import "./globals.css";
 
 export const metadata: Metadata = {

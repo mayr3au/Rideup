@@ -20,7 +20,7 @@ export default async function CoursePage({ params }: { params: Promise<{ slug: s
     <article className="mx-auto max-w-2xl px-4 py-14 sm:px-6">
       <Link href="/cours" className="text-lagoon hover:underline">Tous les cours</Link>
       <p className="mt-6 text-slate">{c.level} · {c.minutes} min de lecture</p>
-      <h1 className="text-5xl font-extrabold">{c.title}</h1>
+      <h1 className="text-3xl font-extrabold sm:text-4xl">{c.title}</h1>
       <p className="mt-4 text-lg">{c.intro}</p>
 
       <section className="mt-10">
@@ -66,14 +66,14 @@ export default async function CoursePage({ params }: { params: Promise<{ slug: s
         </ul>
       </section>
 
-      <p className="mt-10 rounded-xl border-2 border-danger/50 bg-danger/5 p-4">
+      <p className="mt-10 rounded-md border-2 border-danger/50 bg-danger/5 p-4">
         <span className="font-bold text-danger">Sécurité : </span>
         {c.securite}
       </p>
 
-      <div className="mt-10 rounded-2xl bg-deep p-6 text-salt">
+      <div className="mt-10 rounded-lg bg-brand p-6 text-white">
         <h2 className="text-2xl font-bold">Tu as essayé ?</h2>
-        <p className="mt-2 text-salt/75">Filme ta tentative et fais-la analyser pour savoir exactement quoi corriger.</p>
+        <p className="mt-2 text-white/75">Filme ta tentative et fais-la analyser pour savoir exactement quoi corriger.</p>
         <Link href={`/analyse?figure=${c.trickId}`} className="btn btn-kite mt-5">Analyser ma tentative</Link>
       </div>
     </article>

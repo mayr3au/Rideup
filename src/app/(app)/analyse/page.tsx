@@ -18,7 +18,7 @@ export default async function AnalysePage({ searchParams }: { searchParams: Prom
 
   return (
     <div className="mx-auto max-w-2xl">
-      <h1 className="text-4xl font-bold sm:text-5xl">Analyser une figure</h1>
+      <h1 className="text-3xl font-bold sm:text-4xl">Analyser une figure</h1>
       <p className="mt-2 text-slate">
         Importe ta vidéo, sélectionne le passage et reçois les corrections technique par technique.
         {deep && " Ton analyse Elite est approfondie et comparée à tes tentatives précédentes."}

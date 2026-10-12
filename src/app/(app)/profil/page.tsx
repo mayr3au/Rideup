@@ -10,7 +10,7 @@ export default async function ProfilePage() {
 
   return (
     <div className="mx-auto max-w-2xl">
-      <h1 className="text-4xl font-bold sm:text-5xl">{first ? "Crée ton profil rider" : "Ton profil"}</h1>
+      <h1 className="text-3xl font-bold sm:text-4xl">{first ? "Crée ton profil rider" : "Ton profil"}</h1>
       <p className="mt-3 text-slate">
         {first
           ? "Deux minutes. Ton niveau, ton poids et ton matériel servent à adapter les analyses, la roadmap et le choix des spots."

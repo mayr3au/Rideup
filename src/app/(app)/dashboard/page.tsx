@@ -22,12 +22,12 @@ export default async function Dashboard({ searchParams }: { searchParams: Promis
   return (
     <div className="space-y-8">
       {abonnement === "ok" && (
-        <p role="status" className="rounded-xl border border-lagoon/40 bg-lagoon/10 p-4">
+        <p role="status" className="rounded-md border border-lagoon/40 bg-lagoon/10 p-4">
           Ton abonnement est actif. S&apos;il n&apos;apparaît pas encore, recharge la page dans quelques secondes.
         </p>
       )}
 
-      <h1 className="text-4xl font-bold sm:text-5xl">{firstName ? `Salut ${firstName}` : "Salut"}</h1>
+      <h1 className="text-3xl font-bold sm:text-4xl">{firstName ? `Salut ${firstName}` : "Salut"}</h1>
 
       {!profile.onboarded && (
         <section className="panel border-2 !border-kite p-5">
@@ -37,21 +37,21 @@ export default async function Dashboard({ searchParams }: { searchParams: Promis
         </section>
       )}
 
-      <section className="rounded-2xl bg-deep p-5 text-salt sm:p-6">
+      <section className="rounded-lg bg-brand p-5 text-white sm:p-6">
         <div className="flex flex-wrap items-end justify-between gap-4">
           <div>
-            <p className="text-salt/70">{plan === "free" ? "Essai gratuit" : `${PLANS[plan].name} · cette période`}</p>
+            <p className="text-white/70">{plan === "free" ? "Essai gratuit" : `${PLANS[plan].name} · cette période`}</p>
             <p className="mt-1 font-display text-4xl font-extrabold">
               {quota.remaining}
-              <span className="text-xl font-semibold text-salt/70"> analyse{quota.remaining > 1 ? "s" : ""} restante{quota.remaining > 1 ? "s" : ""}</span>
+              <span className="text-xl font-semibold text-white/70"> analyse{quota.remaining > 1 ? "s" : ""} restante{quota.remaining > 1 ? "s" : ""}</span>
             </p>
           </div>
           <Link href="/analyse" className="btn btn-kite">Analyser une figure</Link>
         </div>
-        <div className="mt-4 h-2 overflow-hidden rounded-full bg-salt/15" role="progressbar" aria-valuenow={quota.used} aria-valuemin={0} aria-valuemax={quota.limit} aria-label="Analyses utilisées">
-          <div className="h-full rounded-full bg-kite" style={{ width: `${pct}%` }} />
+        <div className="mt-4 h-2 overflow-hidden rounded-sm bg-ink/15" role="progressbar" aria-valuenow={quota.used} aria-valuemin={0} aria-valuemax={quota.limit} aria-label="Analyses utilisées">
+          <div className="h-full rounded-sm bg-kite" style={{ width: `${pct}%` }} />
         </div>
-        <p className="mt-2 text-sm text-salt/70">
+        <p className="mt-2 text-sm text-white/70">
           {quota.used} sur {quota.limit} utilisée{quota.used > 1 ? "s" : ""}
           {plan === "free" && (
             <>

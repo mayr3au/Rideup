@@ -19,7 +19,7 @@ export default async function AccountPage() {
   if (profile.plan_override) {
     return (
       <div className="max-w-3xl">
-        <h1 className="text-4xl font-bold sm:text-5xl">Abonnement</h1>
+        <h1 className="text-3xl font-bold sm:text-4xl">Abonnement</h1>
         <p className="mt-4 text-lg">Ton accès {PLANS[profile.plan_override].name} t&apos;est offert par RIDE&apos;UP.</p>
       </div>
     );
@@ -29,7 +29,7 @@ export default async function AccountPage() {
   return (
     <div className="max-w-3xl space-y-14">
       <section>
-        <h1 className="text-4xl font-bold sm:text-5xl">Abonnement</h1>
+        <h1 className="text-3xl font-bold sm:text-4xl">Abonnement</h1>
         <p className="mt-2 text-slate">{user.email}</p>
 
         <div className="panel mt-8 p-6">

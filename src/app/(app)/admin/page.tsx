@@ -76,7 +76,7 @@ export default async function AdminOverview() {
           {[...byDay.entries()].map(([d, v]) => (
             <div key={d} className="group relative flex-1">
               <div className="w-full rounded-t bg-lagoon" style={{ height: `${Math.max(2, (v / maxDay) * 150)}px` }} />
-              <span className="pointer-events-none absolute bottom-full left-1/2 mb-1 hidden -translate-x-1/2 whitespace-nowrap rounded bg-deep px-2 py-1 text-xs text-salt group-hover:block">
+              <span className="pointer-events-none absolute bottom-full left-1/2 mb-1 hidden -translate-x-1/2 whitespace-nowrap rounded bg-brand px-2 py-1 text-xs text-white group-hover:block">
                 {d.slice(5)} : {usd(v)}
               </span>
             </div>

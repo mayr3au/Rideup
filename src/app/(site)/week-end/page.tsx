@@ -54,20 +54,20 @@ export default async function WeekendPage({ searchParams }: { searchParams: Prom
 
   return (
     <div className="mx-auto max-w-4xl px-4 py-14 sm:px-6">
-      <h1 className="text-5xl font-extrabold">Les spots les plus ventés ce week-end</h1>
+      <h1 className="text-3xl font-extrabold sm:text-4xl">Les spots les plus ventés ce week-end</h1>
       <p className="mt-3 text-lg text-slate">
         Vent moyen prévu entre 10 h et 18 h, {fmtDate(sat)} et {fmtDate(sun)}. Classement par puissance du vent.
       </p>
 
       <nav className="-mx-4 mt-8 flex gap-2 overflow-x-auto px-4 pb-1" aria-label="Pays">
-        <Link href="/week-end" className={`whitespace-nowrap rounded-full px-4 py-2 text-[0.95rem] ${!pays ? "bg-deep text-salt" : "border border-line"}`}>
+        <Link href="/week-end" className={`whitespace-nowrap rounded-sm px-4 py-2 text-[0.95rem] ${!pays ? "bg-brand text-white" : "border border-line"}`}>
           Monde
         </Link>
         {countries.map((c) => (
           <Link
             key={c}
             href={`/week-end?pays=${encodeURIComponent(c)}`}
-            className={`whitespace-nowrap rounded-full px-4 py-2 text-[0.95rem] ${pays === c ? "bg-deep text-salt" : "border border-line"}`}
+            className={`whitespace-nowrap rounded-sm px-4 py-2 text-[0.95rem] ${pays === c ? "bg-brand text-white" : "border border-line"}`}
           >
             {c}
           </Link>
@@ -75,7 +75,7 @@ export default async function WeekendPage({ searchParams }: { searchParams: Prom
       </nav>
 
       {failed ? (
-        <p role="alert" className="mt-8 rounded-xl border border-danger/40 bg-danger/5 p-4">
+        <p role="alert" className="mt-8 rounded-md border border-danger/40 bg-danger/5 p-4">
           Les prévisions sont indisponibles pour le moment. Réessaie dans quelques minutes.
         </p>
       ) : (
@@ -109,9 +109,9 @@ export default async function WeekendPage({ searchParams }: { searchParams: Prom
         </ol>
       )}
 
-      <div className="mt-10 rounded-2xl bg-deep p-6 text-salt">
+      <div className="mt-10 rounded-lg bg-brand p-6 text-white">
         <h2 className="text-2xl font-bold">Le bon spot pour toi, pas seulement le plus venté</h2>
-        <p className="mt-2 text-salt/75">
+        <p className="mt-2 text-white/75">
           Le Spot Finder tient compte de ton niveau, de ton poids, de tes kites et de ton rayon, et te donne les créneaux
           ridables et la taille de kite à sortir.
         </p>

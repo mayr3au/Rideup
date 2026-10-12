@@ -1,57 +1,80 @@
 @import "tailwindcss";
 
 /*
-  RIDE'UP — identité
-  Sel (fond), Écume (surfaces), Fond marin (texte), Ardoise (secondaire),
-  Lagon (actions), Kite (signal : ligne du hero, Premium, alertes vent).
+  RIDE'UP — style « app de glisse » : clair, aéré, cartes photo très arrondies,
+  verre dépoli sur les photos, bleu océan du logo.
+  Les anciens noms de jetons sont conservés :
+    salt  = fond de page          spray = cartes blanches
+    deep  = texte (bleu nuit)     slate = texte secondaire
+    brand / kite = bleu océan     lagoon = liens et accents texte
+    ink   = texte posé sur le bleu (blanc)
 */
 :root {
-  --salt: #eef3f1;
+  color-scheme: light;
+  --salt: #f3f7fa;
   --spray: #ffffff;
-  --deep: #0b3442;
-  --slate: #557381;
-  --lagoon: #12877e;
-  --lagoon-dark: #0c6c65;
-  --kite: #f5b700;
-  --line: rgba(11, 52, 66, 0.14);
-  --danger: #b4321f;
-  --font-bricolage: "Bricolage Grotesque Variable";
-  --font-instrument: "Instrument Sans Variable";
+  --raised: #eaf1f6;
+  --deep: #0e2a47;
+  --slate: #6b7f95;
+  --brand: #1688c8;
+  --brand-light: #e3f2fa;
+  --lagoon: #0f78b5;
+  --lagoon-dark: #0b5f90;
+  --kite: #1688c8;
+  --ink: #ffffff;
+  --line: rgba(14, 42, 71, 0.09);
+  --danger: #d6453d;
+  --font-main: "Plus Jakarta Sans Variable";
+  --shadow-soft: 0 18px 40px -22px rgba(14, 42, 71, 0.28);
+  --shadow-card: 0 30px 60px -30px rgba(14, 42, 71, 0.45);
 }
 
 @theme inline {
   --color-salt: var(--salt);
   --color-spray: var(--spray);
+  --color-raised: var(--raised);
   --color-deep: var(--deep);
   --color-slate: var(--slate);
+  --color-brand: var(--brand);
+  --color-brand-light: var(--brand-light);
   --color-lagoon: var(--lagoon);
   --color-lagoon-dark: var(--lagoon-dark);
   --color-kite: var(--kite);
+  --color-ink: var(--ink);
   --color-line: var(--line);
   --color-danger: var(--danger);
-  --font-display: var(--font-bricolage);
-  --font-sans: var(--font-instrument);
+  --font-display: var(--font-main), system-ui, sans-serif;
+  --font-sans: var(--font-main), system-ui, sans-serif;
+  /* Rayons généreux, façon app mobile */
+  --radius-sm: 9999px;
+  --radius-md: 16px;
+  --radius-lg: 26px;
 }
 
 html {
   background: var(--salt);
   color: var(--deep);
   -webkit-font-smoothing: antialiased;
+  -webkit-tap-highlight-color: transparent;
 }
 
 body {
-  font-family: var(--font-instrument), system-ui, sans-serif;
-  font-size: 1.0625rem;
-  line-height: 1.55;
+  font-family: var(--font-main), system-ui, sans-serif;
+  font-size: 1rem;
+  line-height: 1.6;
 }
 
 h1,
 h2,
 h3 {
-  font-family: var(--font-bricolage), system-ui, sans-serif;
-  letter-spacing: -0.02em;
-  line-height: 1.05;
+  font-weight: 750;
+  letter-spacing: -0.025em;
+  line-height: 1.1;
   text-wrap: balance;
+}
+.font-display {
+  font-weight: 800;
+  letter-spacing: -0.02em;
 }
 
 p {
@@ -59,121 +82,181 @@ p {
 }
 
 :focus-visible {
-  outline: 3px solid var(--kite);
+  outline: 3px solid var(--brand);
   outline-offset: 2px;
-  border-radius: 6px;
 }
 
-/* Boutons */
+::selection {
+  background: var(--brand-light);
+}
+
+/* Boutons : arrondis, cible tactile ≥ 48 px */
 .btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
-  border-radius: 999px;
-  padding: 0.75rem 1.4rem;
-  font-weight: 600;
+  min-height: 50px;
+  border-radius: 16px;
+  padding: 0.75rem 1.5rem;
+  font-weight: 700;
   font-size: 1rem;
   line-height: 1;
-  transition: background-color 0.15s, color 0.15s, border-color 0.15s;
+  transition: background-color 0.15s, color 0.15s, border-color 0.15s, transform 0.1s;
   cursor: pointer;
   white-space: nowrap;
 }
+.btn:active:not(:disabled) {
+  transform: scale(0.98);
+}
 .btn:disabled {
-  opacity: 0.55;
+  opacity: 0.5;
   cursor: not-allowed;
 }
 .btn-primary {
-  background: var(--lagoon);
+  background: var(--brand);
   color: #fff;
+  box-shadow: 0 12px 24px -12px rgba(22, 136, 200, 0.7);
 }
 .btn-primary:hover:not(:disabled) {
-  background: var(--lagoon-dark);
+  background: #1279b3;
 }
 .btn-ghost {
-  border: 1.5px solid var(--line);
+  background: var(--spray);
   color: var(--deep);
-  background: transparent;
+  border: 1px solid var(--line);
 }
 .btn-ghost:hover:not(:disabled) {
-  border-color: var(--deep);
+  border-color: rgba(14, 42, 71, 0.25);
 }
+/* Bouton blanc : sur les blocs bleus et sur les photos */
 .btn-kite {
-  background: var(--kite);
+  background: #fff;
   color: var(--deep);
 }
 .btn-kite:hover:not(:disabled) {
-  background: #e0a700;
+  background: var(--brand-light);
+}
+.btn-glass {
+  background: rgba(255, 255, 255, 0.18);
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  -webkit-backdrop-filter: blur(14px);
+  backdrop-filter: blur(14px);
 }
 
-/* Champs */
+/* Champs (16 px : évite le zoom automatique sur iPhone) */
 .field {
   display: block;
   width: 100%;
-  border-radius: 12px;
-  border: 1.5px solid var(--line);
+  min-height: 50px;
+  border-radius: 14px;
+  border: 1px solid var(--line);
   background: var(--spray);
-  padding: 0.7rem 0.9rem;
+  padding: 0.75rem 1rem;
   font: inherit;
+  font-size: 16px;
   color: var(--deep);
+}
+.field::placeholder {
+  color: #9aa9b8;
 }
 .field:focus {
   outline: none;
-  border-color: var(--lagoon);
+  border-color: var(--brand);
+  box-shadow: 0 0 0 4px var(--brand-light);
 }
 .label {
   display: block;
-  font-weight: 600;
-  font-size: 0.95rem;
-  margin-bottom: 0.35rem;
+  font-weight: 650;
+  font-size: 0.92rem;
+  margin-bottom: 0.4rem;
 }
 
-/* Surfaces : un seul niveau de carte, bord net, pas d'ombre */
+/* Pastille */
+.tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  border-radius: 9999px;
+  background: var(--brand-light);
+  color: var(--lagoon);
+  padding: 0.3rem 0.8rem;
+  font-weight: 700;
+  font-size: 0.8rem;
+}
+.tag-solid {
+  background: var(--brand);
+  color: #fff;
+}
+.tag-glass {
+  background: rgba(255, 255, 255, 0.2);
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+}
+
+/* Cartes blanches flottantes */
 .panel {
   background: var(--spray);
-  border: 1px solid var(--line);
-  border-radius: 20px;
+  border-radius: 22px;
+  box-shadow: var(--shadow-soft);
 }
 
-/* Ligne de kite du hero : le seul mouvement automatique du site */
-@keyframes draw-line {
-  from {
-    stroke-dashoffset: var(--len);
-  }
-  to {
-    stroke-dashoffset: 0;
-  }
+/* Verre dépoli posé sur une photo */
+.glass {
+  background: rgba(255, 255, 255, 0.16);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  -webkit-backdrop-filter: blur(16px) saturate(140%);
+  backdrop-filter: blur(16px) saturate(140%);
+  color: #fff;
 }
-.kite-line {
-  stroke-dasharray: var(--len);
-  stroke-dashoffset: var(--len);
-  animation: draw-line 1.6s cubic-bezier(0.6, 0, 0.2, 1) 0.2s forwards;
+
+.photo-card {
+  border-radius: 28px;
+  box-shadow: var(--shadow-card);
 }
-@keyframes kite-in {
+
+/* Voile pour lire du texte blanc sur une photo */
+.photo-veil {
+  background: linear-gradient(180deg, rgba(8, 30, 52, 0) 30%, rgba(8, 30, 52, 0.55) 70%, rgba(8, 30, 52, 0.85) 100%);
+}
+
+/* Défilement horizontal de cartes (carrousel au doigt) */
+.snap-row {
+  display: flex;
+  gap: 1rem;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+  padding-bottom: 2.5rem;
+}
+.snap-row::-webkit-scrollbar {
+  display: none;
+}
+.snap-row > * {
+  scroll-snap-align: start;
+  flex-shrink: 0;
+}
+
+/* Apparition du hero : le seul mouvement automatique du site */
+@keyframes rise {
   from {
     opacity: 0;
-    transform: translate(-30px, 20px) rotate(-8deg);
+    transform: translateY(14px);
   }
   to {
     opacity: 1;
     transform: none;
   }
 }
-.kite-shape {
-  opacity: 0;
-  transform-box: fill-box;
-  transform-origin: center;
-  animation: kite-in 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) 1.4s forwards;
+.rise {
+  animation: rise 0.7s cubic-bezier(0.2, 0.8, 0.2, 1) both;
 }
-
 @media (prefers-reduced-motion: reduce) {
-  .kite-line {
+  .rise {
     animation: none;
-    stroke-dashoffset: 0;
-  }
-  .kite-shape {
-    animation: none;
-    opacity: 1;
   }
 }
 
@@ -188,4 +271,8 @@ p {
 }
 .prose-coach strong {
   font-weight: 700;
+}
+
+.leaflet-container {
+  font-family: inherit;
 }

@@ -1,38 +1,57 @@
 import Link from "next/link";
 import { Logo } from "./logo";
 
+const COLS = [
+  {
+    title: "Plateforme",
+    links: [
+      ["/tarifs", "Abonnements"],
+      ["/cours", "Cours de kitesurf"],
+      ["/week-end", "Spots du week-end"],
+      ["/inscription", "Créer un compte"],
+      ["/connexion", "Connexion"],
+    ],
+  },
+  {
+    title: "Légal",
+    links: [
+      ["/mentions-legales", "Mentions légales"],
+      ["/cgu", "CGU"],
+      ["/confidentialite", "Confidentialité"],
+      ["/cookies", "Cookies"],
+    ],
+  },
+];
+
 export function SiteFooter() {
   return (
-    <footer className="mt-24 border-t border-line">
+    <footer className="border-t border-line bg-spray">
       <div className="mx-auto grid max-w-6xl gap-10 px-4 py-12 sm:grid-cols-[2fr_1fr_1fr] sm:px-6">
         <div className="max-w-sm">
-          <Logo />
-          <p className="mt-3 text-slate">
+          <Logo full height={64} />
+          <p className="mt-4 text-slate">
             Coaching kitesurf par IA : analyse vidéo de tes figures, suivi de progression et Spot Finder selon le vent,
             ton niveau et ton matériel.
           </p>
         </div>
-        <div>
-          <p className="font-semibold">Plateforme</p>
-          <ul className="mt-3 space-y-2 text-slate">
-            <li><Link href="/tarifs" className="hover:text-deep">Tarifs</Link></li>
-            <li><Link href="/cours" className="hover:text-deep">Cours de kitesurf</Link></li>
-            <li><Link href="/week-end" className="hover:text-deep">Spots du week-end</Link></li>
-            <li><Link href="/inscription" className="hover:text-deep">Créer un compte</Link></li>
-            <li><Link href="/connexion" className="hover:text-deep">Connexion</Link></li>
-          </ul>
-        </div>
-        <div>
-          <p className="font-semibold">Légal</p>
-          <ul className="mt-3 space-y-2 text-slate">
-            <li><Link href="/mentions-legales" className="hover:text-deep">Mentions légales</Link></li>
-            <li><Link href="/cgu" className="hover:text-deep">CGU</Link></li>
-            <li><Link href="/confidentialite" className="hover:text-deep">Confidentialité</Link></li>
-            <li><Link href="/cookies" className="hover:text-deep">Cookies</Link></li>
-          </ul>
+        <div className="grid grid-cols-2 gap-8 sm:col-span-2">
+          {COLS.map((c) => (
+            <div key={c.title}>
+              <p className="font-bold">{c.title}</p>
+              <ul className="mt-2 text-slate">
+                {c.links.map(([href, label]) => (
+                  <li key={href}>
+                    <Link href={href} className="block py-1.5 hover:text-deep">
+                      {label}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
         </div>
       </div>
-      <p className="mx-auto max-w-6xl px-4 pb-8 text-sm text-slate sm:px-6">© {new Date().getFullYear()} RIDE&apos;UP</p>
+      <p className="mx-auto max-w-6xl px-4 pb-8 text-sm text-slate sm:px-6">© {new Date().getFullYear()} RIDE&apos;UP · Progress your ride</p>
     </footer>
   );
 }

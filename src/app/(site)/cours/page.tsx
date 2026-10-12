@@ -10,7 +10,7 @@ export const metadata: Metadata = {
 export default function CoursesPage() {
   return (
     <div className="mx-auto max-w-4xl px-4 py-14 sm:px-6">
-      <h1 className="text-5xl font-extrabold">Cours de kitesurf</h1>
+      <h1 className="text-3xl font-extrabold sm:text-4xl">Cours de kitesurf</h1>
       <p className="mt-3 max-w-2xl text-lg text-slate">
         Les étapes, les erreurs courantes et les exercices pour chaque figure. Lis le cours, va sur l&apos;eau, puis fais
         analyser ta tentative.

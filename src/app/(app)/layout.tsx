@@ -14,7 +14,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
           <Logo href="/dashboard" />
           <AppNav isAdmin={profile.is_admin} />
           <div className="flex items-center gap-3">
-            <a href="/compte" className="rounded-full bg-salt px-3 py-1 text-sm">
+            <a href="/compte" className="rounded-sm bg-salt px-3 py-1 text-sm">
               {plan === "free" ? "Essai" : PLANS[plan].name}
             </a>
             <form action="/auth/deconnexion" method="post" className="hidden lg:block">
@@ -23,7 +23,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
           </div>
         </div>
       </header>
-      <main className="mx-auto max-w-6xl px-4 py-8 sm:px-6 sm:py-10">{children}</main>
+      <main className="mx-auto max-w-6xl px-5 py-6 sm:px-6 sm:py-10">{children}</main>
     </div>
   );
 }

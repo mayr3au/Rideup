@@ -26,18 +26,18 @@ export default async function HistoryPage({ searchParams }: { searchParams: Prom
 
   return (
     <div className="mx-auto max-w-3xl">
-      <h1 className="text-4xl font-bold sm:text-5xl">Historique</h1>
+      <h1 className="text-3xl font-bold sm:text-4xl">Historique</h1>
 
       {filterTricks.length > 1 && (
         <nav className="-mx-4 mt-6 flex gap-2 overflow-x-auto px-4 pb-1" aria-label="Filtrer par figure">
-          <Link href="/historique" className={`whitespace-nowrap rounded-full px-4 py-2 text-[0.95rem] ${!figure ? "bg-deep text-salt" : "border border-line"}`}>
+          <Link href="/historique" className={`whitespace-nowrap rounded-sm px-4 py-2 text-[0.95rem] ${!figure ? "bg-brand text-white" : "border border-line"}`}>
             Toutes
           </Link>
           {TRICKS.filter((t) => filterTricks.some((f) => f?.id === t.id)).map((t) => (
             <Link
               key={t.id}
               href={`/historique?figure=${t.id}`}
-              className={`whitespace-nowrap rounded-full px-4 py-2 text-[0.95rem] ${figure === t.id ? "bg-deep text-salt" : "border border-line"}`}
+              className={`whitespace-nowrap rounded-sm px-4 py-2 text-[0.95rem] ${figure === t.id ? "bg-brand text-white" : "border border-line"}`}
             >
               {t.name}
             </Link>
@@ -72,7 +72,7 @@ export default async function HistoryPage({ searchParams }: { searchParams: Prom
           ))}
         </ul>
       ) : (
-        <div className="mt-6 rounded-2xl border border-dashed border-line p-6">
+        <div className="mt-6 rounded-lg border border-dashed border-line p-6">
           <p>Aucune analyse pour l&apos;instant.</p>
           <Link href="/analyse" className="btn btn-primary mt-4">Analyser une figure</Link>
         </div>

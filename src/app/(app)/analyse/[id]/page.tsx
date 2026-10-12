@@ -47,7 +47,7 @@ export default async function AnalysisDetail({
       </Link>
 
       {deja && (
-        <p role="status" className="mt-4 rounded-xl border border-lagoon/40 bg-lagoon/10 p-4">
+        <p role="status" className="mt-4 rounded-md border border-lagoon/40 bg-lagoon/10 p-4">
           Ce passage a déjà été analysé : voici le résultat, sans nouvelle analyse décomptée.
         </p>
       )}
@@ -58,10 +58,10 @@ export default async function AnalysisDetail({
             {new Date(a.created_at).toLocaleDateString("fr-FR", { weekday: "long", day: "numeric", month: "long" })}
             {a.depth === "approfondie" && " · analyse approfondie"}
           </p>
-          <h1 className="text-4xl font-extrabold sm:text-5xl">{r?.figure ?? trick?.name ?? "Analyse"}</h1>
+          <h1 className="text-3xl font-extrabold sm:text-4xl">{r?.figure ?? trick?.name ?? "Analyse"}</h1>
         </div>
         {r && (
-          <p className="font-display text-6xl font-extrabold leading-none">
+          <p className="text-5xl font-extrabold leading-none">
             {r.note}
             <span className="text-2xl text-slate">/10</span>
           </p>
@@ -69,13 +69,13 @@ export default async function AnalysisDetail({
       </div>
 
       {a.status === "erreur" && (
-        <p role="alert" className="mt-6 rounded-xl border border-danger/40 bg-danger/5 p-4">
+        <p role="alert" className="mt-6 rounded-md border border-danger/40 bg-danger/5 p-4">
           Cette analyse a échoué et n&apos;a pas été décomptée. Relance-la depuis la page Analyse.
         </p>
       )}
 
       {(a.status === "en-attente" || a.status === "en-cours") && (
-        <p role="status" className="mt-6 rounded-xl border border-line bg-spray p-4">
+        <p role="status" className="mt-6 rounded-md border border-line bg-spray p-4">
           Analyse en cours. Recharge la page dans un instant. Si elle reste bloquée plus de 10 minutes, elle sera
           annulée et ne sera pas décomptée.
         </p>
@@ -84,15 +84,15 @@ export default async function AnalysisDetail({
       <div className="mt-6 grid gap-8 md:grid-cols-[1fr_1.25fr]">
         <div className="md:sticky md:top-6 md:self-start">
           {signed?.signedUrl ? (
-            <video src={`${signed.signedUrl}#t=${start},${end}`} controls playsInline className="w-full rounded-2xl bg-deep" />
+            <video src={`${signed.signedUrl}#t=${start},${end}`} controls playsInline className="w-full rounded-lg bg-brand" />
           ) : (
-            <div className="rounded-2xl bg-deep/5 p-6 text-slate">Vidéo indisponible.</div>
+            <div className="rounded-lg bg-raised p-6 text-slate">Vidéo indisponible.</div>
           )}
           <p className="mt-2 text-sm text-slate">
             Passage analysé : {start.toFixed(1)} s → {end.toFixed(1)} s
           </p>
           {r && r.visibilite !== "bonne" && (
-            <p className="mt-3 rounded-xl bg-kite/20 p-3 text-[0.95rem]">
+            <p className="mt-3 rounded-md bg-kite/20 p-3 text-[0.95rem]">
               Visibilité {r.visibilite} : filme plus près, de côté, avec le kite dans le cadre pour une analyse plus fine.
             </p>
           )}
@@ -103,14 +103,14 @@ export default async function AnalysisDetail({
             <p className="text-lg">{r.resume}</p>
 
             {r.securite && (
-              <div role="alert" className="rounded-xl border-2 border-danger bg-danger/5 p-4">
+              <div role="alert" className="rounded-md border-2 border-danger bg-danger/5 p-4">
                 <p className="font-bold text-danger">Sécurité</p>
                 <p className="mt-1">{r.securite}</p>
               </div>
             )}
 
-            <section className="rounded-2xl bg-deep p-5 text-salt">
-              <h2 className="text-sm font-semibold text-kite">Priorité pour ta prochaine session</h2>
+            <section className="rounded-lg bg-brand p-5 text-white">
+              <h2 className="text-sm font-semibold text-white">Priorité pour ta prochaine session</h2>
               <p className="mt-1 text-lg font-semibold">{r.priorite_session}</p>
             </section>
 

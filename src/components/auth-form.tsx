@@ -29,7 +29,7 @@ export function AuthForm({
 
   if (state?.message) {
     return (
-      <p role="status" className="rounded-xl border border-lagoon/40 bg-lagoon/10 p-4">
+      <p role="status" className="rounded-md border border-lagoon/40 bg-lagoon/10 p-4">
         {state.message}
       </p>
     );

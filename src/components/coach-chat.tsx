@@ -70,7 +70,7 @@ export function CoachChat({ initial, clearAction }: { initial: Msg[]; clearActio
             <p className="text-slate">Pose une question sur une figure, ton matériel ou ta progression.</p>
             <div className="mt-4 flex flex-col items-start gap-2">
               {SUGGESTIONS.map((s) => (
-                <button key={s} onClick={() => send(s)} className="rounded-full border border-line px-4 py-2 text-left text-[0.95rem] hover:border-deep">
+                <button key={s} onClick={() => send(s)} className="rounded-sm border border-line px-4 py-2 text-left text-[0.95rem] hover:border-deep">
                   {s}
                 </button>
               ))}
@@ -79,11 +79,11 @@ export function CoachChat({ initial, clearAction }: { initial: Msg[]; clearActio
         )}
         {messages.map((m, i) =>
           m.role === "user" ? (
-            <div key={i} className="ml-auto max-w-[85%] rounded-2xl rounded-br-md bg-deep px-4 py-2.5 text-salt">
+            <div key={i} className="ml-auto max-w-[85%] rounded-lg rounded-br-md bg-brand px-4 py-2.5 text-white">
               {m.content}
             </div>
           ) : (
-            <div key={i} className="max-w-[90%] rounded-2xl rounded-bl-md bg-salt px-4 py-3">
+            <div key={i} className="max-w-[90%] rounded-lg rounded-bl-md bg-salt px-4 py-3">
               <RichText text={m.content} />
             </div>
           ),

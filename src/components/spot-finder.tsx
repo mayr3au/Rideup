@@ -67,7 +67,7 @@ export function SpotFinder({ spots, origin, canAlert }: { spots: SpotData[]; ori
             key={d}
             onClick={() => setDayIdx(i)}
             aria-pressed={i === dayIdx}
-            className={`whitespace-nowrap rounded-full px-4 py-2.5 text-[0.95rem] font-medium ${i === dayIdx ? "bg-deep text-salt" : "border border-line bg-spray"}`}
+            className={`whitespace-nowrap rounded-sm px-4 py-2.5 text-[0.95rem] font-medium ${i === dayIdx ? "bg-brand text-white" : "border border-line bg-spray"}`}
           >
             {dayLabel(d, i)}
           </button>
@@ -99,7 +99,7 @@ export function SpotFinder({ spots, origin, canAlert }: { spots: SpotData[]; ori
                     >
                       <div className="min-w-0 flex-1">
                         <p className="truncate font-semibold">
-                          {favs.has(s.spot.id) && <span aria-label="favori" className="text-kite">★ </span>}
+                          {favs.has(s.spot.id) && <span aria-label="favori" className="text-white">★ </span>}
                           {s.spot.name}
                         </p>
                         <p className="text-sm text-slate">
@@ -118,7 +118,7 @@ export function SpotFinder({ spots, origin, canAlert }: { spots: SpotData[]; ori
                           <p className="text-sm text-lagoon-dark">{d.kite ? `Kite ${d.kite} m` : ""}</p>
                         </div>
                       ) : (
-                        <span className="shrink-0 rounded-full bg-deep/5 px-3 py-1 text-sm text-slate">Pas ridable</span>
+                        <span className="shrink-0 rounded-sm bg-raised px-3 py-1 text-sm text-slate">Pas ridable</span>
                       )}
                     </button>
                   </li>
@@ -128,7 +128,7 @@ export function SpotFinder({ spots, origin, canAlert }: { spots: SpotData[]; ori
           )}
         </div>
 
-        <div className="order-1 h-[42dvh] min-h-[280px] overflow-hidden rounded-2xl border border-line lg:sticky lg:top-6 lg:order-2 lg:h-[70dvh]">
+        <div className="order-1 h-[42dvh] min-h-[280px] overflow-hidden rounded-lg border border-line lg:sticky lg:top-6 lg:order-2 lg:h-[70dvh]">
           <SpotMap
             origin={origin}
             selected={selected}
@@ -184,7 +184,7 @@ function SpotDetail({
         <button
           onClick={onFavorite}
           aria-pressed={favorite}
-          className={`btn !px-4 !py-2 ${favorite ? "btn-kite" : "btn-ghost"}`}
+          className={`btn !px-4 !py-2 ${favorite ? "btn-primary" : "btn-ghost"}`}
           title={canAlert ? "Les favoris reçoivent les alertes vent" : undefined}
         >
           {favorite ? "★ Favori" : "☆ Favori"}
@@ -199,7 +199,7 @@ function SpotDetail({
       </dl>
 
       {d && d.goodHours > 0 ? (
-        <div className="mt-5 rounded-xl bg-lagoon/10 p-4">
+        <div className="mt-5 rounded-md bg-lagoon/10 p-4">
           <p className="font-semibold">
             Ridable de {d.window!.from} à {d.window!.to} · {d.avgWind} nœuds de {compass(d.dir!)} ({ORIENTATION_LABEL[d.orientation!]})
           </p>
@@ -209,7 +209,7 @@ function SpotDetail({
           {d.warnings.length > 0 && <p className="mt-1 text-sm">{d.warnings.join(" · ")}</p>}
         </div>
       ) : (
-        <p className="mt-5 rounded-xl bg-deep/5 p-4">
+        <p className="mt-5 rounded-md bg-raised p-4">
           Pas de créneau ridable pour toi ce jour-là{d?.warnings[0] ? ` : ${d.warnings[0].toLowerCase()}` : ""}.
         </p>
       )}
@@ -222,7 +222,7 @@ function SpotDetail({
           {hours.map((h) => (
             <div key={h.time} className="flex w-9 flex-col items-center text-xs">
               <span className="font-semibold">{Math.round(h.wind)}</span>
-              <div className="relative mt-1 flex h-28 w-4 items-end rounded bg-deep/5">
+              <div className="relative mt-1 flex h-28 w-4 items-end rounded bg-raised">
                 <div className="absolute bottom-0 w-full rounded bg-kite/40" style={{ height: `${(h.gust / max) * 100}%` }} />
                 <div className="relative w-full rounded bg-lagoon" style={{ height: `${(h.wind / max) * 100}%` }} />
               </div>

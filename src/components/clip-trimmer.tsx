@@ -121,7 +121,7 @@ export function ClipTrimmer({
         controls
         preload="auto"
         onLoadedMetadata={onLoaded}
-        className="max-h-[55dvh] w-full rounded-xl bg-deep"
+        className="max-h-[55dvh] w-full rounded-md bg-brand"
       />
 
       {duration > 0 && (
@@ -134,7 +134,7 @@ export function ClipTrimmer({
             onClick={(e) => {
               if (!drag && videoRef.current) videoRef.current.currentTime = timeAt(e.clientX);
             }}
-            className="relative h-14 touch-none select-none rounded-xl bg-deep/10"
+            className="relative h-14 touch-none select-none rounded-md bg-raised"
             aria-label="Passage à analyser"
           >
             {/* Passage sélectionné */}
@@ -165,11 +165,11 @@ export function ClipTrimmer({
                 className="absolute inset-y-[-6px] flex w-11 -translate-x-1/2 cursor-ew-resize items-center justify-center"
                 style={{ left: `${pct(k === "start" ? start : end)}%` }}
               >
-                <span className="h-full w-2.5 rounded-full bg-kite shadow-[0_0_0_2px_var(--deep)]" />
+                <span className="h-full w-2.5 rounded-sm bg-kite shadow-[0_0_0_2px_var(--deep)]" />
               </div>
             ))}
             {/* Tête de lecture */}
-            <div className="pointer-events-none absolute inset-y-0 w-0.5 bg-deep" style={{ left: `${pct(current)}%` }} />
+            <div className="pointer-events-none absolute inset-y-0 w-0.5 bg-brand" style={{ left: `${pct(current)}%` }} />
           </div>
 
           <div className="flex flex-wrap items-center justify-between gap-2 text-[0.95rem]">

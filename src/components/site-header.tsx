@@ -1,42 +1,49 @@
 import Link from "next/link";
 import { getSession } from "@/lib/auth";
 import { Logo } from "./logo";
+import { MobileMenu } from "./mobile-menu";
+
+export const SITE_LINKS = [
+  { href: "/#analyse", label: "Analyse vidéo" },
+  { href: "/#spots", label: "Spot Finder" },
+  { href: "/cours", label: "Cours" },
+  { href: "/week-end", label: "Week-end" },
+  { href: "/tarifs", label: "Tarifs" },
+];
 
 export async function SiteHeader() {
   const session = await getSession();
 
   return (
-    <header className="border-b border-line">
-      <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-4 sm:px-6">
-        <Logo />
-        <nav className="flex items-center gap-1 text-[0.95rem] sm:gap-5">
-          <Link href="/#analyse" className="hidden hover:text-lagoon md:inline">
-            Analyse vidéo
-          </Link>
-          <Link href="/cours" className="hidden hover:text-lagoon md:inline">
-            Cours
-          </Link>
-          <Link href="/week-end" className="hidden hover:text-lagoon md:inline">
-            Week-end
-          </Link>
-          <Link href="/tarifs" className="px-2 hover:text-lagoon">
-            Tarifs
-          </Link>
+    <header className="sticky top-0 z-40 bg-salt/80 backdrop-blur-xl">
+      <div className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-4 px-5 sm:px-6">
+        <Logo height={30} />
+
+        <nav className="hidden items-center gap-7 text-[0.95rem] font-semibold lg:flex" aria-label="Navigation principale">
+          {SITE_LINKS.map((l) => (
+            <Link key={l.href} href={l.href} className="text-deep/80 hover:text-brand">
+              {l.label}
+            </Link>
+          ))}
+        </nav>
+
+        <div className="flex items-center gap-2">
           {session ? (
-            <Link href="/dashboard" className="btn btn-primary !py-2.5">
+            <Link href="/dashboard" className="btn btn-primary !min-h-10 !rounded-xl !px-4 !py-2 !text-sm">
               Mon espace
             </Link>
           ) : (
             <>
-              <Link href="/connexion" className="px-2 hover:text-lagoon">
+              <Link href="/connexion" className="hidden px-3 text-[0.95rem] font-semibold text-deep/80 hover:text-brand sm:inline">
                 Connexion
               </Link>
-              <Link href="/inscription" className="btn btn-primary hidden !py-2.5 sm:inline-flex">
-                Essayer gratuitement
+              <Link href="/inscription" className="btn btn-primary !min-h-10 !rounded-xl !px-4 !py-2 !text-sm">
+                Essai gratuit
               </Link>
             </>
           )}
-        </nav>
+          <MobileMenu links={SITE_LINKS} loggedIn={Boolean(session)} />
+        </div>
       </div>
     </header>
   );

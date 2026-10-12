@@ -148,7 +148,7 @@ export function AnalyseUploader({
       <div className="space-y-3">
         <label
           htmlFor="clip"
-          className="flex min-h-44 cursor-pointer flex-col items-center justify-center rounded-2xl border-2 border-dashed border-deep/25 bg-spray px-4 py-10 text-center hover:border-lagoon"
+          className="flex min-h-44 cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed border-deep/25 bg-spray px-4 py-10 text-center hover:border-lagoon"
         >
           <span className="font-display text-2xl font-bold">Importer une vidéo</span>
           <span className="mt-2 max-w-xs text-slate">

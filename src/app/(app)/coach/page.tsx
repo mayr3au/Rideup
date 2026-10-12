@@ -53,7 +53,7 @@ export default async function CoachPage() {
                   return (
                     <li
                       key={t.id}
-                      className={`rounded-xl border p-4 ${
+                      className={`rounded-md border p-4 ${
                         s === "valide" ? "border-line bg-salt" : isNext ? "border-2 border-kite bg-spray" : "border-line bg-spray"
                       }`}
                     >
@@ -112,13 +112,13 @@ function TrickControls({ trickId, status }: { trickId: string; status?: string }
 
   return (
     <div className="flex shrink-0 gap-1.5">
-      {status === "en-cours" && <span className="rounded-full bg-kite/30 px-3 py-1 text-sm font-medium">En cours</span>}
+      {status === "en-cours" && <span className="rounded-sm bg-kite/30 px-3 py-1 text-sm font-medium">En cours</span>}
       {options.map((o) => (
         <form key={o.value} action={setTrickStatus}>
           <input type="hidden" name="trick" value={trickId} />
           <input type="hidden" name="status" value={o.value} />
           <button
-            className={`rounded-full px-3 py-1 text-sm font-medium ${
+            className={`rounded-sm px-3 py-1 text-sm font-medium ${
               o.value === "valide" ? "bg-lagoon text-white hover:bg-lagoon-dark" : "border border-line hover:border-deep"
             }`}
           >

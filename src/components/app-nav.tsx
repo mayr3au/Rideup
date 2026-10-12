@@ -55,13 +55,13 @@ export function AppNav({ isAdmin }: { isAdmin: boolean }) {
             key={l.href}
             href={l.href}
             aria-current={active(l.href) ? "page" : undefined}
-            className={`whitespace-nowrap rounded-full px-3.5 py-2 text-[0.95rem] font-medium ${active(l.href) ? "bg-deep text-salt" : "hover:bg-deep/5"}`}
+            className={`whitespace-nowrap rounded-sm px-3.5 py-2 text-[0.95rem] font-medium ${active(l.href) ? "bg-brand text-white" : "hover:bg-raised"}`}
           >
             {"icon" in l && l.label === "Progrès" ? "Progression" : l.label}
           </Link>
         ))}
         <details className="relative">
-          <summary className="cursor-pointer list-none rounded-full px-3.5 py-2 text-[0.95rem] font-medium hover:bg-deep/5">Plus</summary>
+          <summary className="cursor-pointer list-none rounded-sm px-3.5 py-2 text-[0.95rem] font-medium hover:bg-raised">Plus</summary>
           <div className="panel absolute right-0 z-50 mt-2 w-56 p-2">
             {secondary.slice(2).map((l) => (
               <Link key={l.href} href={l.href} className="block rounded-lg px-3 py-2 hover:bg-salt">
@@ -103,15 +103,15 @@ export function AppNav({ isAdmin }: { isAdmin: boolean }) {
         </ul>
       </nav>
       {open && (
-        <div className="fixed inset-0 z-30 bg-deep/30 lg:hidden" onClick={() => setOpen(false)}>
-          <div className="absolute inset-x-0 bottom-[calc(64px+env(safe-area-inset-bottom))] rounded-t-2xl bg-spray p-3" onClick={(e) => e.stopPropagation()}>
+        <div className="fixed inset-0 z-30 bg-black/70 lg:hidden" onClick={() => setOpen(false)}>
+          <div className="absolute inset-x-0 bottom-[calc(64px+env(safe-area-inset-bottom))] rounded-t-lg bg-spray p-3" onClick={(e) => e.stopPropagation()}>
             {secondary.map((l) => (
-              <Link key={l.href} href={l.href} className={`block rounded-xl px-4 py-3.5 text-lg ${active(l.href) ? "bg-salt font-semibold" : ""}`}>
+              <Link key={l.href} href={l.href} className={`block rounded-md px-4 py-3.5 text-lg ${active(l.href) ? "bg-salt font-semibold" : ""}`}>
                 {l.label}
               </Link>
             ))}
             <form action="/auth/deconnexion" method="post">
-              <button className="block w-full rounded-xl px-4 py-3.5 text-left text-lg text-slate">Se déconnecter</button>
+              <button className="block w-full rounded-md px-4 py-3.5 text-left text-lg text-slate">Se déconnecter</button>
             </form>
           </div>
         </div>

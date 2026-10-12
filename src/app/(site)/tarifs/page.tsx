@@ -17,7 +17,7 @@ export default async function PricingPage() {
 
   return (
     <div className="mx-auto max-w-5xl px-4 py-14 sm:px-6">
-      <h1 className="max-w-3xl text-5xl font-extrabold sm:text-6xl">Choisis ton rythme de progression</h1>
+      <h1 className="max-w-3xl text-4xl font-extrabold sm:text-5xl">Choisis ton rythme de progression</h1>
       <p className="mt-4 max-w-2xl text-lg text-slate">
         Sans engagement, résiliable en deux clics. À l&apos;inscription, {settings.free.monthly_analyses} analyse
         {settings.free.monthly_analyses > 1 ? "s" : ""} offerte{settings.free.monthly_analyses > 1 ? "s" : ""} pour essayer.
@@ -54,12 +54,12 @@ export default async function PricingPage() {
               ) : session ? (
                 <form action="/api/checkout" method="post" className="mt-8">
                   <input type="hidden" name="plan" value={key} />
-                  <button className={`btn w-full ${elite ? "btn-kite" : "btn-primary"}`}>
+                  <button className={`btn w-full ${"btn-primary"}`}>
                     {current === "free" ? `Choisir ${plan.name}` : `Passer à ${plan.name}`}
                   </button>
                 </form>
               ) : (
-                <Link href="/inscription" className={`btn mt-8 ${elite ? "btn-kite" : "btn-primary"}`}>
+                <Link href="/inscription" className={`btn mt-8 ${"btn-primary"}`}>
                   Commencer avec une analyse offerte
                 </Link>
               )}

@@ -20,7 +20,7 @@ export default async function SpotsPage({ searchParams }: { searchParams: Promis
   if (!hasSpotFinder(plan)) {
     return (
       <div className="mx-auto max-w-2xl">
-        <h1 className="text-4xl font-bold sm:text-5xl">Spot Finder</h1>
+        <h1 className="text-3xl font-bold sm:text-4xl">Spot Finder</h1>
         <p className="mt-3 text-lg text-slate">
           Le meilleur spot selon le vent prévu, ton niveau, ton poids, ton matériel et ton rayon de déplacement, avec les
           créneaux horaires et la taille de kite à sortir.
@@ -41,7 +41,7 @@ export default async function SpotsPage({ searchParams }: { searchParams: Promis
   if (lat == null || lng == null || !Number.isFinite(lat) || !Number.isFinite(lng)) {
     return (
       <div className="mx-auto max-w-2xl">
-        <h1 className="text-4xl font-bold sm:text-5xl">Spot Finder</h1>
+        <h1 className="text-3xl font-bold sm:text-4xl">Spot Finder</h1>
         <p className="mt-3 text-slate">Indique d&apos;où tu pars pour trouver les spots dans ton rayon.</p>
         <Link href="/profil" className="btn btn-primary mt-6">Renseigner ma ville</Link>
       </div>
@@ -91,7 +91,7 @@ export default async function SpotsPage({ searchParams }: { searchParams: Promis
     <div>
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <h1 className="text-4xl font-bold sm:text-5xl">Spot Finder</h1>
+          <h1 className="text-3xl font-bold sm:text-4xl">Spot Finder</h1>
           <p className="mt-2 text-slate">
             {nearby.length} spot{nearby.length > 1 ? "s" : ""} à moins de {radius} km
             {sp.lat ? " de ta position" : profile.home_label ? ` de ${profile.home_label}` : ""} · {profile.weight_kg ?? "?"} kg ·{" "}
@@ -102,17 +102,17 @@ export default async function SpotsPage({ searchParams }: { searchParams: Promis
       </div>
 
       {!rider.kites.length && (
-        <p className="mt-4 rounded-xl bg-kite/20 p-3 text-[0.95rem]">
+        <p className="mt-4 rounded-md bg-kite/20 p-3 text-[0.95rem]">
           Ajoute les tailles de tes kites dans ton profil pour que les créneaux tiennent compte de ton matériel.
         </p>
       )}
 
       {forecastError ? (
-        <p role="alert" className="mt-6 rounded-xl border border-danger/40 bg-danger/5 p-4">
+        <p role="alert" className="mt-6 rounded-md border border-danger/40 bg-danger/5 p-4">
           Les prévisions sont indisponibles pour le moment. Recharge la page dans quelques minutes.
         </p>
       ) : nearby.length === 0 ? (
-        <div className="mt-6 rounded-2xl border border-dashed border-line p-6">
+        <div className="mt-6 rounded-lg border border-dashed border-line p-6">
           <p>Aucun spot référencé dans ce rayon.</p>
           <Link href={`/spots?rayon=${Math.min(2000, radius * 2)}`} className="btn btn-primary mt-4">
             Chercher à {Math.min(2000, radius * 2)} km

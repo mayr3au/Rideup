@@ -6,7 +6,7 @@ import { DISCIPLINES, LEVELS } from "@/lib/tricks";
 import type { Profile } from "@/lib/types";
 
 const chip =
-  "cursor-pointer rounded-full border border-line bg-spray px-4 py-2.5 has-[:checked]:border-deep has-[:checked]:bg-deep has-[:checked]:text-salt has-[:focus-visible]:outline has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-kite";
+  "cursor-pointer rounded-sm border border-line bg-spray px-4 py-2.5 has-[:checked]:border-deep has-[:checked]:bg-brand has-[:checked]:text-white has-[:focus-visible]:outline has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-kite";
 
 export function ProfileForm({ profile, submitLabel, showAlerts }: { profile: Profile; submitLabel: string; showAlerts?: boolean }) {
   const [state, action, pending] = useActionState<ProfileState, FormData>(saveProfile, undefined);
@@ -55,7 +55,7 @@ export function ProfileForm({ profile, submitLabel, showAlerts }: { profile: Pro
         <legend className="label">Ton niveau</legend>
         <div className="grid gap-2 sm:grid-cols-2">
           {LEVELS.map((l) => (
-            <label key={l.id} className="flex cursor-pointer gap-3 rounded-xl border border-line bg-spray p-3 has-[:checked]:border-lagoon has-[:checked]:bg-lagoon/5">
+            <label key={l.id} className="flex cursor-pointer gap-3 rounded-md border border-line bg-spray p-3 has-[:checked]:border-lagoon has-[:checked]:bg-lagoon/5">
               <input type="radio" name="level" value={l.id} defaultChecked={profile.level === l.id} required className="mt-1 accent-[var(--lagoon)]" />
               <span>
                 <span className="font-semibold">{l.label}</span>

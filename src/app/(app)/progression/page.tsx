@@ -13,7 +13,7 @@ const TREND = {
   "en-baisse": { label: "En baisse", cls: "bg-lagoon/15 text-lagoon-dark" },
   "en-hausse": { label: "En hausse", cls: "bg-danger/10 text-danger" },
   stable: { label: "Persistante", cls: "bg-kite/25" },
-  nouvelle: { label: "Nouvelle", cls: "bg-deep/10" },
+  nouvelle: { label: "Nouvelle", cls: "bg-raised" },
 } as const;
 
 export default async function ProgressionPage() {
@@ -30,7 +30,7 @@ export default async function ProgressionPage() {
   return (
     <div className="space-y-12">
       <header>
-        <h1 className="text-4xl font-bold sm:text-5xl">Progression</h1>
+        <h1 className="text-3xl font-bold sm:text-4xl">Progression</h1>
         <dl className="mt-6 grid grid-cols-3 gap-3 sm:max-w-xl">
           <Stat label="Maîtrisées" value={`${data.validated.length}/${TRICKS.length}`} />
           <Stat label="Analyses" value={String(data.analysesCount)} />
@@ -97,7 +97,7 @@ export default async function ProgressionPage() {
                     {elite && ` · ${e.recent} sur les 5 dernières`}
                   </p>
                 </div>
-                {elite && <span className={`rounded-full px-3 py-1 text-sm font-medium ${TREND[e.trend].cls}`}>{TREND[e.trend].label}</span>}
+                {elite && <span className={`rounded-sm px-3 py-1 text-sm font-medium ${TREND[e.trend].cls}`}>{TREND[e.trend].label}</span>}
               </li>
             ))}
           </ul>
@@ -160,36 +160,36 @@ export default async function ProgressionPage() {
       </section>
 
       {/* Programme Elite */}
-      <section className="rounded-2xl bg-deep p-6 text-salt sm:p-8">
+      <section className="rounded-lg bg-brand p-6 text-white sm:p-8">
         <h2 className="text-2xl font-bold">Programme personnalisé</h2>
         {!elite ? (
           <>
-            <p className="mt-2 text-salt/75">
+            <p className="mt-2 text-white/75">
               Un plan de 3 à 5 sessions construit à partir de tes erreurs récurrentes et de tes objectifs. Inclus dans Elite.
             </p>
             <Link href="/tarifs" className="btn btn-kite mt-5">Passer à Elite</Link>
           </>
         ) : program ? (
           <div className="mt-3">
-            <p className="text-sm text-salt/70">
+            <p className="text-sm text-white/70">
               Créé le {new Date(programRow!.created_at).toLocaleDateString("fr-FR", { day: "numeric", month: "long" })}
             </p>
-            <p className="mt-2 text-xl font-semibold text-kite">{program.focus}</p>
-            <p className="mt-2 text-salt/80">{program.diagnostic}</p>
+            <p className="mt-2 text-xl font-semibold text-white">{program.focus}</p>
+            <p className="mt-2 text-white/80">{program.diagnostic}</p>
             <ol className="mt-6 space-y-5">
               {program.sessions.map((s, i) => (
                 <li key={i} className="border-l-2 border-kite pl-4">
                   <p className="font-semibold">Session {i + 1} · {s.titre}</p>
-                  <p className="text-salt/80">{s.objectif}</p>
-                  <ul className="mt-2 list-disc space-y-1 pl-5 text-salt/90">
+                  <p className="text-white/80">{s.objectif}</p>
+                  <ul className="mt-2 list-disc space-y-1 pl-5 text-white/90">
                     {s.exercices.map((x) => <li key={x}>{x}</li>)}
                   </ul>
                 </li>
               ))}
             </ol>
             {program.criteres_reussite.length > 0 && (
-              <p className="mt-6 text-salt/80">
-                <span className="font-semibold text-salt">Objectif atteint quand :</span> {program.criteres_reussite.join(" ; ")}
+              <p className="mt-6 text-white/80">
+                <span className="font-semibold text-white">Objectif atteint quand :</span> {program.criteres_reussite.join(" ; ")}
               </p>
             )}
             <div className="mt-6">
@@ -198,7 +198,7 @@ export default async function ProgressionPage() {
           </div>
         ) : (
           <>
-            <p className="mt-2 text-salt/75">
+            <p className="mt-2 text-white/75">
               Génère un plan de sessions basé sur tes analyses{data.analysesCount < 2 ? " (plus tu as d'analyses, plus il est précis)" : ""}.
             </p>
             <div className="mt-5">
