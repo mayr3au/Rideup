@@ -1,3 +1,4 @@
+import { SUPABASE_ANON_KEY, SUPABASE_URL, SUPABASE_CONFIGURED } from "@/lib/supabase/env";
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
@@ -5,10 +6,11 @@ const PROTECTED = ["/dashboard", "/coach", "/analyse", "/compte", "/admin", "/pr
 
 export async function middleware(request: NextRequest) {
   let response = NextResponse.next({ request });
+  if (!SUPABASE_CONFIGURED) return response; // aperçu sans base : pas d'authentification
 
   const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    SUPABASE_URL,
+    SUPABASE_ANON_KEY,
     {
       cookies: {
         getAll() {
@@ -25,9 +27,14 @@ export async function middleware(request: NextRequest) {
     },
   );
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  let user = null;
+  try {
+    ({
+      data: { user },
+    } = await supabase.auth.getUser());
+  } catch {
+    // Supabase injoignable : on laisse passer, les pages gèrent l'absence de session.
+  }
 
   const path = request.nextUrl.pathname;
   if (!user && PROTECTED.some((p) => path === p || path.startsWith(p + "/"))) {

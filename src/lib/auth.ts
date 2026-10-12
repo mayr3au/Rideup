@@ -7,9 +7,14 @@ import type { Profile } from "@/lib/types";
 /** Utilisateur connecté + profil, ou null. */
 export async function getSession() {
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  let user;
+  try {
+    ({
+      data: { user },
+    } = await supabase.auth.getUser());
+  } catch {
+    return null;
+  }
   if (!user) return null;
 
   const { data: profile } = await supabase.from("profiles").select("*").eq("id", user.id).single<Profile>();
