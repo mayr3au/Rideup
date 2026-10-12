@@ -1,26 +1,191 @@
 @import "tailwindcss";
 
+/*
+  RIDE'UP — identité
+  Sel (fond), Écume (surfaces), Fond marin (texte), Ardoise (secondaire),
+  Lagon (actions), Kite (signal : ligne du hero, Premium, alertes vent).
+*/
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --salt: #eef3f1;
+  --spray: #ffffff;
+  --deep: #0b3442;
+  --slate: #557381;
+  --lagoon: #12877e;
+  --lagoon-dark: #0c6c65;
+  --kite: #f5b700;
+  --line: rgba(11, 52, 66, 0.14);
+  --danger: #b4321f;
+  --font-bricolage: "Bricolage Grotesque Variable";
+  --font-instrument: "Instrument Sans Variable";
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-salt: var(--salt);
+  --color-spray: var(--spray);
+  --color-deep: var(--deep);
+  --color-slate: var(--slate);
+  --color-lagoon: var(--lagoon);
+  --color-lagoon-dark: var(--lagoon-dark);
+  --color-kite: var(--kite);
+  --color-line: var(--line);
+  --color-danger: var(--danger);
+  --font-display: var(--font-bricolage);
+  --font-sans: var(--font-instrument);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html {
+  background: var(--salt);
+  color: var(--deep);
+  -webkit-font-smoothing: antialiased;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-instrument), system-ui, sans-serif;
+  font-size: 1.0625rem;
+  line-height: 1.55;
+}
+
+h1,
+h2,
+h3 {
+  font-family: var(--font-bricolage), system-ui, sans-serif;
+  letter-spacing: -0.02em;
+  line-height: 1.05;
+  text-wrap: balance;
+}
+
+p {
+  text-wrap: pretty;
+}
+
+:focus-visible {
+  outline: 3px solid var(--kite);
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+
+/* Boutons */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border-radius: 999px;
+  padding: 0.75rem 1.4rem;
+  font-weight: 600;
+  font-size: 1rem;
+  line-height: 1;
+  transition: background-color 0.15s, color 0.15s, border-color 0.15s;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+.btn-primary {
+  background: var(--lagoon);
+  color: #fff;
+}
+.btn-primary:hover:not(:disabled) {
+  background: var(--lagoon-dark);
+}
+.btn-ghost {
+  border: 1.5px solid var(--line);
+  color: var(--deep);
+  background: transparent;
+}
+.btn-ghost:hover:not(:disabled) {
+  border-color: var(--deep);
+}
+.btn-kite {
+  background: var(--kite);
+  color: var(--deep);
+}
+.btn-kite:hover:not(:disabled) {
+  background: #e0a700;
+}
+
+/* Champs */
+.field {
+  display: block;
+  width: 100%;
+  border-radius: 12px;
+  border: 1.5px solid var(--line);
+  background: var(--spray);
+  padding: 0.7rem 0.9rem;
+  font: inherit;
+  color: var(--deep);
+}
+.field:focus {
+  outline: none;
+  border-color: var(--lagoon);
+}
+.label {
+  display: block;
+  font-weight: 600;
+  font-size: 0.95rem;
+  margin-bottom: 0.35rem;
+}
+
+/* Surfaces : un seul niveau de carte, bord net, pas d'ombre */
+.panel {
+  background: var(--spray);
+  border: 1px solid var(--line);
+  border-radius: 20px;
+}
+
+/* Ligne de kite du hero : le seul mouvement automatique du site */
+@keyframes draw-line {
+  from {
+    stroke-dashoffset: var(--len);
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+.kite-line {
+  stroke-dasharray: var(--len);
+  stroke-dashoffset: var(--len);
+  animation: draw-line 1.6s cubic-bezier(0.6, 0, 0.2, 1) 0.2s forwards;
+}
+@keyframes kite-in {
+  from {
+    opacity: 0;
+    transform: translate(-30px, 20px) rotate(-8deg);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.kite-shape {
+  opacity: 0;
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: kite-in 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) 1.4s forwards;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .kite-line {
+    animation: none;
+    stroke-dashoffset: 0;
+  }
+  .kite-shape {
+    animation: none;
+    opacity: 1;
+  }
+}
+
+/* Texte riche des réponses du coach */
+.prose-coach p + p {
+  margin-top: 0.6rem;
+}
+.prose-coach ul {
+  list-style: disc;
+  padding-left: 1.2rem;
+  margin: 0.4rem 0;
+}
+.prose-coach strong {
+  font-weight: 700;
 }
