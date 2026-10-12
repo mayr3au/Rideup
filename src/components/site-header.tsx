@@ -4,10 +4,9 @@ import { Logo } from "./logo";
 import { MobileMenu } from "./mobile-menu";
 
 export const SITE_LINKS = [
-  { href: "/#analyse", label: "Analyse vidéo" },
-  { href: "/#spots", label: "Spot Finder" },
+  { href: "/#analyse", label: "Comment ça marche" },
   { href: "/cours", label: "Cours" },
-  { href: "/week-end", label: "Week-end" },
+  { href: "/week-end", label: "Spots du week-end" },
   { href: "/tarifs", label: "Tarifs" },
 ];
 
@@ -34,11 +33,11 @@ export async function SiteHeader() {
             </Link>
           ) : (
             <>
-              <Link href="/connexion" className="hidden px-3 text-[0.95rem] font-semibold text-deep/80 hover:text-brand sm:inline">
-                Connexion
+              <Link href="/connexion" className="whitespace-nowrap px-2 text-[0.95rem] font-semibold text-deep hover:text-brand">
+                Se connecter
               </Link>
-              <Link href="/inscription" className="btn btn-primary !min-h-10 !rounded-xl !px-4 !py-2 !text-sm">
-                Essai gratuit
+              <Link href="/inscription" className="btn btn-primary hidden !min-h-10 !rounded-xl !px-4 !py-2 !text-sm sm:inline-flex">
+                Essayer gratuitement
               </Link>
             </>
           )}

@@ -90,6 +90,8 @@ p {
   background: var(--brand-light);
 }
 
+/* Composants : dans @layer components pour que les utilitaires Tailwind (hidden, w-full…) gardent la priorité */
+@layer components {
 /* Boutons : arrondis, cible tactile ≥ 48 px */
 .btn {
   display: inline-flex;
@@ -238,6 +240,8 @@ p {
 .snap-row > * {
   scroll-snap-align: start;
   flex-shrink: 0;
+}
+
 }
 
 /* Apparition du hero : le seul mouvement automatique du site */

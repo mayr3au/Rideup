@@ -49,8 +49,8 @@ export function MobileMenu({ links, loggedIn }: { links: { href: string; label: 
               <Link href="/dashboard" className="btn btn-primary w-full">Mon espace</Link>
             ) : (
               <>
-                <Link href="/inscription" className="btn btn-primary w-full">Analyser mon premier clip</Link>
-                <Link href="/connexion" className="btn btn-ghost w-full">Connexion</Link>
+                <Link href="/inscription" className="btn btn-primary w-full">Essayer gratuitement</Link>
+                <Link href="/connexion" className="btn btn-ghost w-full">Se connecter</Link>
               </>
             )}
           </div>
