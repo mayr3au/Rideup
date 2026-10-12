@@ -1,7 +1,9 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { getForecasts } from "@/lib/weather";
-import { compass, parseKites, summarizeDay, type DaySummary } from "@/lib/wind";
+import { getConditions } from "@/lib/weather";
+import { compass, summarizeDay, type DaySummary } from "@/lib/wind";
+import { gearSizes, levelFor, riderSports } from "@/lib/rider";
+import { SPORTS, type SportId } from "@/lib/sports";
 import { escapeHtml, sendEmail } from "@/lib/email";
 import { isActive } from "@/lib/plans";
 import type { Profile, Spot } from "@/lib/types";
@@ -9,7 +11,7 @@ import type { Profile, Spot } from "@/lib/types";
 export const maxDuration = 300;
 
 /**
- * Alertes vent (Elite) : lancé chaque jour par Vercel Cron (vercel.json).
+ * Alertes conditions (Elite) : lancé chaque jour par Vercel Cron (vercel.json).
  * Pour chaque abonné Elite avec alertes activées, regarde les 3 prochains jours sur ses spots favoris
  * et envoie un e-mail récapitulatif des créneaux ridables encore jamais signalés.
  */
@@ -43,7 +45,8 @@ export async function GET(request: NextRequest) {
   const spots = [...spotMap.values()];
   if (!spots.length) return NextResponse.json({ users: elite.length, sent: 0 });
 
-  const forecasts = await getForecasts(spots);
+  // La houle n'est demandée que si un favori est un spot de surf.
+  const forecasts = await getConditions(spots, spots.some((s) => s.sports?.includes("surf")));
   const hoursBySpot = new Map(spots.map((s, i) => [s.id, forecasts[i] ?? []]));
 
   const { data: already } = await db
@@ -56,8 +59,9 @@ export async function GET(request: NextRequest) {
   let sent = 0;
   for (const user of elite) {
     if (!user.email) continue;
-    const rider = { level: user.level, weightKg: user.weight_kg, kites: parseKites(user.quiver) };
-    const hits: { spot: Spot; day: DaySummary }[] = [];
+    // Les alertes concernent les sports dépendant des conditions (pas le téléski).
+    const sports = riderSports(user).filter((sp) => SPORTS[sp].spot !== "cable");
+    const hits: { spot: Spot; day: DaySummary; sport: SportId }[] = [];
 
     for (const f of (favs ?? []).filter((x) => x.user_id === user.id)) {
       const spot = spotMap.get(f.spot_id as string);
@@ -65,23 +69,35 @@ export async function GET(request: NextRequest) {
       const hours = hoursBySpot.get(spot.id) ?? [];
       const dates = [...new Set(hours.map((h) => h.time.slice(0, 10)))].slice(0, 3);
       for (const date of dates) {
-        const day = summarizeDay(hours, date, spot.sea_bearing, rider, spot.min_level);
-        if (day.goodHours >= 2 && !sentKey.has(`${user.id}|${spot.id}|${date}`)) hits.push({ spot, day });
+        if (sentKey.has(`${user.id}|${spot.id}|${date}`)) continue;
+        // Premier sport pratiqué par l'utilisateur et possible sur ce spot qui donne un bon créneau.
+        for (const sport of sports.filter((sp) => spot.sports?.includes(sp))) {
+          const rider = { sport, level: levelFor(user, sport), weightKg: user.weight_kg, gear: gearSizes(user, sport) };
+          const day = summarizeDay(hours, date, spot, rider);
+          if (day.goodHours >= 2) {
+            hits.push({ spot, day, sport });
+            break;
+          }
+        }
       }
     }
     if (!hits.length) continue;
 
     const site = process.env.NEXT_PUBLIC_SITE_URL ?? "";
     const lines = hits
-      .map(({ spot, day }) => {
+      .map(({ spot, day, sport }) => {
         const d = new Date(day.date + "T12:00:00").toLocaleDateString("fr-FR", { weekday: "long", day: "numeric", month: "long" });
-        return `<li><strong>${escapeHtml(spot.name)}</strong>, ${d} : ${day.window!.from}–${day.window!.to}, ${day.avgWind} nœuds de ${compass(day.dir!)}${day.kite ? `, kite ${day.kite} m` : ""}</li>`;
+        const cond =
+          SPORTS[sport].spot === "waves"
+            ? `houle ${day.avgWave?.toFixed(1).replace(".", ",")} m, période ${day.period} s`
+            : `${day.avgWind} nœuds de ${compass(day.dir!)}${day.gear ? `, ${day.gearName} ${String(day.gear).replace(".", ",")} m²` : ""}`;
+        return `<li><strong>${escapeHtml(spot.name)}</strong> (${SPORTS[sport].name}), ${d} : ${day.window!.from}–${day.window!.to}, ${cond}</li>`;
       })
       .join("");
     const ok = await sendEmail(
       user.email,
-      `Du vent prévu sur ${hits.length > 1 ? "tes spots" : hits[0].spot.name}`,
-      `<p>Salut ${escapeHtml(user.full_name || "")},</p><p>Des créneaux ridables pour toi sont prévus :</p><ul>${lines}</ul><p><a href="${site}/spots">Voir le détail dans le Spot Finder</a></p><p style="color:#557381;font-size:13px">Prévisions indicatives : vérifie toujours les conditions sur place. Tu peux désactiver ces alertes dans ton profil.</p>`,
+      `Bonnes conditions prévues sur ${hits.length > 1 ? "tes spots" : hits[0].spot.name}`,
+      `<p>Salut ${escapeHtml(user.full_name || "")},</p><p>De bons créneaux pour toi sont prévus :</p><ul>${lines}</ul><p><a href="${site}/spots">Voir le détail dans le Spot Finder</a></p><p style="color:#557381;font-size:13px">Prévisions indicatives : vérifie toujours les conditions sur place. Tu peux désactiver ces alertes dans ton profil.</p>`,
     );
     if (ok) {
       sent++;

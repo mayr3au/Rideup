@@ -5,20 +5,17 @@ import { redirect } from "next/navigation";
 import { z } from "zod";
 import { requireSession } from "@/lib/auth";
 import { geocode } from "@/lib/weather";
-import { DISCIPLINES, LEVELS, TRICKS } from "@/lib/tricks";
+import { isSport, LEVEL_ORDER, SPORTS, TRICKS, type Level, type SportId } from "@/lib/sports";
 
 export type ProfileState = { error?: string; saved?: boolean } | undefined;
 
 const optionalNumber = (min: number, max: number) =>
   z.preprocess((v) => (v === "" || v == null ? null : Number(v)), z.number().min(min).max(max).nullable());
 
-const profileSchema = z.object({
+const baseSchema = z.object({
   full_name: z.string().trim().min(1, "Indique ton prénom.").max(80),
-  level: z.enum(LEVELS.map((l) => l.id) as [string, ...string[]], { error: "Choisis ton niveau." }),
-  discipline: z.enum(DISCIPLINES.map((d) => d.id) as [string, ...string[]], { error: "Choisis ta pratique." }),
-  stance: z.enum(["regular", "goofy"], { error: "Choisis ta stance." }),
-  weight_kg: optionalNumber(25, 200).refine((v) => v !== null, "Indique ton poids : il sert à choisir la bonne taille de kite."),
-  quiver: z.string().trim().max(400).optional().default(""),
+  stance: z.enum(["regular", "goofy"], { error: "Choisis ton pied avant." }),
+  weight_kg: optionalNumber(25, 200).refine((v) => v !== null, "Indique ton poids : il sert à choisir la bonne taille d'aile ou de kite."),
   goals: z.string().trim().max(600).optional().default(""),
   home_label: z.string().trim().max(120).optional().default(""),
   home_lat: optionalNumber(-90, 90),
@@ -27,15 +24,29 @@ const profileSchema = z.object({
   wind_alerts: z.preprocess((v) => v === "on", z.boolean()),
 });
 
-const LEVEL_ORDER: string[] = LEVELS.map((l) => l.id);
-
 export async function saveProfile(_: ProfileState, formData: FormData): Promise<ProfileState> {
-  const parsed = profileSchema.safeParse(Object.fromEntries(formData));
+  const parsed = baseSchema.safeParse(Object.fromEntries(formData));
   if (!parsed.success) return { error: parsed.error.issues[0].message };
   const data = { ...parsed.data };
 
+  // Sports, niveau et matériel par sport
+  const sports = [...new Set(formData.getAll("sports").map(String).filter(isSport))];
+  if (!sports.length) return { error: "Choisis au moins un sport." };
+  const wanted = String(formData.get("sport") ?? "");
+  const sport: SportId = isSport(wanted) && sports.includes(wanted) ? wanted : sports[0];
+
+  const levels: Partial<Record<SportId, Level>> = {};
+  const gear: Partial<Record<SportId, string>> = {};
+  for (const s of sports) {
+    const lvl = String(formData.get(`level_${s}`) ?? "");
+    if (!LEVEL_ORDER.includes(lvl as Level)) return { error: `Choisis ton niveau en ${SPORTS[s].name.toLowerCase()}.` };
+    levels[s] = lvl as Level;
+    const g = String(formData.get(`gear_${s}`) ?? "").trim().slice(0, 300);
+    if (g) gear[s] = g;
+  }
+
   const { supabase, user, profile } = await requireSession();
-  const firstTime = !profile.onboarded;
+  const previousLevels = profile.onboarded ? profile.levels ?? {} : {};
 
   // Ville saisie à la main : on la géolocalise.
   if (data.home_label && (data.home_lat == null || data.home_label !== profile.home_label) && data.home_label !== "Ma position") {
@@ -52,24 +63,38 @@ export async function saveProfile(_: ProfileState, formData: FormData): Promise<
 
   const { error } = await supabase
     .from("profiles")
-    .update({ ...data, onboarded: true })
+    .update({ ...data, sport, sports, levels, gear, onboarded: true })
     .eq("id", user.id);
   if (error) return { error: "Enregistrement impossible. Réessaie." };
 
-  // Premier passage : on valide d'office les figures des niveaux inférieurs.
-  if (firstTime) {
-    const levelIdx = LEVEL_ORDER.indexOf(data.level);
-    const below = TRICKS.filter((t) => LEVEL_ORDER.indexOf(t.level) < levelIdx);
-    if (below.length) {
-      await supabase.from("trick_progress").upsert(
-        below.map((t) => ({ user_id: user.id, trick_id: t.id, status: "valide", updated_at: new Date().toISOString() })),
-      );
-    }
-    redirect("/dashboard");
+  // Nouveau sport (ou premier profil) : on valide d'office les figures des niveaux inférieurs.
+  const newly = sports.filter((s) => !previousLevels[s]);
+  const toValidate = TRICKS.filter(
+    (t) => newly.includes(t.sport) && LEVEL_ORDER.indexOf(t.level) < LEVEL_ORDER.indexOf(levels[t.sport]!),
+  );
+  if (toValidate.length) {
+    await supabase.from("trick_progress").upsert(
+      toValidate.map((t) => ({ user_id: user.id, trick_id: t.id, status: "valide", updated_at: new Date().toISOString() })),
+      { onConflict: "user_id,trick_id", ignoreDuplicates: true },
+    );
   }
 
+  if (!profile.onboarded) redirect("/dashboard");
   revalidatePath("/", "layout");
   return { saved: true };
+}
+
+/** Change le sport actif (sélecteur en haut de l'espace membre). */
+export async function switchSport(formData: FormData) {
+  const sport = String(formData.get("sport"));
+  const back = String(formData.get("back") ?? "/dashboard");
+  const { supabase, user, profile } = await requireSession();
+  if (isSport(sport)) {
+    const sports = profile.sports?.includes(sport) ? profile.sports : [...(profile.sports ?? []), sport];
+    await supabase.from("profiles").update({ sport, sports }).eq("id", user.id);
+  }
+  revalidatePath("/", "layout");
+  redirect(back.startsWith("/") && !back.startsWith("//") ? back : "/dashboard");
 }
 
 export async function setTrickStatus(formData: FormData) {

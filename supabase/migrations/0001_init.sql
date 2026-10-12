@@ -6,11 +6,14 @@ create table if not exists public.profiles (
   id uuid primary key references auth.users (id) on delete cascade,
   email text,
   full_name text,
-  level text check (level in ('debutant', 'intermediaire', 'avance', 'expert')),
-  discipline text,
+  -- Sports : kitesurf, wingfoil, foil, surf, wakeboard
+  sport text not null default 'kitesurf'
+    check (sport in ('kitesurf', 'wingfoil', 'foil', 'surf', 'wakeboard')),        -- sport actif
+  sports text[] not null default '{kitesurf}',                                     -- sports pratiqués
+  levels jsonb not null default '{}'::jsonb,                                       -- {"kitesurf": "avance", ...}
+  gear jsonb not null default '{}'::jsonb,                                         -- {"kitesurf": "9 et 12", ...}
   stance text check (stance in ('regular', 'goofy')),
   weight_kg integer check (weight_kg between 25 and 200),
-  quiver text,                       -- texte libre, ex. "9 m, 12 m, twin-tip 138"
   goals text,
   home_label text,                   -- ville ou spot de départ
   home_lat double precision,
@@ -39,7 +42,7 @@ create policy "profil : modification propriétaire" on public.profiles
 
 -- L'utilisateur ne peut modifier QUE ces colonnes (ni le plan, ni is_admin).
 revoke update on public.profiles from authenticated, anon;
-grant update (full_name, level, discipline, stance, weight_kg, quiver, goals,
+grant update (full_name, sport, sports, levels, gear, stance, weight_kg, goals,
               home_label, home_lat, home_lng, radius_km, wind_alerts, onboarded)
   on public.profiles to authenticated;
 
@@ -116,6 +119,8 @@ create policy "messages : suppression propriétaire" on public.coach_messages
 create table if not exists public.video_analyses (
   id uuid primary key default gen_random_uuid(),
   user_id uuid not null references auth.users (id) on delete cascade,
+  sport text not null default 'kitesurf'
+    check (sport in ('kitesurf', 'wingfoil', 'foil', 'surf', 'wakeboard')),
   trick text,
   notes text,
   video_path text,
@@ -204,12 +209,14 @@ alter table public.ai_usage enable row level security; -- aucune policy : servic
 create table if not exists public.spots (
   id text primary key,                     -- slug
   name text not null,
+  -- Sports praticables : kitesurf, wingfoil, foil (vent), surf (houle), wakeboard (téléski)
+  sports text[] not null default '{kitesurf,wingfoil,foil}',
   country text not null,
   region text,
   lat double precision not null,
   lng double precision not null,
-  sea_bearing integer not null check (sea_bearing between 0 and 359), -- direction plage → large, en degrés
-  water text not null default 'chop' check (water in ('flat', 'chop', 'vagues')),
+  sea_bearing integer not null default 0 check (sea_bearing between 0 and 359), -- direction plage → large (sans objet pour un téléski)
+  water text not null default 'chop' check (water in ('flat', 'chop', 'vagues', 'lac')),
   min_level text not null default 'debutant' check (min_level in ('debutant', 'intermediaire', 'avance')),
   notes text,
   active boolean not null default true,

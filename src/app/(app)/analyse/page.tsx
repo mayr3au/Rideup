@@ -3,7 +3,9 @@ import Link from "next/link";
 import { requireSession, effectivePlan } from "@/lib/auth";
 import { getQuota, sweepStaleAnalyses } from "@/lib/usage";
 import { ANALYSIS_DEPTH } from "@/lib/plans";
-import { trickById } from "@/lib/tricks";
+import { trickById } from "@/lib/sports";
+import { activeSport, riderSports } from "@/lib/rider";
+import { redirect } from "next/navigation";
 import { AnalyseUploader } from "@/components/analyse-uploader";
 
 export const metadata: Metadata = { title: "Analyse vidéo" };
@@ -11,6 +13,7 @@ export const metadata: Metadata = { title: "Analyse vidéo" };
 export default async function AnalysePage({ searchParams }: { searchParams: Promise<{ figure?: string }> }) {
   const { figure } = await searchParams;
   const { supabase, profile } = await requireSession();
+  if (!profile.onboarded) redirect("/profil");
   const plan = effectivePlan(profile);
   await sweepStaleAnalyses(profile.id);
   const quota = await getQuota(supabase, profile, plan, "analyses");
@@ -20,7 +23,7 @@ export default async function AnalysePage({ searchParams }: { searchParams: Prom
     <div className="mx-auto max-w-2xl">
       <h1 className="text-3xl font-bold sm:text-4xl">Analyser une figure</h1>
       <p className="mt-2 text-slate">
-        Importe ta vidéo, sélectionne le passage et reçois les corrections technique par technique.
+        Importe ta vidéo, garde le moment de ta figure et reçois tes corrections en une minute environ.
         {deep && " Ton analyse Elite est approfondie et comparée à tes tentatives précédentes."}
       </p>
 
@@ -31,6 +34,8 @@ export default async function AnalysePage({ searchParams }: { searchParams: Prom
             remaining={quota.remaining}
             deep={deep}
             sheetCount={ANALYSIS_DEPTH[plan].sheets}
+            sports={riderSports(profile)}
+            defaultSport={activeSport(profile)}
           />
         ) : (
           <div className="panel p-6">

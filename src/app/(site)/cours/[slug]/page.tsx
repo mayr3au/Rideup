@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { COURSES, courseBySlug } from "@/lib/courses";
+import { COURSES, courseBySlug, courseSport } from "@/lib/courses";
+import { SPORTS } from "@/lib/sports";
 
 export function generateStaticParams() {
   return COURSES.map((c) => ({ slug: c.slug }));
@@ -9,7 +10,7 @@ export function generateStaticParams() {
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const c = courseBySlug((await params).slug);
-  return c ? { title: `${c.title} — cours de kitesurf`, description: c.intro } : {};
+  return c ? { title: `${c.title} — cours de ${SPORTS[courseSport(c)].name.toLowerCase()}`, description: c.intro } : {};
 }
 
 export default async function CoursePage({ params }: { params: Promise<{ slug: string }> }) {
@@ -19,7 +20,7 @@ export default async function CoursePage({ params }: { params: Promise<{ slug: s
   return (
     <article className="mx-auto max-w-2xl px-4 py-14 sm:px-6">
       <Link href="/cours" className="text-lagoon hover:underline">Tous les cours</Link>
-      <p className="mt-6 text-slate">{c.level} · {c.minutes} min de lecture</p>
+      <p className="mt-6 text-slate">{SPORTS[courseSport(c)].name} · {c.level} · {c.minutes} min de lecture</p>
       <h1 className="text-3xl font-extrabold sm:text-4xl">{c.title}</h1>
       <p className="mt-4 text-lg">{c.intro}</p>
 

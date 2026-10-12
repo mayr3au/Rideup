@@ -8,13 +8,13 @@ export default function Page() {
     <LegalPage title="Conditions générales d'utilisation">
       <h2>Le service</h2>
       <p>
-        RIDE&apos;UP propose un accompagnement en ligne pour progresser en kitesurf : analyse de vidéos par
+        RIDE&apos;UP propose un accompagnement en ligne pour progresser en sports de glisse (kitesurf, wingfoil, foil, surf, wakeboard) : analyse de vidéos par
         intelligence artificielle, roadmap de figures et coach conversationnel. Les conseils fournis sont
         indicatifs et ne remplacent pas un enseignement encadré par un moniteur diplômé.
       </p>
       <h2>Sécurité</h2>
       <p>
-        Le kitesurf est un sport à risques. L&apos;utilisateur reste seul juge des conditions de pratique (vent,
+        Les sports de glisse sont des sports à risques. L&apos;utilisateur reste seul juge des conditions de pratique (vent,
         mer, matériel, niveau) et seul responsable de sa sécurité et de celle des tiers.
       </p>
       <h2>Compte</h2>

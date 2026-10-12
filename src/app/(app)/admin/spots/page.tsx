@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { requireAdmin } from "@/lib/auth";
 import type { Spot } from "@/lib/types";
+import { SPORT_IDS, SPORTS } from "@/lib/sports";
 import { AdminForm } from "@/components/admin-form";
 import { saveSpot, toggleSpot } from "../actions";
 
@@ -37,6 +38,7 @@ export default async function AdminSpots({ searchParams }: { searchParams: Promi
                 <option value="flat">Eau plate</option>
                 <option value="chop">Clapot</option>
                 <option value="vagues">Vagues</option>
+                <option value="lac">Lac (téléski)</option>
               </select>
             </div>
             <div>
@@ -48,6 +50,24 @@ export default async function AdminSpots({ searchParams }: { searchParams: Promi
               </select>
             </div>
           </div>
+          <fieldset className="mt-4">
+            <legend className="label">Sports possibles sur ce spot</legend>
+            <div className="flex flex-wrap gap-2">
+              {SPORT_IDS.map((sp) => (
+                <label key={sp} className="flex min-h-10 cursor-pointer items-center gap-2 rounded-full border border-line px-3 has-[:checked]:border-brand has-[:checked]:bg-brand-light">
+                  <input
+                    type="checkbox"
+                    name="sports"
+                    value={sp}
+                    defaultChecked={current ? current.sports?.includes(sp) : SPORTS[sp].spot === "wind"}
+                    className="accent-[var(--color-brand)]"
+                  />
+                  {SPORTS[sp].name}
+                </label>
+              ))}
+            </div>
+            <p className="mt-1 text-sm text-slate">Un téléski nautique : coche seulement Wakeboard et choisis « Lac ».</p>
+          </fieldset>
           <div className="mt-4">
             <label htmlFor="notes" className="label">Notes (sécurité, accès, réglementation)</label>
             <textarea id="notes" name="notes" rows={2} defaultValue={current?.notes ?? ""} className="field" />
@@ -63,7 +83,7 @@ export default async function AdminSpots({ searchParams }: { searchParams: Promi
             <li key={s.id} className="flex items-center justify-between gap-3 py-3">
               <div className={`min-w-0 ${s.active ? "" : "opacity-50"}`}>
                 <p className="truncate font-semibold">{s.name}</p>
-                <p className="text-sm text-slate">{s.country} · large {s.sea_bearing}° · {s.lat.toFixed(3)}, {s.lng.toFixed(3)}</p>
+                <p className="text-sm text-slate">{s.country} · {(s.sports ?? []).map((sp) => SPORTS[sp]?.short ?? sp).join(", ")} · large {s.sea_bearing}° · {s.lat.toFixed(3)}, {s.lng.toFixed(3)}</p>
               </div>
               <div className="flex shrink-0 gap-2">
                 <a href={`/admin/spots?edit=${s.id}`} className="btn btn-ghost !px-3 !py-1.5 text-sm">Modifier</a>

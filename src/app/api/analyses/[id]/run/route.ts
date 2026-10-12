@@ -59,6 +59,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
       .from("video_analyses")
       .select("id, created_at, result")
       .eq("trick", analysis.trick)
+      .eq("sport", analysis.sport)
       .eq("status", "termine")
       .neq("id", id)
       .order("created_at", { ascending: false })
@@ -79,6 +80,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
   try {
     ({ result, cost } = await analyseClip({
       profile,
+      sport: analysis.sport,
       history,
       sheets: parsed.data.sheets.map((s) => s.replace(/^data:image\/jpeg;base64,/, "")),
       frameTimes: parsed.data.frameTimes,

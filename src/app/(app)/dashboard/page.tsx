@@ -1,104 +1,117 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { requireSession, effectivePlan } from "@/lib/auth";
 import { getQuota } from "@/lib/usage";
 import { getProgressData } from "@/lib/progress";
 import { PLANS } from "@/lib/plans";
 import { courseForTrick } from "@/lib/courses";
+import { activeSport } from "@/lib/rider";
+import { SPORTS } from "@/lib/sports";
+import { SPORT_PHOTOS } from "@/lib/photos";
 
-export const metadata: Metadata = { title: "Tableau de bord" };
+export const metadata: Metadata = { title: "Accueil" };
 
 export default async function Dashboard({ searchParams }: { searchParams: Promise<{ abonnement?: string }> }) {
   const { abonnement } = await searchParams;
   const { supabase, user, profile } = await requireSession();
-  const plan = effectivePlan(profile);
+  if (!profile.onboarded) redirect("/profil");
 
-  const [quota, data] = await Promise.all([getQuota(supabase, profile, plan, "analyses"), getProgressData(supabase, user.id)]);
+  const plan = effectivePlan(profile);
+  const sport = activeSport(profile);
+  const S = SPORTS[sport];
+
+  const [quota, data] = await Promise.all([
+    getQuota(supabase, profile, plan, "analyses"),
+    getProgressData(supabase, user.id, sport),
+  ]);
   const firstName = profile.full_name?.split(" ")[0];
-  const pct = quota.limit ? Math.min(100, (quota.used / quota.limit) * 100) : 100;
   const next = data.working[0] ?? data.nextTrick;
   const course = next ? courseForTrick(next.id) : undefined;
 
   return (
-    <div className="space-y-8">
+    <div className="mx-auto max-w-3xl space-y-6">
       {abonnement === "ok" && (
-        <p role="status" className="rounded-md border border-lagoon/40 bg-lagoon/10 p-4">
+        <p role="status" className="rounded-2xl bg-brand-light p-4 font-semibold text-lagoon">
           Ton abonnement est actif. S&apos;il n&apos;apparaît pas encore, recharge la page dans quelques secondes.
         </p>
       )}
 
-      <h1 className="text-3xl font-bold sm:text-4xl">{firstName ? `Salut ${firstName}` : "Salut"}</h1>
+      <div>
+        <p className="text-slate">{firstName ? `Salut ${firstName}` : "Salut"}</p>
+        <h1 className="text-3xl font-bold">Prêt pour ta session de {S.name.toLowerCase()} ?</h1>
+      </div>
 
-      {!profile.onboarded && (
-        <section className="panel border-2 !border-kite p-5">
-          <h2 className="text-2xl font-bold">Crée ton profil rider</h2>
-          <p className="mt-1 text-slate">Niveau, poids, matériel : c&apos;est ce qui rend les analyses et le Spot Finder justes pour toi.</p>
-          <Link href="/profil" className="btn btn-primary mt-4">Créer mon profil</Link>
-        </section>
-      )}
-
-      <section className="rounded-lg bg-brand p-5 text-white sm:p-6">
-        <div className="flex flex-wrap items-end justify-between gap-4">
+      {/* Action principale */}
+      <Link href="/analyse" className="photo-card relative flex min-h-56 flex-col justify-end overflow-hidden">
+        <Image src={SPORT_PHOTOS[sport]} alt="" fill sizes="(min-width: 768px) 768px, 100vw" className="object-cover" priority />
+        <div className="photo-veil absolute inset-0" />
+        <div className="relative flex items-end justify-between gap-4 p-5 text-white">
           <div>
-            <p className="text-white/70">{plan === "free" ? "Essai gratuit" : `${PLANS[plan].name} · cette période`}</p>
-            <p className="mt-1 font-display text-4xl font-extrabold">
-              {quota.remaining}
-              <span className="text-xl font-semibold text-white/70"> analyse{quota.remaining > 1 ? "s" : ""} restante{quota.remaining > 1 ? "s" : ""}</span>
+            <p className="text-2xl font-bold">Analyser une figure</p>
+            <p className="text-white/85">
+              {quota.remaining} analyse{quota.remaining > 1 ? "s" : ""} restante{quota.remaining > 1 ? "s" : ""}
+              {plan === "free" ? " (essai)" : ` ce mois-ci · ${PLANS[plan].name}`}
             </p>
           </div>
-          <Link href="/analyse" className="btn btn-kite">Analyser une figure</Link>
+          <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-white text-brand" aria-hidden="true">
+            <svg viewBox="0 0 24 24" className="h-6 w-6" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M12 5v14M5 12h14" />
+            </svg>
+          </span>
         </div>
-        <div className="mt-4 h-2 overflow-hidden rounded-sm bg-ink/15" role="progressbar" aria-valuenow={quota.used} aria-valuemin={0} aria-valuemax={quota.limit} aria-label="Analyses utilisées">
-          <div className="h-full rounded-sm bg-kite" style={{ width: `${pct}%` }} />
-        </div>
-        <p className="mt-2 text-sm text-white/70">
-          {quota.used} sur {quota.limit} utilisée{quota.used > 1 ? "s" : ""}
-          {plan === "free" && (
-            <>
-              {" · "}
-              <Link href="/tarifs" className="underline">Passer à Progress</Link>
-            </>
-          )}
+      </Link>
+      {plan === "free" && (
+        <p className="text-center text-sm text-slate">
+          Plus d&apos;analyses ?{" "}
+          <Link href="/tarifs" className="font-semibold text-lagoon">Voir les formules</Link>
         </p>
-      </section>
+      )}
 
+      {/* Priorités */}
       <section>
-        <h2 className="text-2xl font-bold">Pour ta prochaine session</h2>
+        <h2 className="text-xl font-bold">À travailler à ta prochaine session</h2>
         {data.priorities.length ? (
-          <ol className="mt-3 space-y-2">
+          <ol className="mt-3 space-y-3">
             {data.priorities.map((p, i) => (
-              <li key={i} className="panel p-4">
-                <p className="font-semibold">{p.title}</p>
-                <p className="mt-1 text-slate">{p.detail}</p>
+              <li key={i} className="panel flex gap-4 p-4">
+                <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-brand-light font-extrabold text-brand">{i + 1}</span>
+                <div>
+                  <p className="font-semibold">{p.title}</p>
+                  <p className="mt-0.5 text-[0.95rem] text-slate">{p.detail}</p>
+                </div>
               </li>
             ))}
           </ol>
         ) : (
-          <p className="mt-2 text-slate">Analyse ta première figure : tes priorités apparaîtront ici.</p>
+          <p className="panel mt-3 p-4 text-slate">Analyse ta première figure : tes priorités apparaîtront ici.</p>
         )}
       </section>
 
-      <div className="grid gap-4 md:grid-cols-2">
+      <div className="grid gap-4 sm:grid-cols-2">
         {next && (
           <section className="panel p-5">
-            <p className="text-sm text-slate">{data.working.length ? "Figure en cours" : "Prochaine figure"}</p>
-            <h2 className="mt-1 text-2xl font-bold">{next.name}</h2>
-            <p className="mt-1 text-slate">{next.summary}</p>
-            <div className="mt-4 flex flex-wrap gap-x-4 gap-y-2">
-              <Link href={`/analyse?figure=${next.id}`} className="text-lagoon underline">Analyser une tentative</Link>
-              {course && <Link href={`/cours/${course.slug}`} className="text-lagoon underline">Lire le cours</Link>}
+            <p className="text-sm font-semibold text-brand">{data.working.length ? "Figure en cours" : "Prochaine figure"}</p>
+            <h2 className="mt-1 text-xl font-bold">{next.name}</h2>
+            <p className="mt-1 text-[0.95rem] text-slate">{next.summary}</p>
+            <div className="mt-3 flex flex-wrap gap-x-4 gap-y-1">
+              <Link href="/coach" className="inline-flex min-h-10 items-center text-sm font-semibold text-lagoon">Voir ma roadmap</Link>
+              {course && <Link href={`/cours/${course.slug}`} className="inline-flex min-h-10 items-center text-sm font-semibold text-lagoon">Lire le cours</Link>}
             </div>
           </section>
         )}
         <section className="panel p-5">
-          <p className="text-sm text-slate">Où rider</p>
-          <h2 className="mt-1 text-2xl font-bold">Spot Finder</h2>
-          <p className="mt-1 text-slate">
-            {plan === "free"
-              ? "Le meilleur spot selon le vent, ton niveau et ton matériel, avec Progress."
-              : "Les créneaux ridables autour de toi pour les 7 prochains jours."}
+          <p className="text-sm font-semibold text-brand">{S.spot === "cable" ? "Où rider" : "Conditions"}</p>
+          <h2 className="mt-1 text-xl font-bold">Spot Finder</h2>
+          <p className="mt-1 text-[0.95rem] text-slate">
+            {S.spot === "cable"
+              ? "Les téléskis nautiques autour de toi."
+              : S.spot === "waves"
+                ? "Les spots où il y a des vagues pour ton niveau, cette semaine."
+                : "Les spots où il y a du vent pour ton niveau et ton matériel, cette semaine."}
           </p>
-          <Link href={plan === "free" ? "/week-end" : "/spots"} className="mt-4 inline-block text-lagoon underline">
+          <Link href={plan === "free" ? "/week-end" : "/spots"} className="mt-3 inline-flex min-h-10 items-center text-sm font-semibold text-lagoon">
             {plan === "free" ? "Voir les spots du week-end" : "Trouver un spot"}
           </Link>
         </section>
@@ -107,17 +120,17 @@ export default async function Dashboard({ searchParams }: { searchParams: Promis
       {data.recentAttempts.length > 0 && (
         <section>
           <div className="flex items-baseline justify-between">
-            <h2 className="text-2xl font-bold">Dernières analyses</h2>
-            <Link href="/historique" className="text-lagoon hover:underline">Historique</Link>
+            <h2 className="text-xl font-bold">Dernières analyses</h2>
+            <Link href="/historique" className="text-sm font-semibold text-lagoon">Tout voir</Link>
           </div>
-          <ul className="mt-3 divide-y divide-line border-y border-line">
+          <ul className="mt-3 space-y-2">
             {data.recentAttempts.slice(-3).reverse().map((a, i) => (
-              <li key={i} className="flex items-center justify-between gap-4 py-3">
+              <li key={i} className="panel flex items-center justify-between gap-4 px-4 py-3">
                 <span>
                   <span className="font-semibold">{a.figure}</span>
-                  <span className="ml-2 text-sm text-slate">{a.date}</span>
+                  <span className="block text-sm text-slate">{a.date}</span>
                 </span>
-                <span className="font-display text-lg font-bold">{a.note}/10</span>
+                <span className="text-xl font-extrabold text-brand">{a.note}/10</span>
               </li>
             ))}
           </ul>

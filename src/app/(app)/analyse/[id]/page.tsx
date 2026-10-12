@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { requireSession } from "@/lib/auth";
-import { errorLabel, trickById } from "@/lib/tricks";
+import { errorLabel, phaseLabel, SPORTS, trickById } from "@/lib/sports";
 import type { VideoAnalysis } from "@/lib/types";
 import { ConfirmButton } from "@/components/confirm-button";
 import { deleteAnalysis } from "../actions";
@@ -10,7 +10,6 @@ import { setTrickStatus } from "../../coach/actions";
 
 export const metadata: Metadata = { title: "Résultat d'analyse" };
 
-const PHASE_LABEL = { approche: "Approche", appel: "Appel", vol: "En l'air", reception: "Réception" } as const;
 const GRAVITE_STYLE = {
   majeure: "border-danger",
   moyenne: "border-kite",
@@ -56,6 +55,7 @@ export default async function AnalysisDetail({
         <div>
           <p className="text-slate">
             {new Date(a.created_at).toLocaleDateString("fr-FR", { weekday: "long", day: "numeric", month: "long" })}
+            {SPORTS[a.sport] && ` · ${SPORTS[a.sport].name}`}
             {a.depth === "approfondie" && " · analyse approfondie"}
           </p>
           <h1 className="text-3xl font-extrabold sm:text-4xl">{r?.figure ?? trick?.name ?? "Analyse"}</h1>
@@ -93,7 +93,7 @@ export default async function AnalysisDetail({
           </p>
           {r && r.visibilite !== "bonne" && (
             <p className="mt-3 rounded-md bg-kite/20 p-3 text-[0.95rem]">
-              Visibilité {r.visibilite} : filme plus près, de côté, avec le kite dans le cadre pour une analyse plus fine.
+              Visibilité {r.visibilite} : filme plus près et de côté, en gardant tout le rider dans le cadre, pour une analyse plus fine.
             </p>
           )}
         </div>
@@ -128,7 +128,7 @@ export default async function AnalysisDetail({
                   {r.phases.map((p) => (
                     <div key={p.phase} className="grid grid-cols-[5.5rem_1fr] gap-3">
                       <dt>
-                        <span className="block font-semibold">{PHASE_LABEL[p.phase]}</span>
+                        <span className="block font-semibold">{phaseLabel(a.sport, p.phase)}</span>
                         <span className="font-display text-lg font-bold">{p.note}/10</span>
                       </dt>
                       <dd className="text-slate">{p.commentaire}</dd>

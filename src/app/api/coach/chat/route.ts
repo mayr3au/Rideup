@@ -2,13 +2,14 @@ import { NextResponse, type NextRequest } from "next/server";
 import { z } from "zod";
 import { getSession, effectivePlan } from "@/lib/auth";
 import { coachReply } from "@/lib/ai";
+import { activeSport } from "@/lib/rider";
 import { getRiderHistory, reserveQuota } from "@/lib/usage";
 import { createAdminClient } from "@/lib/supabase/admin";
 import type { CoachMessage } from "@/lib/types";
 
 export const maxDuration = 60;
 
-const body = z.object({ message: z.string().trim().min(1).max(2000) });
+const body = z.object({ message: z.string().trim().min(1).max(2000), sport: z.string().optional() });
 
 export async function POST(request: NextRequest) {
   const session = await getSession();
@@ -49,7 +50,7 @@ export async function POST(request: NextRequest) {
 
   let reply: string;
   try {
-    reply = await coachReply(profile, history, [...messages, { role: "user", content: parsed.data.message }]);
+    reply = await coachReply(profile, activeSport(profile, parsed.data.sport), history, [...messages, { role: "user", content: parsed.data.message }]);
   } catch (e) {
     console.error("coach", e);
     await createAdminClient().from("usage_events").delete().eq("kind", "coach").eq("ref", ref);

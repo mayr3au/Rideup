@@ -2,7 +2,8 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { requireSession, effectivePlan } from "@/lib/auth";
 import { getProgressData } from "@/lib/progress";
-import { TRICKS } from "@/lib/tricks";
+import { SPORTS } from "@/lib/sports";
+import { activeSport } from "@/lib/rider";
 import type { Program } from "@/lib/types";
 import { Sparkline } from "@/components/sparkline";
 import { ProgramButton } from "@/components/program-button";
@@ -20,19 +21,26 @@ export default async function ProgressionPage() {
   const { supabase, user, profile } = await requireSession();
   const plan = effectivePlan(profile);
   const elite = plan === "elite";
-  const data = await getProgressData(supabase, user.id);
+  const sport = activeSport(profile);
+  const data = await getProgressData(supabase, user.id, sport);
 
   const { data: programRow } = elite
-    ? await supabase.from("programs").select("content, created_at").order("created_at", { ascending: false }).limit(1).maybeSingle()
+    ? await supabase
+        .from("programs")
+        .select("content, created_at")
+        .eq("content->>sport", sport)
+        .order("created_at", { ascending: false })
+        .limit(1)
+        .maybeSingle()
     : { data: null };
   const program = programRow?.content as Program | undefined;
 
   return (
     <div className="space-y-12">
       <header>
-        <h1 className="text-3xl font-bold sm:text-4xl">Progression</h1>
+        <h1 className="text-3xl font-bold sm:text-4xl">Progression {SPORTS[sport].name.toLowerCase()}</h1>
         <dl className="mt-6 grid grid-cols-3 gap-3 sm:max-w-xl">
-          <Stat label="Maîtrisées" value={`${data.validated.length}/${TRICKS.length}`} />
+          <Stat label="Maîtrisées" value={`${data.validated.length}/${data.totalTricks}`} />
           <Stat label="Analyses" value={String(data.analysesCount)} />
           <Stat label="Moyenne récente" value={data.average ? data.average.toFixed(1) : "–"} />
         </dl>

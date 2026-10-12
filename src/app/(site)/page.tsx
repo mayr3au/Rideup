@@ -1,12 +1,14 @@
 import Image from "next/image";
 import Link from "next/link";
 import { DEFAULT_SETTINGS, PLANS } from "@/lib/plans";
-import { PHOTOS } from "@/lib/photos";
+import { PHOTOS, SPORT_PHOTOS } from "@/lib/photos";
+import { SPORT_IDS, SPORTS } from "@/lib/sports";
 
 export default function Home() {
   return (
     <>
       <Hero />
+      <Sports />
       <Steps />
       <Result />
       <Features />
@@ -42,7 +44,7 @@ function Hero() {
       <div className="photo-card relative flex min-h-[72svh] flex-col justify-end overflow-hidden sm:min-h-[600px]">
         <Image
           src={PHOTOS.heroJump}
-          alt="Rider de kitesurf en plein saut"
+          alt="Rider en plein saut"
           fill
           priority
           sizes="(min-width: 1152px) 1152px, 100vw"
@@ -51,9 +53,9 @@ function Hero() {
         <div className="photo-veil absolute inset-0" />
 
         <div className="rise relative p-6 sm:p-10">
-          <h1 className="max-w-xl text-[2.35rem] text-white sm:text-6xl">Ton coach de kitesurf dans ta poche</h1>
+          <h1 className="max-w-xl text-[2.35rem] text-white sm:text-6xl">Ton coach de glisse dans ta poche</h1>
           <p className="mt-3 max-w-md text-[1.05rem] text-white/90 sm:text-lg">
-            Envoie la vidéo d&apos;un saut ou d&apos;une figure. En une minute, tu sais exactement quoi corriger.
+            Kite, wing, foil, surf ou wake : envoie la vidéo d&apos;une figure. En une minute, tu sais exactement quoi corriger.
           </p>
           <Link href="/inscription" className="btn btn-kite mt-6 w-full sm:w-auto">
             Essayer gratuitement
@@ -62,6 +64,37 @@ function Hero() {
           <p className="mt-3 text-center text-sm text-white/85 sm:text-left">1 analyse offerte · sans carte bancaire</p>
         </div>
       </div>
+    </section>
+  );
+}
+
+/* ───────────── 1 bis. Les sports ───────────── */
+const SPORT_TAGLINE: Record<(typeof SPORT_IDS)[number], string> = {
+  kitesurf: "Du water start au kiteloop",
+  wingfoil: "Du premier vol au jibe",
+  foil: "Kitefoil : vol, jibe, tack",
+  surf: "Take-off, bottom, cutback",
+  wakeboard: "Au téléski : kickers et modules",
+};
+
+function Sports() {
+  return (
+    <section className="mx-auto max-w-6xl pt-10 sm:px-6 sm:pt-14">
+      <h2 className="px-5 text-2xl sm:px-0 sm:text-3xl">Cinq sports, un seul coach</h2>
+      <ul className="snap-row mt-4 flex scroll-px-5 gap-3 overflow-x-auto px-5 pb-2 sm:grid sm:grid-cols-5 sm:overflow-visible sm:px-0">
+        {SPORT_IDS.map((sp) => (
+          <li key={sp} className="w-[42vw] max-w-[200px] shrink-0 snap-start sm:w-auto sm:max-w-none">
+            <div className="photo-card relative aspect-[3/4] overflow-hidden">
+              <Image src={SPORT_PHOTOS[sp]} alt="" fill sizes="(min-width: 640px) 220px, 42vw" className="object-cover" />
+              <div className="photo-veil absolute inset-0" />
+              <div className="absolute inset-x-0 bottom-0 p-3 text-white">
+                <p className="text-lg font-bold leading-tight">{SPORTS[sp].name}</p>
+                <p className="text-xs text-white/85">{SPORT_TAGLINE[sp]}</p>
+              </div>
+            </div>
+          </li>
+        ))}
+      </ul>
     </section>
   );
 }
@@ -101,7 +134,7 @@ function Steps() {
           <div className="p-5">
             <p className="text-sm font-bold text-brand">Étape 2</p>
             <h3 className="mt-1 text-xl">Garde ta figure</h3>
-            <p className="mt-1 text-[0.95rem] text-slate">Fais glisser le curseur pour garder le moment du saut, 20 secondes maximum.</p>
+            <p className="mt-1 text-[0.95rem] text-slate">Fais glisser le curseur pour garder le moment de la figure, 20 secondes maximum.</p>
           </div>
         </li>
 
@@ -143,7 +176,7 @@ function Result() {
             Voici à quoi ressemble une analyse. Chaque erreur vient avec une consigne simple à appliquer sur l&apos;eau.
           </p>
           <ul className="mt-5 space-y-2.5">
-            {["Une note pour chaque phase du saut", "Les erreurs, de la plus importante à la moins importante", "Les exercices à faire à ta prochaine session"].map((t) => (
+            {["Une note pour chaque phase de la figure", "Les erreurs, de la plus importante à la moins importante", "Les exercices à faire à ta prochaine session"].map((t) => (
               <li key={t} className="flex items-start gap-3">
                 <span className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-brand-light text-brand">
                   <Icon name="check" className="h-4 w-4" />
@@ -209,7 +242,7 @@ function Features() {
     {
       icon: "pin" as const,
       title: "Spot Finder",
-      text: "Le spot où aller selon le vent prévu, ton niveau et tes kites. Avec la taille de kite à sortir.",
+      text: "Le spot où aller selon le vent ou la houle prévus, ton niveau et ton matériel. Avec la taille d'aile à sortir.",
       photo: PHOTOS.blue,
       href: "/week-end",
       link: "Voir les spots du week-end",
@@ -217,7 +250,7 @@ function Features() {
     {
       icon: "book" as const,
       title: "Cours figure par figure",
-      text: "Du water start au kiteloop : les étapes, les erreurs courantes, les exercices.",
+      text: "Pour chaque sport : les étapes, les erreurs courantes, les exercices.",
       photo: PHOTOS.sunset,
       href: "/cours",
       link: "Lire les cours",
@@ -278,7 +311,7 @@ function PricingTeaser() {
               </p>
               <p className="mt-3 text-[0.95rem] text-slate">
                 {elite
-                  ? "Analyse plus poussée, comparaison de tes tentatives, programme personnalisé et alertes vent."
+                  ? "Analyse plus poussée, comparaison de tes tentatives, programme personnalisé et alertes conditions sur tes spots."
                   : "Analyse vidéo, suivi de progression, coach et Spot Finder."}
               </p>
             </div>
@@ -297,11 +330,11 @@ function Faq() {
   const items = [
     {
       q: "Il faut quel genre de vidéo ?",
-      a: "Un téléphone suffit. Filme de côté, à une trentaine de mètres, en gardant le rider et le kite dans le cadre si possible.",
+      a: "Un téléphone suffit. Filme de côté, à une trentaine de mètres, en gardant le rider (et son aile ou son kite) dans le cadre.",
     },
     {
       q: "Pourquoi 20 secondes maximum ?",
-      a: "Une figure dure quelques secondes. En gardant juste l'approche, le saut et la réception, l'analyse se concentre sur ce qui compte.",
+      a: "Une figure dure quelques secondes. En gardant juste l'approche, la figure et la réception, l'analyse se concentre sur ce qui compte.",
     },
     {
       q: "Ça remplace un moniteur ?",

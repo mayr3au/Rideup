@@ -76,3 +76,32 @@ insert into public.spots (id, name, country, region, lat, lng, sea_bearing, wate
 ('kanaha', 'Kanaha', 'États-Unis', 'Maui', 20.900, -156.440, 0, 'vagues', 'intermediaire', 'Zones réglementées.'),
 ('mui-ne', 'Mui Ne', 'Viêt Nam', 'Binh Thuan', 10.950, 108.290, 150, 'vagues', 'intermediaire', null)
 on conflict (id) do nothing;
+
+-- Spots de vent qui marchent aussi en surf quand il y a de la houle
+update public.spots set sports = '{kitesurf,wingfoil,foil,surf}'
+where id in ('lacanau', 'la-torche', 'sainte-barbe', 'famara', 'klitmoller', 'guincho', 'wissant');
+
+-- Spots de surf (houle). Coordonnées et orientations approximatives, à vérifier dans Admin → Spots.
+insert into public.spots (id, name, country, region, lat, lng, sea_bearing, water, min_level, sports, notes) values
+('hossegor-graviere', 'Hossegor – La Gravière', 'France', 'Landes', 43.672, -1.443, 270, 'vagues', 'avance', '{surf}', 'Beach break puissant et creux.'),
+('seignosse-bourdaines', 'Seignosse – Les Bourdaines', 'France', 'Landes', 43.700, -1.440, 270, 'vagues', 'intermediaire', '{surf}', null),
+('capbreton', 'Capbreton – La Piste', 'France', 'Landes', 43.640, -1.451, 270, 'vagues', 'intermediaire', '{surf}', null),
+('mimizan', 'Mimizan', 'France', 'Landes', 44.213, -1.300, 270, 'vagues', 'debutant', '{surf}', 'Plage surveillée l''été.'),
+('biscarrosse', 'Biscarrosse Plage', 'France', 'Landes', 44.446, -1.255, 270, 'vagues', 'debutant', '{surf}', null),
+('anglet-cavaliers', 'Anglet – Les Cavaliers', 'France', 'Pays basque', 43.520, -1.530, 290, 'vagues', 'intermediaire', '{surf}', null),
+('biarritz-cote-basques', 'Biarritz – Côte des Basques', 'France', 'Pays basque', 43.478, -1.567, 290, 'vagues', 'debutant', '{surf}', 'Idéale pour apprendre à marée basse.'),
+('guethary-parlementia', 'Guéthary – Parlementia', 'France', 'Pays basque', 43.430, -1.610, 310, 'vagues', 'avance', '{surf}', 'Vague de récif, grosse houle.'),
+('siouville', 'Siouville-Hague', 'France', 'Manche', 49.560, -1.850, 270, 'vagues', 'intermediaire', '{surf}', null),
+('zarautz', 'Zarautz', 'Espagne', 'Pays basque', 43.285, -2.170, 0, 'vagues', 'debutant', '{surf}', null),
+('mundaka', 'Mundaka', 'Espagne', 'Pays basque', 43.408, -2.700, 330, 'vagues', 'avance', '{surf}', 'Gauche de rivière mythique, réservée aux confirmés.'),
+('peniche-supertubos', 'Peniche – Supertubos', 'Portugal', 'Centre', 39.343, -9.360, 220, 'vagues', 'avance', '{surf}', 'Beach break très creux.'),
+('baleal', 'Baleal', 'Portugal', 'Centre', 39.374, -9.338, 20, 'vagues', 'debutant', '{surf}', null),
+('ericeira-ribeira', 'Ericeira – Ribeira d''Ilhas', 'Portugal', 'Lisbonne', 38.988, -9.420, 280, 'vagues', 'intermediaire', '{surf}', null),
+('taghazout-anchor', 'Taghazout – Anchor Point', 'Maroc', 'Agadir', 30.545, -9.710, 270, 'vagues', 'avance', '{surf}', 'Droite de pointe, en hiver.'),
+('imsouane', 'Imsouane – La Baie', 'Maroc', 'Agadir', 30.840, -9.820, 200, 'vagues', 'debutant', '{surf}', 'Longue droite douce.'),
+('canggu', 'Canggu – Batu Bolong', 'Indonésie', 'Bali', -8.659, 115.130, 220, 'vagues', 'intermediaire', '{surf}', null),
+('kuta-bali', 'Kuta Beach', 'Indonésie', 'Bali', -8.718, 115.168, 250, 'vagues', 'debutant', '{surf}', null),
+('uluwatu', 'Uluwatu', 'Indonésie', 'Bali', -8.815, 115.087, 240, 'vagues', 'avance', '{surf}', 'Récif, réservé aux confirmés.')
+on conflict (id) do nothing;
+
+-- Téléskis nautiques (wakeboard) : à ajouter depuis Admin → Spots en cochant « Wakeboard ».

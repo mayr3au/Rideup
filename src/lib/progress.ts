@@ -1,6 +1,6 @@
 import "server-only";
 import type { SupabaseClient } from "@supabase/supabase-js";
-import { TRICKS, errorLabel } from "@/lib/tricks";
+import { errorLabel, tricksFor, type SportId } from "@/lib/sports";
 import type { AnalysisResult, TrickProgress, VideoAnalysis } from "@/lib/types";
 
 type Row = Pick<VideoAnalysis, "id" | "trick" | "created_at" | "result">;
@@ -27,12 +27,15 @@ export type ErrorTrend = {
 };
 
 /** Toutes les données de la page Progression, calculées sans appel IA. */
-export async function getProgressData(db: SupabaseClient, userId: string) {
+/** Données de progression pour un sport donné. */
+export async function getProgressData(db: SupabaseClient, userId: string, sport: SportId) {
+  const TRICKS = tricksFor(sport);
   const [{ data: rows }, { data: progress }] = await Promise.all([
     db
       .from("video_analyses")
       .select("id, trick, created_at, result")
       .eq("user_id", userId)
+      .eq("sport", sport)
       .eq("status", "termine")
       .order("created_at", { ascending: true })
       .limit(300)
@@ -111,6 +114,8 @@ export async function getProgressData(db: SupabaseClient, userId: string) {
   const nextTrick = TRICKS.find((t) => !status.get(t.id));
 
   return {
+    sport,
+    totalTricks: TRICKS.length,
     analysesCount: analyses.length,
     average: analyses.length ? analyses.slice(-10).reduce((s, a) => s + a.result.note, 0) / Math.min(10, analyses.length) : null,
     tricks,

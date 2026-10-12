@@ -3,16 +3,29 @@
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { RichText } from "./rich-text";
+import type { SportId } from "@/lib/sports";
 
 type Msg = { role: "user" | "assistant"; content: string };
 
-const SUGGESTIONS = [
-  "Pourquoi je retombe toujours sur les fesses en saut ?",
-  "Quelle taille de kite pour 18 nœuds, je fais 75 kg ?",
-  "Comment je prépare mon premier backroll ?",
-];
+const SUGGESTIONS: Record<SportId, string[]> = {
+  kitesurf: ["Pourquoi je retombe sur les fesses en saut ?", "Quelle taille de kite pour 18 nœuds, je fais 75 kg ?", "Comment je prépare mon premier backroll ?"],
+  wingfoil: ["Je n'arrive pas à décoller, je fais quoi ?", "Quelle taille d'aile pour 15 nœuds, je fais 75 kg ?", "Comment réussir mon premier jibe en vol ?"],
+  foil: ["Mon foil sort de l'eau sans arrêt, pourquoi ?", "Comment je tiens une hauteur de vol stable ?", "Comment préparer mon premier jibe en vol ?"],
+  surf: ["Je me lève trop tard sur la vague, pourquoi ?", "Comment faire un bon bottom turn ?", "Quelle planche pour progresser après la mousse ?"],
+  wakeboard: ["Comment aborder mon premier kicker ?", "Je tombe à chaque virage du câble, pourquoi ?", "Comment préparer un backroll sur kicker ?"],
+};
 
-export function CoachChat({ initial, clearAction }: { initial: Msg[]; clearAction: () => Promise<void> }) {
+export function CoachChat({
+  initial,
+  clearAction,
+  sport,
+  sportName,
+}: {
+  initial: Msg[];
+  clearAction: () => Promise<void>;
+  sport: SportId;
+  sportName: string;
+}) {
   const [messages, setMessages] = useState<Msg[]>(initial);
   const [input, setInput] = useState("");
   const [pending, setPending] = useState(false);
@@ -34,7 +47,7 @@ export function CoachChat({ initial, clearAction }: { initial: Msg[]; clearActio
       const res = await fetch("/api/coach/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message }),
+        body: JSON.stringify({ message, sport }),
       });
       const data = await res.json();
       if (!res.ok) {
@@ -54,9 +67,9 @@ export function CoachChat({ initial, clearAction }: { initial: Msg[]; clearActio
   }
 
   return (
-    <div className="panel flex h-[70dvh] min-h-[480px] flex-col">
+    <div className="panel flex h-[calc(100dvh-15rem)] min-h-[420px] flex-col lg:h-[70dvh]">
       <div className="flex items-center justify-between border-b border-line px-5 py-3">
-        <h2 className="text-xl font-bold">Ton coach</h2>
+        <h2 className="text-xl font-bold">Ton coach · {sportName}</h2>
         {messages.length > 0 && (
           <form action={async () => { await clearAction(); setMessages([]); }}>
             <button className="text-sm text-slate hover:text-deep">Effacer la conversation</button>
@@ -69,7 +82,7 @@ export function CoachChat({ initial, clearAction }: { initial: Msg[]; clearActio
           <div>
             <p className="text-slate">Pose une question sur une figure, ton matériel ou ta progression.</p>
             <div className="mt-4 flex flex-col items-start gap-2">
-              {SUGGESTIONS.map((s) => (
+              {SUGGESTIONS[sport].map((s) => (
                 <button key={s} onClick={() => send(s)} className="rounded-sm border border-line px-4 py-2 text-left text-[0.95rem] hover:border-deep">
                   {s}
                 </button>

@@ -73,7 +73,7 @@ export default async function AccountPage() {
 
       <section>
         <h2 className="text-2xl font-bold">Profil rider</h2>
-        <p className="mt-2 text-slate">Niveau, poids, matériel, ville et alertes vent.</p>
+        <p className="mt-2 text-slate">Sports, niveaux, matériel, ville et alertes.</p>
         <Link href="/profil" className="btn btn-ghost mt-4">Modifier mon profil</Link>
       </section>
 

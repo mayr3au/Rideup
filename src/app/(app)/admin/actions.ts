@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { requireAdmin as checkAdmin } from "@/lib/auth";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { SPORT_IDS } from "@/lib/sports";
 
 async function requireAdmin() {
   await checkAdmin();
@@ -56,14 +57,15 @@ const spotSchema = z.object({
   lat: z.coerce.number().min(-90).max(90),
   lng: z.coerce.number().min(-180).max(180),
   sea_bearing: z.coerce.number().int().min(0).max(359),
-  water: z.enum(["flat", "chop", "vagues"]),
+  water: z.enum(["flat", "chop", "vagues", "lac"]),
   min_level: z.enum(["debutant", "intermediaire", "avance"]),
   notes: z.string().trim().max(400).optional().default(""),
+  sports: z.array(z.enum(SPORT_IDS as [string, ...string[]])).min(1, "Coche au moins un sport."),
 });
 
 export async function saveSpot(_: AdminState, formData: FormData): Promise<AdminState> {
   const db = await requireAdmin();
-  const parsed = spotSchema.safeParse(Object.fromEntries(formData));
+  const parsed = spotSchema.safeParse({ ...Object.fromEntries(formData), sports: formData.getAll("sports") });
   if (!parsed.success) return { error: parsed.error.issues[0].message };
   const { error } = await db
     .from("spots")

@@ -58,6 +58,58 @@ export async function getForecasts(points: Point[]): Promise<HourForecast[][]> {
   return out;
 }
 
+type MarineResult = {
+  hourly: {
+    time: string[];
+    wave_height: (number | null)[];
+    wave_period: (number | null)[];
+    wave_direction: (number | null)[];
+    swell_wave_period?: (number | null)[];
+    swell_wave_direction?: (number | null)[];
+  };
+};
+
+const MARINE = KEY ? "https://customer-marine-api.open-meteo.com/v1/marine" : "https://marine-api.open-meteo.com/v1/marine";
+
+/** Houle horaire (7 jours), même découpage horaire que getForecasts. */
+async function getMarine(points: Point[]) {
+  const out: Map<string, { wave: number | null; period: number | null; swellDir: number | null }>[] = [];
+  for (let i = 0; i < points.length; i += 50) {
+    const batch = points.slice(i, i + 50);
+    const params = new URLSearchParams({
+      latitude: batch.map((p) => p.lat.toFixed(3)).join(","),
+      longitude: batch.map((p) => p.lng.toFixed(3)).join(","),
+      hourly: "wave_height,wave_period,wave_direction,swell_wave_period,swell_wave_direction",
+      timezone: "auto",
+      forecast_days: "7",
+    });
+    if (KEY) params.set("apikey", KEY);
+    const res = await fetch(`${MARINE}?${params}`, { next: { revalidate: 1800 } });
+    if (!res.ok) throw new Error(`Open-Meteo Marine ${res.status}`);
+    const json = (await res.json()) as MarineResult | MarineResult[];
+    for (const r of Array.isArray(json) ? json : [json]) {
+      const h = r.hourly;
+      const m = new Map<string, { wave: number | null; period: number | null; swellDir: number | null }>();
+      h.time.forEach((t, k) =>
+        m.set(t, {
+          wave: h.wave_height[k] ?? null,
+          period: h.swell_wave_period?.[k] ?? h.wave_period[k] ?? null,
+          swellDir: h.swell_wave_direction?.[k] ?? h.wave_direction[k] ?? null,
+        }),
+      );
+      out.push(m);
+    }
+  }
+  return out;
+}
+
+/** Prévisions complètes : vent et météo, plus la houle si `withWaves`. */
+export async function getConditions(points: Point[], withWaves: boolean): Promise<HourForecast[][]> {
+  if (!withWaves) return getForecasts(points);
+  const [weather, marine] = await Promise.all([getForecasts(points), getMarine(points)]);
+  return weather.map((hours, i) => hours.map((h) => ({ ...h, ...(marine[i]?.get(h.time) ?? { wave: null, period: null, swellDir: null }) })));
+}
+
 /** Ville → coordonnées. */
 export async function geocode(name: string) {
   const params = new URLSearchParams({ name, count: "1", language: "fr", format: "json" });

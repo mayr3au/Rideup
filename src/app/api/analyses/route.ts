@@ -5,17 +5,19 @@ import { getSession, effectivePlan } from "@/lib/auth";
 import { releaseAnalysis, reserveQuota, sweepStaleAnalyses } from "@/lib/usage";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { ANALYSIS_DEPTH, MAX_SEGMENT_SECONDS } from "@/lib/plans";
-import { TRICKS } from "@/lib/tricks";
+import { isSport, trickById } from "@/lib/sports";
 
 const body = z
   .object({
-    trick: z.string().refine((t) => t === "" || TRICKS.some((x) => x.id === t)),
+    sport: z.string().refine(isSport, "Sport inconnu."),
+    trick: z.string(),
     notes: z.string().trim().max(500),
     extension: z.enum(["mp4", "mov", "webm"]),
     clipHash: z.string().regex(/^[a-f0-9]{64}$/),
     segStart: z.number().min(0),
     segEnd: z.number().positive(),
   })
+  .refine((b) => b.trick === "" || trickById(b.trick)?.sport === b.sport, { message: "Cette figure ne correspond pas au sport choisi." })
   .refine((b) => b.segEnd > b.segStart && b.segEnd - b.segStart <= MAX_SEGMENT_SECONDS + 0.2, {
     message: `Le passage doit durer ${MAX_SEGMENT_SECONDS} secondes maximum.`,
   });
@@ -42,7 +44,7 @@ export async function POST(request: NextRequest) {
   const depth = ANALYSIS_DEPTH[plan];
 
   const cacheKey = createHash("sha256")
-    .update([b.clipHash, b.segStart.toFixed(1), b.segEnd.toFixed(1), b.trick || "-", depth.depth].join("|"))
+    .update([b.clipHash, b.segStart.toFixed(1), b.segEnd.toFixed(1), b.sport, b.trick || "-", depth.depth].join("|"))
     .digest("hex");
 
   // 1. Résultat déjà disponible ?
@@ -87,6 +89,7 @@ export async function POST(request: NextRequest) {
   const { error } = await createAdminClient().from("video_analyses").insert({
     id,
     user_id: user.id,
+    sport: b.sport,
     trick: b.trick || null,
     notes: b.notes || null,
     video_path: videoPath,

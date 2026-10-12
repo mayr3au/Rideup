@@ -1,15 +1,20 @@
-import type { Level } from "./tricks";
+import type { Level, SportId } from "./sports";
 import type { Plan } from "./plans";
 
 export type Profile = {
   id: string;
   email: string | null;
   full_name: string | null;
-  level: Level | null;
-  discipline: string | null;
+  /** Sport actif (celui affiché par défaut) */
+  sport: SportId;
+  /** Sports pratiqués */
+  sports: SportId[];
+  /** Niveau par sport */
+  levels: Partial<Record<SportId, Level>>;
+  /** Matériel par sport, texte libre */
+  gear: Partial<Record<SportId, string>>;
   stance: "regular" | "goofy" | null;
   weight_kg: number | null;
-  quiver: string | null;
   goals: string | null;
   home_label: string | null;
   home_lat: number | null;
@@ -45,6 +50,7 @@ export type CoachMessage = {
 export type PhaseNote = { phase: "approche" | "appel" | "vol" | "reception"; note: number; commentaire: string };
 
 export type AnalysisResult = {
+  sport?: SportId;
   figure: string;
   figure_id: string | null;
   note: number;
@@ -62,6 +68,7 @@ export type AnalysisResult = {
 export type VideoAnalysis = {
   id: string;
   user_id: string;
+  sport: SportId;
   trick: string | null;
   notes: string | null;
   video_path: string | null;
@@ -81,6 +88,7 @@ export type VideoAnalysis = {
 export type Spot = {
   id: string;
   name: string;
+  sports: SportId[];
   country: string;
   region: string | null;
   lat: number;

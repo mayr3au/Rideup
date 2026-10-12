@@ -1,6 +1,9 @@
 # RIDE'UP
 
-Plateforme de coaching kitesurf par IA : analyse vidéo des figures, suivi de progression, coach, cours et Spot Finder.
+Plateforme de coaching de glisse par IA (kitesurf, wingfoil, foil, surf, wakeboard au téléski) : analyse vidéo des figures, suivi de progression, coach, cours et Spot Finder.
+
+### Multi-sport
+Toute la logique propre à chaque sport (phases d'une figure, erreurs, roadmap de figures, matériel, niveaux, type de spot) est dans `src/lib/sports.ts`. Un rider peut pratiquer plusieurs sports, avec un niveau et un matériel par sport (`profiles.sports`, `levels`, `gear`) ; le sélecteur en haut de l'appli change le sport actif. Les analyses, la progression, le programme et le coach sont filtrés par sport. Le « foil » désigne le kitefoil.
 
 **Stack :** Next.js 15 (App Router) · Supabase (auth, Postgres, stockage) · Stripe (abonnements) · Claude Sonnet 5.5 d'Anthropic (analyses, coach, programmes) · Open-Meteo (vent) · Leaflet + OpenStreetMap (carte) · Resend (alertes e-mail) · Vercel.
 
@@ -25,9 +28,14 @@ Les coûts réels sont enregistrés à chaque appel (table `ai_usage`) et visibl
 Erreurs récurrentes (et leur tendance en Elite), priorités pour la prochaine session, suivi figure par figure (tentatives, meilleure note, courbe en Elite), roadmap de 15 figures, programme personnalisé de 3 à 5 sessions (Elite, 1 par 24 h), coach conversationnel qui connaît l'historique.
 
 ### Spot Finder (Progress et Elite)
-Pour chaque spot dans le rayon choisi : vent heure par heure sur 7 jours, orientation par rapport à la plage (onshore, side, offshore), créneau ridable selon le niveau, le poids et les kites du rider, taille de kite conseillée, carte. Logique dans `src/lib/wind.ts`. Spots favoris ; alertes vent par e-mail pour Elite (tâche quotidienne `vercel.json`).
+Pour chaque spot du sport actif dans le rayon choisi, sur 7 jours, avec carte :
+- **kite, wing, foil** : vent heure par heure, orientation (onshore, side, offshore), créneau ridable selon le niveau, le poids et le matériel, taille d'aile conseillée ;
+- **surf** : houle (hauteur, période, direction via Open-Meteo Marine) et vent (offshore = vagues propres), fourchette de vagues selon le niveau ;
+- **wakeboard** : téléskis nautiques avec météo (pluie, orage, température).
 
-La page publique **/week-end** classe tous les spots par vent prévu samedi et dimanche.
+Logique dans `src/lib/wind.ts`. Spots favoris ; alertes par e-mail pour Elite (tâche quotidienne `vercel.json`). Chaque spot a une liste `sports` ; les téléskis s'ajoutent dans **Admin → Spots** (plan d'eau « Lac », sport Wakeboard).
+
+La page publique **/week-end** classe les spots par sport : vent prévu pour kite, wing et foil, houle pour le surf.
 
 ### Formules
 - **Essai** : 1 analyse et 10 messages au coach (réglable).
@@ -38,7 +46,7 @@ La page publique **/week-end** classe tous les spots par vent prévu samedi et d
 
 ### 1. Supabase
 1. Crée un projet (région Europe).
-2. **SQL Editor** : exécute `supabase/migrations/0001_init.sql`, puis `supabase/seed_spots.sql` (61 spots de départ).
+2. **SQL Editor** : exécute `supabase/migrations/0001_init.sql`, puis `supabase/seed_spots.sql` (61 spots de vent et 19 spots de surf ; pas de téléski).
 3. **Authentication → URL Configuration** : *Site URL* = l'URL du site, et ajoute `https://TON-DOMAINE/auth/callback` (et `http://localhost:3000/auth/callback`) dans *Redirect URLs*.
 4. **Project Settings → API** : URL, clé `anon`, clé `service_role`.
 5. Inscris-toi sur le site, puis **Table Editor → profiles** : passe `is_admin` à `true` sur ton compte.

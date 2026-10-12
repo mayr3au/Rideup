@@ -2,14 +2,17 @@
 
 import { useActionState, useState } from "react";
 import { saveProfile, type ProfileState } from "@/app/(app)/coach/actions";
-import { DISCIPLINES, LEVELS } from "@/lib/tricks";
+import { LEVEL_LABELS, LEVEL_ORDER, SPORT_IDS, SPORTS, type SportId } from "@/lib/sports";
+import { riderSports } from "@/lib/rider";
 import type { Profile } from "@/lib/types";
 
 const chip =
-  "cursor-pointer rounded-sm border border-line bg-spray px-4 py-2.5 has-[:checked]:border-deep has-[:checked]:bg-brand has-[:checked]:text-white has-[:focus-visible]:outline has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-kite";
+  "cursor-pointer select-none rounded-full border border-line bg-spray px-4 py-2.5 font-semibold has-[:checked]:border-brand has-[:checked]:bg-brand has-[:checked]:text-white has-[:focus-visible]:outline has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-brand";
 
 export function ProfileForm({ profile, submitLabel, showAlerts }: { profile: Profile; submitLabel: string; showAlerts?: boolean }) {
   const [state, action, pending] = useActionState<ProfileState, FormData>(saveProfile, undefined);
+  const [sports, setSports] = useState<SportId[]>(profile.onboarded ? riderSports(profile) : []);
+  const [main, setMain] = useState<SportId>(profile.sport ?? "kitesurf");
   const [place, setPlace] = useState({
     label: profile.home_label ?? "",
     lat: profile.home_lat?.toString() ?? "",
@@ -17,6 +20,15 @@ export function ProfileForm({ profile, submitLabel, showAlerts }: { profile: Pro
   });
   const [locating, setLocating] = useState(false);
   const [geoError, setGeoError] = useState<string | null>(null);
+
+  function toggleSport(id: SportId) {
+    setSports((list) => {
+      const next = list.includes(id) ? list.filter((s) => s !== id) : [...list, id];
+      if (!next.includes(main) && next.length) setMain(next[0]);
+      if (next.length === 1) setMain(next[0]);
+      return next;
+    });
+  }
 
   function locate() {
     setGeoError(null);
@@ -40,48 +52,77 @@ export function ProfileForm({ profile, submitLabel, showAlerts }: { profile: Pro
 
   return (
     <form action={action} className="space-y-8">
-      <div className="grid gap-6 sm:grid-cols-2">
-        <div>
-          <label htmlFor="full_name" className="label">Prénom</label>
-          <input id="full_name" name="full_name" defaultValue={profile.full_name ?? ""} required className="field" />
-        </div>
-        <div>
-          <label htmlFor="weight_kg" className="label">Poids (kg)</label>
-          <input id="weight_kg" name="weight_kg" type="number" inputMode="numeric" min={25} max={200} defaultValue={profile.weight_kg ?? ""} required className="field" />
-        </div>
-      </div>
-
-      <fieldset>
-        <legend className="label">Ton niveau</legend>
-        <div className="grid gap-2 sm:grid-cols-2">
-          {LEVELS.map((l) => (
-            <label key={l.id} className="flex cursor-pointer gap-3 rounded-md border border-line bg-spray p-3 has-[:checked]:border-lagoon has-[:checked]:bg-lagoon/5">
-              <input type="radio" name="level" value={l.id} defaultChecked={profile.level === l.id} required className="mt-1 accent-[var(--lagoon)]" />
-              <span>
-                <span className="font-semibold">{l.label}</span>
-                <span className="block text-sm text-slate">{l.hint}</span>
-              </span>
+      {/* 1. Sports */}
+      <fieldset className="panel p-5">
+        <legend className="sr-only">Tes sports</legend>
+        <p className="text-lg font-bold">Quels sports tu pratiques ?</p>
+        <p className="text-sm text-slate">Choisis-en un ou plusieurs.</p>
+        <div className="mt-4 flex flex-wrap gap-2">
+          {SPORT_IDS.map((id) => (
+            <label key={id} className={chip}>
+              <input type="checkbox" name="sports" value={id} checked={sports.includes(id)} onChange={() => toggleSport(id)} className="sr-only" />
+              {SPORTS[id].name}
             </label>
           ))}
         </div>
+        {sports.length > 1 && (
+          <div className="mt-5">
+            <label htmlFor="sport" className="label">Ton sport principal</label>
+            <select id="sport" name="sport" value={main} onChange={(e) => setMain(e.target.value as SportId)} className="field">
+              {sports.map((id) => (
+                <option key={id} value={id}>{SPORTS[id].name}</option>
+              ))}
+            </select>
+            <p className="mt-1 text-sm text-slate">C&apos;est celui qui s&apos;affiche en premier. Tu peux changer à tout moment.</p>
+          </div>
+        )}
+        {sports.length === 1 && <input type="hidden" name="sport" value={sports[0]} />}
       </fieldset>
 
-      <div className="grid gap-6 sm:grid-cols-2">
-        <fieldset>
-          <legend className="label">Ta pratique</legend>
-          <div className="flex flex-wrap gap-2">
-            {DISCIPLINES.map((d) => (
-              <label key={d.id} className={chip}>
-                <input type="radio" name="discipline" value={d.id} defaultChecked={profile.discipline === d.id} required className="sr-only" />
-                {d.label}
-              </label>
-            ))}
+      {/* 2. Niveau et matériel par sport */}
+      {sports.map((id) => {
+        const sport = SPORTS[id];
+        return (
+          <fieldset key={id} className="panel p-5">
+            <legend className="sr-only">{sport.name}</legend>
+            <p className="text-lg font-bold">{sport.name}</p>
+            <p className="mt-3 label">Ton niveau</p>
+            <div className="grid gap-2 sm:grid-cols-2">
+              {LEVEL_ORDER.map((lvl) => (
+                <label key={lvl} className="flex cursor-pointer gap-3 rounded-2xl border border-line bg-spray p-3 has-[:checked]:border-brand has-[:checked]:bg-brand-light">
+                  <input type="radio" name={`level_${id}`} value={lvl} defaultChecked={profile.levels?.[id] === lvl} required className="mt-1 accent-[var(--brand)]" />
+                  <span>
+                    <span className="font-semibold">{LEVEL_LABELS[lvl]}</span>
+                    <span className="block text-sm text-slate">{sport.levelHints[lvl]}</span>
+                  </span>
+                </label>
+              ))}
+            </div>
+            <label htmlFor={`gear_${id}`} className="label mt-4">{sport.gear.label}</label>
+            <input id={`gear_${id}`} name={`gear_${id}`} defaultValue={profile.gear?.[id] ?? ""} placeholder={sport.gear.placeholder} className="field" />
+          </fieldset>
+        );
+      })}
+
+      {/* 3. Toi */}
+      <fieldset className="panel space-y-5 p-5">
+        <legend className="sr-only">Toi</legend>
+        <p className="text-lg font-bold">Toi</p>
+        <div className="grid gap-5 sm:grid-cols-2">
+          <div>
+            <label htmlFor="full_name" className="label">Prénom</label>
+            <input id="full_name" name="full_name" defaultValue={profile.full_name ?? ""} required className="field" />
           </div>
-        </fieldset>
+          <div>
+            <label htmlFor="weight_kg" className="label">Poids (kg)</label>
+            <input id="weight_kg" name="weight_kg" type="number" inputMode="numeric" min={25} max={200} defaultValue={profile.weight_kg ?? ""} required className="field" />
+            <p className="mt-1 text-sm text-slate">Sert à choisir la bonne taille d&apos;aile ou de kite.</p>
+          </div>
+        </div>
         <fieldset>
-          <legend className="label">Stance</legend>
+          <legend className="label">Pied avant</legend>
           <div className="flex gap-2">
-            {[{ id: "regular", label: "Regular" }, { id: "goofy", label: "Goofy" }].map((s) => (
+            {[{ id: "regular", label: "Regular (gauche)" }, { id: "goofy", label: "Goofy (droit)" }].map((s) => (
               <label key={s.id} className={chip}>
                 <input type="radio" name="stance" value={s.id} defaultChecked={profile.stance === s.id} required className="sr-only" />
                 {s.label}
@@ -89,21 +130,16 @@ export function ProfileForm({ profile, submitLabel, showAlerts }: { profile: Pro
             ))}
           </div>
         </fieldset>
-      </div>
+        <div>
+          <label htmlFor="goals" className="label">Ce que tu veux débloquer</label>
+          <textarea id="goals" name="goals" rows={3} defaultValue={profile.goals ?? ""} placeholder="Ex. mon premier backroll cet été, tenir le vol en wing" className="field" />
+        </div>
+      </fieldset>
 
-      <div>
-        <label htmlFor="quiver" className="label">Tes kites et ta planche</label>
-        <input id="quiver" name="quiver" defaultValue={profile.quiver ?? ""} placeholder="Ex. 9 m, 12 m, twin-tip 138" className="field" />
-        <p className="mt-1 text-sm text-slate">Indique les tailles en m² : le Spot Finder s&apos;en sert pour te conseiller le bon kite.</p>
-      </div>
-
-      <div>
-        <label htmlFor="goals" className="label">Tes objectifs</label>
-        <textarea id="goals" name="goals" rows={3} defaultValue={profile.goals ?? ""} placeholder="Ex. passer mon premier backroll cet été, sauter plus haut" className="field" />
-      </div>
-
-      <fieldset className="space-y-3">
-        <legend className="label">Où tu rides</legend>
+      {/* 4. Où tu rides */}
+      <fieldset className="panel space-y-4 p-5">
+        <legend className="sr-only">Où tu rides</legend>
+        <p className="text-lg font-bold">Où tu rides</p>
         <div className="flex flex-col gap-2 sm:flex-row">
           <input
             name="home_label"
@@ -121,28 +157,27 @@ export function ProfileForm({ profile, submitLabel, showAlerts }: { profile: Pro
         <input type="hidden" name="home_lng" value={place.lng} />
         {geoError && <p className="text-sm text-danger">{geoError}</p>}
         <div>
-          <label htmlFor="radius_km" className="label">Rayon de recherche des spots (km)</label>
+          <label htmlFor="radius_km" className="label">Distance max pour aller rider (km)</label>
           <input id="radius_km" name="radius_km" type="number" inputMode="numeric" min={5} max={2000} defaultValue={profile.radius_km ?? 100} className="field max-w-40" />
         </div>
+        {showAlerts ? (
+          <label className="flex items-start gap-3">
+            <input type="checkbox" name="wind_alerts" defaultChecked={profile.wind_alerts} className="mt-1 h-5 w-5 accent-[var(--brand)]" />
+            <span>
+              <span className="font-semibold">Alertes par e-mail</span>
+              <span className="block text-sm text-slate">Quand des conditions adaptées sont prévues sur tes spots favoris.</span>
+            </span>
+          </label>
+        ) : (
+          <input type="hidden" name="wind_alerts" value={profile.wind_alerts ? "on" : ""} />
+        )}
       </fieldset>
 
-      {showAlerts ? (
-        <label className="flex items-start gap-3">
-          <input type="checkbox" name="wind_alerts" defaultChecked={profile.wind_alerts} className="mt-1 h-5 w-5 accent-[var(--lagoon)]" />
-          <span>
-            <span className="font-semibold">Alertes vent par e-mail</span>
-            <span className="block text-sm text-slate">Quand du vent adapté à ton niveau et à ton matériel est prévu sur tes spots favoris.</span>
-          </span>
-        </label>
-      ) : (
-        <input type="hidden" name="wind_alerts" value={profile.wind_alerts ? "on" : ""} />
-      )}
-
       {state?.error && <p role="alert" className="text-danger">{state.error}</p>}
-      {state?.saved && <p role="status" className="text-lagoon">Profil enregistré.</p>}
+      {state?.saved && <p role="status" className="font-semibold text-lagoon">Profil enregistré.</p>}
 
-      <button disabled={pending} className="btn btn-primary w-full sm:w-auto">
-        {pending ? "Enregistrement…" : submitLabel}
+      <button disabled={pending || sports.length === 0} className="btn btn-primary w-full sm:w-auto">
+        {pending ? "Enregistrement…" : sports.length === 0 ? "Choisis au moins un sport" : submitLabel}
       </button>
     </form>
   );

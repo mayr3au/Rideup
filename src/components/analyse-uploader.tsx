@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { buildContactSheets, clipFingerprint, loadVideo } from "@/lib/frames";
-import { LEVELS, TRICKS } from "@/lib/tricks";
+import { LEVEL_LABELS, LEVEL_ORDER, SPORTS, trickById, tricksFor, type SportId } from "@/lib/sports";
 import { ClipTrimmer } from "./clip-trimmer";
 
 const MAX_SIZE = 200 * 1024 * 1024;
@@ -17,13 +17,19 @@ export function AnalyseUploader({
   remaining,
   deep,
   sheetCount,
+  sports,
+  defaultSport,
 }: {
   defaultTrick?: string;
   remaining: number;
   deep: boolean;
   sheetCount: number;
+  sports: SportId[];
+  defaultSport: SportId;
 }) {
   const router = useRouter();
+  const [sport, setSport] = useState<SportId>(defaultTrick ? trickById(defaultTrick)?.sport ?? defaultSport : defaultSport);
+  const [trick, setTrick] = useState(defaultTrick ?? "");
   const [file, setFile] = useState<File | null>(null);
   const [src, setSrc] = useState<string | null>(null);
   const [seg, setSeg] = useState({ start: 0, end: 0 });
@@ -76,7 +82,8 @@ export function AnalyseUploader({
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          trick: form.get("trick") ?? "",
+          sport,
+          trick,
           notes: form.get("notes") ?? "",
           extension: ext,
           clipHash,
@@ -148,9 +155,12 @@ export function AnalyseUploader({
       <div className="space-y-3">
         <label
           htmlFor="clip"
-          className="flex min-h-44 cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed border-deep/25 bg-spray px-4 py-10 text-center hover:border-lagoon"
+          className="panel flex min-h-56 cursor-pointer flex-col items-center justify-center border-2 border-dashed border-brand/30 px-4 py-10 text-center hover:border-brand"
         >
-          <span className="font-display text-2xl font-bold">Importer une vidéo</span>
+          <span className="flex h-14 w-14 items-center justify-center rounded-2xl bg-brand-light text-brand" aria-hidden="true">
+            <svg viewBox="0 0 24 24" className="h-7 w-7" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round"><path d="M4 7h11v10H4zM15 10.5l5-3v9l-5-3" /></svg>
+          </span>
+          <span className="mt-3 text-xl font-bold">Importer une vidéo</span>
           <span className="mt-2 max-w-xs text-slate">
             Tu choisiras ensuite le passage de ta figure, 20 secondes maximum.
           </span>
@@ -166,8 +176,8 @@ export function AnalyseUploader({
       <section>
         <h2 className="text-xl font-bold">1. Choisis le passage</h2>
         <p className="mt-1 text-[0.95rem] text-slate">
-          Garde l&apos;approche, l&apos;appel, le saut et la réception. Plus le passage est serré autour de la figure, plus
-          l&apos;analyse est précise.
+          Fais glisser les poignées bleues pour garder uniquement ta figure, du début à la fin. Plus le passage est serré,
+          plus l&apos;analyse est précise.
         </p>
         <div className="mt-3">
           <ClipTrimmer src={src} start={seg.start} end={seg.end} onChange={onSegment} disabled={busy} />
@@ -181,17 +191,42 @@ export function AnalyseUploader({
 
       <section className="space-y-4">
         <h2 className="text-xl font-bold">2. Dis ce que tu tentes</h2>
+        {sports.length > 1 && (
+          <fieldset>
+            <legend className="label">Sport</legend>
+            <div className="flex flex-wrap gap-2">
+              {sports.map((id) => (
+                <button
+                  key={id}
+                  type="button"
+                  disabled={busy}
+                  aria-pressed={sport === id}
+                  onClick={() => {
+                    setSport(id);
+                    setTrick("");
+                  }}
+                  className={`min-h-10 rounded-full px-4 text-sm font-semibold ${sport === id ? "bg-brand text-white" : "bg-raised"}`}
+                >
+                  {SPORTS[id].name}
+                </button>
+              ))}
+            </div>
+          </fieldset>
+        )}
         <div>
           <label htmlFor="trick" className="label">Figure</label>
-          <select id="trick" name="trick" defaultValue={defaultTrick ?? ""} className="field" disabled={busy}>
+          <select id="trick" name="trick" value={trick} onChange={(e) => setTrick(e.target.value)} className="field" disabled={busy}>
             <option value="">Je ne sais pas, identifie-la</option>
-            {LEVELS.map((l) => (
-              <optgroup key={l.id} label={l.label}>
-                {TRICKS.filter((t) => t.level === l.id).map((t) => (
-                  <option key={t.id} value={t.id}>{t.name}</option>
-                ))}
-              </optgroup>
-            ))}
+            {LEVEL_ORDER.map((l) => {
+              const list = tricksFor(sport).filter((t) => t.level === l);
+              return list.length ? (
+                <optgroup key={l} label={LEVEL_LABELS[l]}>
+                  {list.map((t) => (
+                    <option key={t.id} value={t.id}>{t.name}</option>
+                  ))}
+                </optgroup>
+              ) : null;
+            })}
           </select>
         </div>
         <div>

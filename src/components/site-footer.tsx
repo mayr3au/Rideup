@@ -6,7 +6,7 @@ const COLS = [
     title: "Plateforme",
     links: [
       ["/tarifs", "Abonnements"],
-      ["/cours", "Cours de kitesurf"],
+      ["/cours", "Cours"],
       ["/week-end", "Spots du week-end"],
       ["/inscription", "Créer un compte"],
       ["/connexion", "Connexion"],
@@ -30,7 +30,7 @@ export function SiteFooter() {
         <div className="max-w-sm">
           <Logo full height={64} />
           <p className="mt-4 text-slate">
-            Coaching kitesurf par IA : analyse vidéo de tes figures, suivi de progression et Spot Finder selon le vent,
+            Coaching de glisse par IA (kitesurf, wingfoil, foil, surf, wakeboard) : analyse vidéo de tes figures, suivi de progression et Spot Finder selon le vent et la houle,
             ton niveau et ton matériel.
           </p>
         </div>

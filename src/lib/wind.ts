@@ -1,19 +1,37 @@
 /**
- * Logique du Spot Finder (fonctions pures, utilisables côté serveur et navigateur).
- * Vent en nœuds, directions en degrés (d'où vient le vent).
+ * Moteur du Spot Finder (fonctions pures, serveur et navigateur).
+ * - Sports de vent (kitesurf, wingfoil, foil) : force, rafales, orientation, taille de matériel.
+ * - Surf : hauteur et période de houle, direction, vent (offshore = propre).
+ * - Wakeboard (téléski) : météo seulement (orage, pluie, température).
+ * Vent en nœuds, houle en mètres et secondes, directions = d'où ça vient (degrés).
  */
 
-export type HourForecast = { time: string; wind: number; gust: number; dir: number; code: number; temp: number };
+import { SPORTS, type Level, type SportId } from "./sports";
+
+export type HourForecast = {
+  time: string;
+  wind: number;
+  gust: number;
+  dir: number;
+  code: number;
+  temp: number;
+  wave?: number | null;
+  period?: number | null;
+  swellDir?: number | null;
+};
 
 export type Rider = {
-  level: "debutant" | "intermediaire" | "avance" | "expert" | null;
+  sport: SportId;
+  level: Level | null;
   weightKg: number | null;
-  kites: number[]; // tailles en m²
+  gear: number[]; // tailles d'aile ou de kite (m²)
 };
+
+export type SpotLike = { sea_bearing: number; min_level: "debutant" | "intermediaire" | "avance" };
 
 const COMPASS = ["N", "NNE", "NE", "ENE", "E", "ESE", "SE", "SSE", "S", "SSO", "SO", "OSO", "O", "ONO", "NO", "NNO"];
 export function compass(deg: number) {
-  return COMPASS[Math.round(((deg % 360) + 360) % 360 / 22.5) % 16];
+  return COMPASS[Math.round((((deg % 360) + 360) % 360) / 22.5) % 16];
 }
 
 export function angleDiff(a: number, b: number) {
@@ -40,50 +58,85 @@ export const ORIENTATION_LABEL: Record<Orientation, string> = {
   offshore: "Offshore",
 };
 
-/** Extrait les tailles de kite d'un texte libre : « 9 m, 12m et un 7 » → [7, 9, 12]. */
-export function parseKites(quiver: string | null | undefined) {
-  if (!quiver) return [];
-  const out = new Set<number>();
-  for (const m of quiver.matchAll(/(?<![\d.,])(\d{1,2}(?:[.,]\d)?)(?![\d])/g)) {
-    const n = Number(m[1].replace(",", "."));
-    if (n >= 3 && n <= 21) out.add(n);
-  }
-  return [...out].sort((a, b) => a - b);
-}
-
-/** Taille de kite idéale (règle usuelle twin-tip : poids × 2,2 / nœuds). */
-export function idealKite(weightKg: number, windKn: number) {
-  return (weightKg * 2.2) / windKn;
-}
-
-const LIMITS = {
-  debutant: { min: 12, max: 22, gustSpread: 8 },
-  intermediaire: { min: 12, max: 28, gustSpread: 12 },
-  avance: { min: 11, max: 35, gustSpread: 15 },
-  expert: { min: 10, max: 40, gustSpread: 18 },
-} as const;
-
 const LEVEL_RANK = { debutant: 0, intermediaire: 1, avance: 2, expert: 3 } as const;
+
+/* ───────────────────────── Sports de vent ───────────────────────── */
+
+type WindRule = {
+  limits: Record<Level, { min: number; max: number; gustSpread: number }>;
+  /** Taille de matériel idéale (m²) */
+  ideal: (weightKg: number, windKn: number) => number;
+  /** Écart toléré entre l'idéal et le matériel du rider */
+  tolerance: number;
+  gearName: string;
+};
+
+const WIND_RULES: Partial<Record<SportId, WindRule>> = {
+  kitesurf: {
+    limits: {
+      debutant: { min: 12, max: 22, gustSpread: 8 },
+      intermediaire: { min: 12, max: 28, gustSpread: 12 },
+      avance: { min: 11, max: 35, gustSpread: 15 },
+      expert: { min: 10, max: 40, gustSpread: 18 },
+    },
+    ideal: (w, kn) => (w * 2.2) / kn,
+    tolerance: 3,
+    gearName: "kite",
+  },
+  wingfoil: {
+    limits: {
+      debutant: { min: 12, max: 22, gustSpread: 8 },
+      intermediaire: { min: 11, max: 27, gustSpread: 11 },
+      avance: { min: 10, max: 32, gustSpread: 14 },
+      expert: { min: 9, max: 38, gustSpread: 16 },
+    },
+    ideal: (w, kn) => w / kn,
+    tolerance: 1.5,
+    gearName: "aile",
+  },
+  foil: {
+    limits: {
+      debutant: { min: 9, max: 18, gustSpread: 7 },
+      intermediaire: { min: 8, max: 22, gustSpread: 9 },
+      avance: { min: 7, max: 26, gustSpread: 11 },
+      expert: { min: 6, max: 30, gustSpread: 13 },
+    },
+    ideal: (w, kn) => (w * 1.6) / kn,
+    tolerance: 3,
+    gearName: "kite",
+  },
+};
 
 export type HourVerdict = {
   ok: boolean;
   score: number; // 0–100
-  kite: number | null; // taille conseillée dans le quiver (ou idéale)
-  orientation: Orientation;
+  gear: number | null; // taille conseillée (m²) pour les sports de vent
+  gearName: string | null;
+  orientation: Orientation | null;
   warnings: string[];
 };
 
-export function rateHour(h: HourForecast, seaBearing: number, rider: Rider, spotMinLevel: keyof typeof LEVEL_RANK): HourVerdict {
+const no = (orientation: Orientation | null, warning: string): HourVerdict => ({
+  ok: false,
+  score: 0,
+  gear: null,
+  gearName: null,
+  orientation,
+  warnings: [warning],
+});
+
+function rateWind(h: HourForecast, spot: SpotLike, rider: Rider, rule: WindRule): HourVerdict {
   const level = rider.level ?? "intermediaire";
-  const lim = LIMITS[level];
+  const lim = rule.limits[level];
   const weight = rider.weightKg ?? 75;
-  const o = orientation(h.dir, seaBearing);
+  const o = orientation(h.dir, spot.sea_bearing);
   const warnings: string[] = [];
   let score = 100;
 
-  if (o === "offshore") return { ok: false, score: 0, kite: null, orientation: o, warnings: ["Vent offshore : dangereux"] };
+  if (h.code >= 95) return no(o, "Orage prévu");
+  if (o === "offshore") return no(o, "Vent offshore : dangereux");
   if (o === "side-off") {
-    if (LEVEL_RANK[level] < 2) return { ok: false, score: 0, kite: null, orientation: o, warnings: ["Side-off : réservé aux riders confirmés"] };
+    if (LEVEL_RANK[level] < 2) return no(o, "Side-off : réservé aux riders confirmés");
     warnings.push("Side-off : prévois une sécurité bateau");
     score -= 30;
   }
@@ -91,62 +144,132 @@ export function rateHour(h: HourForecast, seaBearing: number, rider: Rider, spot
     warnings.push("Onshore : départs plus difficiles");
     score -= 15;
   }
-  if (h.code >= 95) return { ok: false, score: 0, kite: null, orientation: o, warnings: ["Orage prévu"] };
 
-  if (h.wind < lim.min) return { ok: false, score: 0, kite: null, orientation: o, warnings: ["Pas assez de vent"] };
-  if (h.wind > lim.max) return { ok: false, score: 0, kite: null, orientation: o, warnings: ["Trop de vent pour ton niveau"] };
+  if (h.wind < lim.min) return no(o, "Pas assez de vent");
+  if (h.wind > lim.max) return no(o, "Trop de vent pour ton niveau");
 
   const spread = h.gust - h.wind;
-  if (spread > lim.gustSpread) return { ok: false, score: 0, kite: null, orientation: o, warnings: ["Rafales trop fortes"] };
+  if (spread > lim.gustSpread) return no(o, "Rafales trop fortes");
   score -= Math.max(0, spread - 5) * 3;
   if (spread > 8) warnings.push(`Rafales à ${Math.round(h.gust)} nœuds`);
 
-  if (LEVEL_RANK[spotMinLevel] > LEVEL_RANK[level]) {
+  if (LEVEL_RANK[spot.min_level] > LEVEL_RANK[level]) {
     warnings.push("Spot exigeant pour ton niveau");
     score -= 25;
   }
 
-  // Taille de kite : la plus proche de l'idéal dans le quiver
-  const ideal = idealKite(weight, h.wind);
-  let kite: number | null = Math.round(ideal);
-  if (rider.kites.length) {
-    const best = rider.kites.reduce((a, b) => (Math.abs(b - ideal) < Math.abs(a - ideal) ? b : a));
+  const ideal = rule.ideal(weight, h.wind);
+  let gear: number | null = Math.round(ideal * 2) / 2;
+  if (rider.gear.length) {
+    const best = rider.gear.reduce((a, b) => (Math.abs(b - ideal) < Math.abs(a - ideal) ? b : a));
     const gap = Math.abs(best - ideal);
-    if (gap > 3) return { ok: false, score: 0, kite: null, orientation: o, warnings: [`Il te faudrait un ${Math.round(ideal)} m`] };
-    score -= gap * 8;
-    kite = best;
+    if (gap > rule.tolerance) return no(o, `Il te faudrait une ${rule.gearName} de ${Math.round(ideal * 2) / 2} m²`);
+    score -= (gap / rule.tolerance) * 25;
+    gear = best;
   }
 
-  // Bonus au cœur de la plage de vent
-  if (h.wind >= 15 && h.wind <= 25) score += 5;
+  score = Math.max(0, Math.min(100, Math.round(score)));
+  return { ok: score >= 40, score, gear, gearName: rule.gearName, orientation: o, warnings };
+}
+
+/* ───────────────────────── Surf ───────────────────────── */
+
+const SURF_WAVES: Record<Level, { min: number; max: number }> = {
+  debutant: { min: 0.3, max: 1.0 },
+  intermediaire: { min: 0.5, max: 1.8 },
+  avance: { min: 0.8, max: 3.0 },
+  expert: { min: 1.0, max: 6.0 },
+};
+
+function rateSurf(h: HourForecast, spot: SpotLike, rider: Rider): HourVerdict {
+  const level = rider.level ?? "intermediaire";
+  const w = SURF_WAVES[level];
+  const o = orientation(h.dir, spot.sea_bearing);
+  const warnings: string[] = [];
+  let score = 100;
+
+  if (h.code >= 95) return no(o, "Orage prévu");
+  if (h.wave == null) return no(o, "Pas de prévision de houle ici");
+  if (h.swellDir != null && angleDiff(h.swellDir, spot.sea_bearing) > 85) return no(o, "Houle mal orientée pour ce spot");
+  if (h.wave < w.min) return no(o, "Trop petit");
+  if (h.wave > w.max) return no(o, "Trop gros pour ton niveau");
+
+  const period = h.period ?? 0;
+  if (period < 6) {
+    warnings.push("Houle courte, vagues molles");
+    score -= 30;
+  } else if (period >= 10) score += 5;
+
+  // Vent : offshore léger = vagues propres, onshore fort = vagues hachées
+  if ((o === "onshore" || o === "side-on") && h.wind > 12) {
+    warnings.push("Vent onshore, vagues hachées");
+    score -= h.wind > 20 ? 50 : 30;
+  } else if ((o === "offshore" || o === "side-off") && h.wind > 25) {
+    warnings.push("Offshore très fort, difficile de rentrer dans les vagues");
+    score -= 25;
+  } else if (o === "offshore" || o === "side-off" || h.wind < 6) {
+    score += 5;
+  }
+
+  if (LEVEL_RANK[spot.min_level] > LEVEL_RANK[level]) {
+    warnings.push("Spot exigeant pour ton niveau");
+    score -= 25;
+  }
 
   score = Math.max(0, Math.min(100, Math.round(score)));
-  return { ok: score >= 40, score, kite, orientation: o, warnings };
+  return { ok: score >= 40, score, gear: null, gearName: null, orientation: o, warnings };
 }
+
+/* ───────────────────────── Wakeboard (téléski) ───────────────────────── */
+
+function rateCable(h: HourForecast): HourVerdict {
+  if (h.code >= 95) return no(null, "Orage prévu");
+  const warnings: string[] = [];
+  let score = 100;
+  if (h.code >= 61) {
+    warnings.push("Pluie");
+    score -= 30;
+  }
+  if (h.temp < 12) {
+    warnings.push("Frais, combinaison conseillée");
+    score -= 15;
+  }
+  if (h.wind > 25) {
+    warnings.push("Vent fort sur le plan d'eau");
+    score -= 20;
+  }
+  return { ok: score >= 40, score: Math.max(0, score), gear: null, gearName: null, orientation: null, warnings };
+}
+
+export function rateHour(h: HourForecast, spot: SpotLike, rider: Rider): HourVerdict {
+  const kind = SPORTS[rider.sport].spot;
+  if (kind === "waves") return rateSurf(h, spot, rider);
+  if (kind === "cable") return rateCable(h);
+  return rateWind(h, spot, rider, WIND_RULES[rider.sport]!);
+}
+
+/* ───────────────────────── Résumé d'une journée ───────────────────────── */
 
 export type DaySummary = {
   date: string; // YYYY-MM-DD
   goodHours: number;
   bestScore: number;
   window: { from: string; to: string } | null; // meilleure plage horaire continue
-  avgWind: number | null; // sur la plage
+  avgWind: number | null;
   maxGust: number | null;
   dir: number | null;
-  kite: number | null;
+  avgWave: number | null;
+  period: number | null;
+  gear: number | null;
+  gearName: string | null;
   orientation: Orientation | null;
   warnings: string[];
 };
 
 /** Résumé d'une journée (8 h – 20 h, heure locale du spot). */
-export function summarizeDay(
-  hours: HourForecast[],
-  date: string,
-  seaBearing: number,
-  rider: Rider,
-  spotMinLevel: keyof typeof LEVEL_RANK,
-): DaySummary {
+export function summarizeDay(hours: HourForecast[], date: string, spot: SpotLike, rider: Rider): DaySummary {
   const day = hours.filter((h) => h.time.startsWith(date) && Number(h.time.slice(11, 13)) >= 8 && Number(h.time.slice(11, 13)) <= 20);
-  const rated = day.map((h) => ({ h, v: rateHour(h, seaBearing, rider, spotMinLevel) }));
+  const rated = day.map((h) => ({ h, v: rateHour(h, spot, rider) }));
 
   let best: typeof rated = [];
   let cur: typeof rated = [];
@@ -159,17 +282,25 @@ export function summarizeDay(
 
   const warnings = new Set<string>();
   (best.length ? best : rated).forEach((r) => r.v.warnings.forEach((w) => warnings.add(w)));
+  const mid = best.length ? best[Math.floor(best.length / 2)] : null;
+  const mean = (f: (h: HourForecast) => number | null | undefined) => {
+    const vals = best.map((r) => f(r.h)).filter((x): x is number => x != null);
+    return vals.length ? vals.reduce((a, b) => a + b, 0) / vals.length : null;
+  };
 
   return {
     date,
     goodHours: rated.filter((r) => r.v.ok).length,
     bestScore: rated.reduce((m, r) => Math.max(m, r.v.score), 0),
     window: best.length ? { from: best[0].h.time.slice(11, 16), to: best.at(-1)!.h.time.slice(11, 16) } : null,
-    avgWind: best.length ? Math.round(best.reduce((s, r) => s + r.h.wind, 0) / best.length) : null,
+    avgWind: best.length ? Math.round(mean((h) => h.wind)!) : null,
     maxGust: best.length ? Math.round(Math.max(...best.map((r) => r.h.gust))) : null,
-    dir: best.length ? best[Math.floor(best.length / 2)].h.dir : null,
-    kite: best.length ? mode(best.map((r) => r.v.kite).filter((k): k is number => k != null)) : null,
-    orientation: best.length ? best[Math.floor(best.length / 2)].v.orientation : null,
+    dir: mid?.h.dir ?? null,
+    avgWave: mean((h) => h.wave) != null ? Math.round(mean((h) => h.wave)! * 10) / 10 : null,
+    period: mean((h) => h.period) != null ? Math.round(mean((h) => h.period)!) : null,
+    gear: best.length ? mode(best.map((r) => r.v.gear).filter((k): k is number => k != null)) : null,
+    gearName: mid?.v.gearName ?? null,
+    orientation: mid?.v.orientation ?? null,
     warnings: [...warnings].slice(0, 3),
   };
 }

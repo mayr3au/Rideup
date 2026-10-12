@@ -1,3 +1,5 @@
+import { trickById, type SportId } from "./sports";
+
 export type Course = {
   slug: string;
   trickId: string;
@@ -122,6 +124,95 @@ export const COURSES: Course[] = [
     exercices: ["Pops unhooked sans extension", "Approches carre forte avec kite bas"],
     securite: "Utilise un leash adapté, vérifie ton système de largage, et commence avec un vent modéré.",
   },
+
+  {
+    slug: "wingfoil-decollage",
+    trickId: "wing-decollage",
+    title: "Décoller en wingfoil",
+    level: "Intermédiaire",
+    minutes: 8,
+    intro: "Le décollage vient de la vitesse, pas d'un coup de pied arrière. Accélère d'abord, le foil fera le reste.",
+    prerequis: ["Naviguer à plat sur les deux bords", "Gonfler et orienter l'aile sans effort", "Pieds placés sans regarder la planche"],
+    etapes: [
+      { titre: "Se placer", texte: "Pied avant au-dessus du mât ou légèrement devant, pied arrière entre le mât et l'arrière de la planche. Genoux fléchis." },
+      { titre: "Prendre de la vitesse", texte: "Pars au travers ou légèrement abattu. Borde l'aile avec la main arrière et fais 2 ou 3 pompages de l'aile pour accélérer." },
+      { titre: "Laisser monter", texte: "Quand la planche devient légère, mets juste un peu plus de poids sur le pied arrière. Le foil sort tout seul." },
+      { titre: "Revenir neutre", texte: "Dès que tu voles, ramène le poids vers l'avant pour stabiliser à 20-30 cm. Garde l'aile haute et stable." },
+    ],
+    erreurs: [
+      { erreur: "Le foil sort trop vite et tu retombes", correction: "Trop de pied arrière : dose la pression et reviens neutre dès les premiers centimètres." },
+      { erreur: "La planche colle à l'eau", correction: "Pas assez de vitesse : abats davantage et pompe l'aile avant de charger l'arrière." },
+      { erreur: "L'aile te tire vers l'avant", correction: "Aile trop bordée et trop basse : tiens-la plus haut, bras fléchis." },
+    ],
+    exercices: ["10 décollages courts en revenant volontairement à l'eau après 5 secondes", "Décollage sur chaque bord en comptant les pompages"],
+    securite: "Le foil est tranchant : garde de la distance avec les autres pratiquants et porte un casque et un gilet d'impact.",
+  },
+  {
+    slug: "foil-premier-decollage",
+    trickId: "foil-decollage",
+    title: "Premier décollage en kitefoil",
+    level: "Débutant en foil",
+    minutes: 8,
+    intro: "En kitefoil, tout est petit : petites pressions, petits mouvements de kite. Les grands gestes te font tomber.",
+    prerequis: ["Être autonome en kitesurf (remonter au vent, transitions)", "Naviguer à plat avec la planche de foil", "Un mât court ou un grand foil pour débuter"],
+    etapes: [
+      { titre: "Naviguer à plat", texte: "Pied avant au-dessus du mât, kite à 45°, barre près du corps. Avance en contrôle sans chercher à voler." },
+      { titre: "Accélérer doucement", texte: "Fais une passe de kite douce pour gagner un peu de vitesse, sans traction brutale." },
+      { titre: "Décoller", texte: "Mets un léger poids sur le pied arrière. Dès que la planche monte, reviens au centre." },
+      { titre: "Redescendre en contrôle", texte: "Pour te poser, charge doucement le pied avant et laisse la planche toucher l'eau sans piquer." },
+    ],
+    erreurs: [
+      { erreur: "Tu montes trop haut et le foil ventile", correction: "Réagis plus tôt : dès que tu décolles, reviens au centre." },
+      { erreur: "Tu piques du nez", correction: "Trop de pied avant : reste centré et fais des corrections minimes." },
+      { erreur: "Tu décroches au vent", correction: "Kite trop haut et trop bordé : garde-le à 45°, barre stable." },
+    ],
+    exercices: ["5 décollages de 10 secondes sur chaque bord", "Naviguer en touchant l'eau volontairement toutes les 10 secondes"],
+    securite: "Commence en vent stable et modéré, loin des autres, avec casque et gilet d'impact. Le foil est dangereux en cas de chute dessus.",
+  },
+  {
+    slug: "surf-take-off",
+    trickId: "surf-takeoff",
+    title: "Le take-off en vague verte",
+    level: "Débutant",
+    minutes: 7,
+    intro: "Réussir son take-off, c'est surtout partir assez tôt avec assez de vitesse. Le lever ne fait que finir le travail.",
+    prerequis: ["Se lever sans difficulté dans la mousse", "Ramer droit et longtemps", "Savoir passer la barre sur un petit spot"],
+    etapes: [
+      { titre: "Choisir la vague", texte: "Repère une vague qui monte sans encore casser, et place-toi un peu à l'intérieur de son pic." },
+      { titre: "Ramer fort", texte: "Retourne-toi vers la plage et rame franchement. Rajoute 2 ou 3 coups de rame quand tu sens la vague te soulever." },
+      { titre: "Se lever", texte: "Dès que la planche glisse seule, mains sous la poitrine et monte en un mouvement, pieds au centre." },
+      { titre: "Prendre l'angle", texte: "Regarde l'épaule de la vague et oriente tout de suite la planche dans sa direction." },
+    ],
+    erreurs: [
+      { erreur: "La vague passe sous toi", correction: "Tu pars trop tard ou tu rames trop mollement : commence plus tôt et rame jusqu'à glisser." },
+      { erreur: "Tu piques du nez", correction: "Tu es trop en avant sur la planche ou tu pars trop tard dans la pente. Recule un peu et prends la vague plus tôt." },
+      { erreur: "Tu tombes en te levant", correction: "Tu montes en plusieurs temps (genoux) : entraîne le lever en un seul mouvement sur la plage." },
+    ],
+    exercices: ["20 levers à sec sur la plage en un seul mouvement", "Prendre 5 vagues en ne cherchant qu'à partir à droite (ou à gauche)"],
+    securite: "Respecte la priorité au pic, reste dans ton niveau de vagues et renseigne-toi sur les courants et les baïnes du spot.",
+  },
+  {
+    slug: "wakeboard-premier-kicker",
+    trickId: "wake-kicker",
+    title: "Ton premier kicker au téléski",
+    level: "Intermédiaire",
+    minutes: 7,
+    intro: "Un kicker se passe en restant passif : approche droite, vitesse constante, et surtout pas de traction sur la poignée.",
+    prerequis: ["Faire le tour du téléski sans tomber", "Changer de carre", "Ollie sur le plat"],
+    etapes: [
+      { titre: "L'approche", texte: "Aligne-toi bien avant le module, planche à plat, poignée basse près des hanches." },
+      { titre: "Sur le kicker", texte: "Garde les genoux souples et laisse le module te monter. Ne tire pas sur la poignée, ne pousse pas sur les jambes." },
+      { titre: "En l'air", texte: "Reste groupé, regarde l'eau devant toi à l'endroit où tu veux atterrir." },
+      { titre: "Réception", texte: "Atterris les deux pieds en même temps, genoux qui amortissent, poignée toujours basse." },
+    ],
+    erreurs: [
+      { erreur: "Tu atterris sur l'arrière", correction: "Tu as tiré sur la poignée en l'air : garde-la au niveau des hanches." },
+      { erreur: "Tu dévies sur le module", correction: "Approche trop en carre : arrive à plat et bien aligné." },
+      { erreur: "Réception dure", correction: "Jambes tendues : plie les genoux pour amortir." },
+    ],
+    exercices: ["3 tours en passant le kicker sans décoller (rouler dessus)", "Straight air en ne travaillant que la poignée basse"],
+    securite: "Porte un casque et un gilet, commence sur les plus petits modules et respecte les consignes du téléski.",
+  },
 ];
 
 export function courseBySlug(slug: string) {
@@ -130,4 +221,9 @@ export function courseBySlug(slug: string) {
 
 export function courseForTrick(trickId: string) {
   return COURSES.find((c) => c.trickId === trickId);
+}
+
+/** Sport d'un cours, déduit de la figure qu'il enseigne. */
+export function courseSport(c: Course): SportId {
+  return trickById(c.trickId)?.sport ?? "kitesurf";
 }

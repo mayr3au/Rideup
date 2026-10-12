@@ -31,7 +31,7 @@ export const PLANS = {
       "Programme de progression personnalisé",
       "Suivi des figures maîtrisées et à travailler",
       "Analyses traitées en priorité",
-      "Alerte quand du vent est prévu sur tes spots favoris",
+      "Alerte quand les conditions (vent ou houle) sont bonnes sur tes spots favoris",
     ],
   },
 } as const;

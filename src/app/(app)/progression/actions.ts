@@ -6,12 +6,14 @@ import { generateProgram } from "@/lib/ai";
 import { getProgressData } from "@/lib/progress";
 import { getRiderHistory } from "@/lib/usage";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { activeSport } from "@/lib/rider";
 
 export type ProgramState = { error?: string } | undefined;
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export async function createProgram(_prev: ProgramState): Promise<ProgramState> {
   const { supabase, user, profile } = await requireSession();
+  const sport = activeSport(profile);
   if (effectivePlan(profile) !== "elite") return { error: "Le programme personnalisé est réservé à la formule Elite." };
 
   // Un programme par 24 h maximum
@@ -26,9 +28,9 @@ export async function createProgram(_prev: ProgramState): Promise<ProgramState> 
   }
 
   try {
-    const [history, data] = await Promise.all([getRiderHistory(supabase, user.id), getProgressData(supabase, user.id)]);
-    const program = await generateProgram(profile, history, data.recentAttempts);
-    await createAdminClient().from("programs").insert({ user_id: user.id, content: program });
+    const [history, data] = await Promise.all([getRiderHistory(supabase, user.id), getProgressData(supabase, user.id, sport)]);
+    const program = await generateProgram(profile, sport, history, data.recentAttempts);
+    await createAdminClient().from("programs").insert({ user_id: user.id, content: { ...program, sport } });
   } catch (e) {
     console.error("programme", e);
     return { error: "La génération a échoué. Réessaie dans un instant." };
