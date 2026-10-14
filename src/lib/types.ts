@@ -94,7 +94,7 @@ export type Spot = {
   lat: number;
   lng: number;
   sea_bearing: number;
-  water: "flat" | "chop" | "vagues";
+  water: "flat" | "chop" | "vagues" | "lac";
   min_level: "debutant" | "intermediaire" | "avance";
   notes: string | null;
   active: boolean;

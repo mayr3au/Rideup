@@ -7,3 +7,6 @@ export const SUPABASE_ANON_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "p
 export const SUPABASE_CONFIGURED = Boolean(
   process.env.NEXT_PUBLIC_SUPABASE_URL && !process.env.NEXT_PUBLIC_SUPABASE_URL.includes("placeholder"),
 );
+
+/** Mode démo : en local (npm run dev) sans Supabase, un faux compte Elite déjà rempli. Jamais en production. */
+export const DEMO_MODE = !SUPABASE_CONFIGURED && process.env.NODE_ENV === "development";

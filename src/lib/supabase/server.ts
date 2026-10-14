@@ -1,11 +1,12 @@
-import { SUPABASE_ANON_KEY, SUPABASE_URL } from "./env";
+import { DEMO_MODE, SUPABASE_ANON_KEY, SUPABASE_URL } from "./env";
+import { demoClient } from "./demo";
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
 
 export async function createClient() {
   const cookieStore = await cookies();
 
-  return createServerClient(
+  const client = createServerClient(
     SUPABASE_URL,
     SUPABASE_ANON_KEY,
     {
@@ -25,4 +26,6 @@ export async function createClient() {
       },
     },
   );
+  if (DEMO_MODE) return demoClient() as unknown as typeof client;
+  return client;
 }
