@@ -16,7 +16,7 @@ export async function SiteHeader() {
   return (
     <header className="sticky top-0 z-40 bg-salt/80 backdrop-blur-xl">
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-4 px-5 sm:px-6">
-        <Logo height={40} />
+        <Logo height={30} />
 
         <nav className="hidden items-center gap-7 text-[0.95rem] font-semibold lg:flex" aria-label="Navigation principale">
           {SITE_LINKS.map((l) => (

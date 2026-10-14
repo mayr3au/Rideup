@@ -20,7 +20,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
       <div className="sticky top-0 z-30">
         <header className="border-b border-line bg-spray">
           <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-5 py-3 sm:px-6">
-            <Logo href="/dashboard" height={36} />
+            <Logo href="/dashboard" height={28} />
             <AppNav isAdmin={profile.is_admin} />
             <div className="flex items-center gap-3">
               <a href="/compte" className="rounded-full bg-brand-light px-3 py-1 text-sm font-semibold text-lagoon">
