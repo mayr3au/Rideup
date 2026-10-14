@@ -28,7 +28,7 @@ export function SiteFooter() {
     <footer className="border-t border-line bg-spray">
       <div className="mx-auto grid max-w-6xl gap-10 px-4 py-12 sm:grid-cols-[2fr_1fr_1fr] sm:px-6">
         <div className="max-w-sm">
-          <Logo full height={120} />
+          <Logo full height={72} />
           <p className="mt-4 text-slate">
             Coaching de glisse par IA (kitesurf, wingfoil, foil, surf, wakeboard) : analyse vidéo de tes figures, suivi de progression et Spot Finder selon le vent et la houle,
             ton niveau et ton matériel.
