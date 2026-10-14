@@ -37,33 +37,38 @@ function Icon({ name, className = "h-6 w-6" }: { name: "video" | "cut" | "check"
   );
 }
 
-/* ───────────── 1. Hero : ce que c'est, en une phrase ───────────── */
+/* ───────────── 1. Hero : la photo en plein écran, le logo au centre ───────────── */
 function Hero() {
   return (
-    <section className="mx-auto max-w-6xl px-3 pt-2 sm:px-6 sm:pt-4">
-      <div className="photo-card relative flex min-h-[72svh] flex-col justify-end overflow-hidden sm:min-h-[600px]">
-        <Image
-          src={PHOTOS.heroJump}
-          alt="Rider en plein saut"
-          fill
-          priority
-          sizes="(min-width: 1152px) 1152px, 100vw"
-          className="object-cover object-[70%_15%]"
-        />
-        <div className="photo-veil absolute inset-0" />
+    <section className="relative flex min-h-[calc(100svh-4rem)] flex-col items-center justify-center overflow-hidden px-5 py-16 text-center text-white sm:min-h-[min(92svh,860px)]">
+      <Image
+        src="/hero-home.jpg"
+        alt="Rider sur une dune, son kite gonflé à la main, face à la mer"
+        fill
+        priority
+        sizes="100vw"
+        className="object-cover object-[46%_50%]"
+      />
+      {/* Voile pour la lisibilité : sombre en bas, léger en haut */}
+      <div className="absolute inset-0 bg-deep/20" />
+      <div className="absolute inset-0 bg-gradient-to-t from-deep/80 via-deep/10 to-deep/25" />
 
-        <div className="rise relative p-6 sm:p-10">
-          <h1 className="max-w-xl text-[2.35rem] text-white sm:text-6xl">Ton coach de glisse dans ta poche</h1>
-          <p className="mt-3 max-w-md text-[1.05rem] text-white/90 sm:text-lg">
-            Kite, wing, foil, surf ou wake : envoie la vidéo d&apos;une figure. En une minute, tu sais exactement quoi corriger.
-          </p>
-          <Link href="/inscription" className="btn btn-kite mt-6 w-full sm:w-auto">
-            Essayer gratuitement
-            <Icon name="arrow" className="h-5 w-5" />
-          </Link>
-          <p className="mt-3 text-center text-sm text-white/85 sm:text-left">1 analyse offerte · sans carte bancaire</p>
-        </div>
+      <div className="rise relative flex max-w-2xl flex-col items-center">
+        <Image src="/logo.png" alt="RIDE'UP, progress your ride" width={765} height={350} priority className="h-28 w-auto drop-shadow-lg sm:h-40" />
+        <h1 className="mt-8 text-[2.1rem] leading-tight sm:text-5xl">Ton coach de glisse dans ta poche</h1>
+        <p className="mt-4 max-w-md text-[1.05rem] text-white/90 sm:text-lg">
+          Kite, wing, foil, surf ou wake : envoie la vidéo d&apos;une figure. En une minute, tu sais exactement quoi corriger.
+        </p>
+        <Link href="/inscription" className="btn btn-kite mt-8 w-full sm:w-auto">
+          Essayer gratuitement
+          <Icon name="arrow" className="h-5 w-5" />
+        </Link>
+        <p className="mt-3 text-sm text-white/85">1 analyse offerte · sans carte bancaire</p>
       </div>
+
+      <a href="#sports" aria-label="Découvrir" className="absolute bottom-5 left-1/2 -translate-x-1/2 text-white/80">
+        <svg viewBox="0 0 24 24" className="h-7 w-7 animate-bounce" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M6 10l6 6 6-6" /></svg>
+      </a>
     </section>
   );
 }
@@ -79,7 +84,7 @@ const SPORT_TAGLINE: Record<(typeof SPORT_IDS)[number], string> = {
 
 function Sports() {
   return (
-    <section className="mx-auto max-w-6xl pt-10 sm:px-6 sm:pt-14">
+    <section id="sports" className="mx-auto max-w-6xl scroll-mt-20 pt-10 sm:px-6 sm:pt-14">
       <h2 className="px-5 text-2xl sm:px-0 sm:text-3xl">Cinq sports, un seul coach</h2>
       <ul className="snap-row mt-4 flex scroll-px-5 gap-3 overflow-x-auto px-5 pb-2 sm:grid sm:grid-cols-5 sm:overflow-visible sm:px-0">
         {SPORT_IDS.map((sp) => (
