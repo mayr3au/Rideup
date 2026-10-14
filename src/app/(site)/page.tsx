@@ -159,9 +159,9 @@ function PhoneMock() {
 
             {/* barre d'onglets */}
             <div className="mt-3 grid grid-cols-5 border-t border-line bg-white px-2 py-2.5 text-[0.55rem] font-semibold text-slate">
-              {["Accueil", "Analyser", "Coach", "Progrès", "Spots"].map((t, i) => (
-                <span key={t} className={`flex flex-col items-center gap-1 ${i === 1 ? "text-lagoon" : ""}`}>
-                  <span aria-hidden="true" className={`h-4 w-4 rounded-md ${i === 1 ? "bg-brand" : "bg-raised"}`} />
+              {["Accueil", "Coach", "Analyser", "Progrès", "Spots"].map((t, i) => (
+                <span key={t} className={`flex flex-col items-center gap-1 ${i === 2 ? "text-lagoon" : ""}`}>
+                  <span aria-hidden="true" className={i === 2 ? "-mt-5 h-8 w-8 rounded-full bg-brand ring-4 ring-white" : "h-4 w-4 rounded-md bg-raised"} />
                   {t}
                 </span>
               ))}

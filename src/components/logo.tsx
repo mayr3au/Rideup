@@ -6,7 +6,7 @@ import Link from "next/link";
  * `light` : version claire pour les fonds sombres ou les photos.
  */
 export function Logo({ href = "/", full = false, light = false, height = 34, className = "" }: { href?: string; full?: boolean; light?: boolean; height?: number; className?: string }) {
-  const src = full ? (light ? "/logo.png" : "/logo-dark.png") : light ? "/logo-wordmark.png" : "/logo-wordmark-dark.png";
+  const src = full ? (light ? "/brand-full-light.png" : "/brand-full-dark.png") : light ? "/brand-wordmark-light.png" : "/brand-wordmark-dark.png";
   const ratio = full ? 765 / 350 : 742 / 330;
   return (
     <Link href={href} className={`inline-flex shrink-0 items-center ${className}`} aria-label="RIDE'UP, accueil">

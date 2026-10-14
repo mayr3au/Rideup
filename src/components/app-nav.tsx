@@ -27,8 +27,8 @@ function Icon({ children, size = 24 }: { children: React.ReactNode; size?: numbe
 /** Les cinq fonctions principales, à portée de pouce sur téléphone. */
 const MAIN: Item[] = [
   { href: "/dashboard", label: "Accueil", icon: <Icon>{I.home}</Icon> },
-  { href: "/analyse", label: "Analyser", icon: <Icon>{I.video}</Icon> },
   { href: "/coach", label: "Coach", icon: <Icon>{I.coach}</Icon> },
+  { href: "/analyse", label: "Analyser", icon: <Icon>{I.video}</Icon> },
   { href: "/progression", label: "Progression", short: "Progrès", icon: <Icon>{I.chart}</Icon> },
   { href: "/spots", label: "Spots", icon: <Icon>{I.map}</Icon> },
 ];
@@ -105,18 +105,37 @@ export function AppNav({ isAdmin, planLabel }: { isAdmin: boolean; planLabel: st
         aria-label="Navigation principale"
       >
         <ul className="grid grid-cols-5">
-          {MAIN.map((l) => (
-            <li key={l.href}>
-              <Link
-                href={l.href}
-                aria-current={active(l.href) ? "page" : undefined}
-                className={`flex flex-col items-center gap-0.5 py-2 text-[0.72rem] font-medium ${active(l.href) ? "text-lagoon" : "text-slate"}`}
-              >
-                {l.icon}
-                {l.short ?? l.label}
-              </Link>
-            </li>
-          ))}
+          {MAIN.map((l) =>
+            l.href === "/analyse" ? (
+              /* Action principale : bouton rond surélevé au centre */
+              <li key={l.href} className="relative">
+                <Link
+                  href={l.href}
+                  aria-current={active(l.href) ? "page" : undefined}
+                  className="flex flex-col items-center gap-0.5 pb-2 pt-1 text-[0.72rem] font-semibold text-lagoon"
+                >
+                  <span
+                    aria-hidden="true"
+                    className={`-mt-6 flex h-14 w-14 items-center justify-center rounded-full text-white shadow-[0_12px_24px_-8px_rgba(22,136,200,0.8)] ring-4 ring-spray transition-transform active:scale-95 ${active(l.href) ? "bg-lagoon-dark" : "bg-brand"}`}
+                  >
+                    <Icon size={26}>{I.video}</Icon>
+                  </span>
+                  {l.label}
+                </Link>
+              </li>
+            ) : (
+              <li key={l.href}>
+                <Link
+                  href={l.href}
+                  aria-current={active(l.href) ? "page" : undefined}
+                  className={`flex flex-col items-center gap-0.5 py-2 text-[0.72rem] font-medium ${active(l.href) ? "text-lagoon" : "text-slate"}`}
+                >
+                  {l.icon}
+                  {l.short ?? l.label}
+                </Link>
+              </li>
+            ),
+          )}
         </ul>
       </nav>
 

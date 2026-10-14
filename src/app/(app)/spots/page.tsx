@@ -134,9 +134,11 @@ export default async function SpotsPage({ searchParams }: { searchParams: Promis
       )}
 
       {forecastError ? (
-        <p role="alert" className="mt-6 rounded-2xl bg-danger/10 p-4">
-          Les prévisions sont indisponibles pour le moment. Recharge la page dans quelques minutes.
-        </p>
+        <div role="alert" className="mt-6 rounded-2xl bg-danger/10 p-4">
+          <p className="font-semibold">Les prévisions sont indisponibles pour le moment.</p>
+          <p className="mt-1 text-sm text-slate">Le service météo ne répond pas. Réessaie dans quelques minutes.</p>
+          <Link href={`/spots?rayon=${radius}&r=${Date.now()}`} className="btn btn-ghost mt-3 !min-h-10 !px-4 !py-2 !text-sm">Réessayer</Link>
+        </div>
       ) : nearby.length === 0 ? (
         <div className="panel mt-6 p-6">
           <p>

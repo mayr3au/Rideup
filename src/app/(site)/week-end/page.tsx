@@ -79,8 +79,13 @@ export default async function WeekendPage({ searchParams }: { searchParams: Prom
 
   return (
     <div className="mx-auto max-w-4xl px-5 py-10 sm:px-6 sm:py-14">
-      <h1 className="text-3xl font-extrabold sm:text-4xl">
-        {waves ? "Les plus belles houles ce week-end" : "Les spots les plus ventés ce week-end"}
+      <p className="eyebrow">Ce week-end</p>
+      <h1 className="mt-2 text-4xl font-extrabold sm:text-6xl">
+        {waves ? (
+          <>Les plus belles <em className="italic text-brand">houles</em>.</>
+        ) : (
+          <>Les spots les plus <em className="italic text-brand">ventés</em>.</>
+        )}
       </h1>
       <p className="mt-3 text-lg text-slate">
         {waves ? "Houle moyenne prévue" : "Vent moyen prévu"} entre 8 h et 18 h, {fmtDate(sat)} et {fmtDate(sun)}.
@@ -115,9 +120,11 @@ export default async function WeekendPage({ searchParams }: { searchParams: Prom
       </nav>
 
       {failed ? (
-        <p role="alert" className="mt-8 rounded-2xl bg-danger/10 p-4">
-          Les prévisions sont indisponibles pour le moment. Réessaie dans quelques minutes.
-        </p>
+        <div role="alert" className="mt-8 rounded-2xl bg-danger/10 p-4">
+          <p className="font-semibold">Les prévisions sont indisponibles pour le moment.</p>
+          <p className="mt-1 text-sm text-slate">Le service météo ne répond pas. Réessaie dans quelques minutes.</p>
+          <Link href={`${href({ sport, pays })}${href({ sport, pays }).includes("?") ? "&" : "?"}r=${Date.now()}`} className="btn btn-ghost mt-3 !min-h-10 !px-4 !py-2 !text-sm">Réessayer</Link>
+        </div>
       ) : shown.length === 0 ? (
         <p className="panel mt-8 p-5 text-slate">Aucun spot référencé ici pour ce sport.</p>
       ) : (

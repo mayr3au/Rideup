@@ -6,6 +6,7 @@ import { errorLabel, phaseLabel, SPORTS, trickById } from "@/lib/sports";
 import type { VideoAnalysis } from "@/lib/types";
 import { ConfirmButton } from "@/components/confirm-button";
 import { AutoRefresh } from "@/components/auto-refresh";
+import { ShareAnalysis } from "@/components/share-analysis";
 import { deleteAnalysis } from "../actions";
 import { setTrickStatus } from "../../coach/actions";
 
@@ -209,6 +210,12 @@ export default async function AnalysisDetail({
         <Link href="/coach" className="btn btn-ghost">
           En parler au coach
         </Link>
+        {r && (
+          <ShareAnalysis
+            title={`${r.figure} : ${r.note}/10 sur RIDE'UP`}
+            text={`${r.resume} Priorité : ${r.priorite_session}`}
+          />
+        )}
         <form action={deleteAnalysis} className="sm:ml-auto">
           <input type="hidden" name="id" value={a.id} />
           <ConfirmButton message="Supprimer définitivement cette analyse ?" className="btn text-danger hover:bg-danger/5">

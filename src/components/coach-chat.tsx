@@ -101,7 +101,16 @@ export function CoachChat({
             </div>
           ),
         )}
-        {pending && <p className="text-slate">Le coach réfléchit…</p>}
+        {pending && (
+          <div className="flex items-center gap-2 text-slate" aria-label="Le coach réfléchit">
+            <span className="flex gap-1 rounded-2xl rounded-bl-md bg-salt px-3 py-2.5" aria-hidden="true">
+              {[0, 1, 2].map((i) => (
+                <span key={i} className="h-2 w-2 animate-bounce rounded-full bg-slate/60" style={{ animationDelay: `${i * 0.15}s` }} />
+              ))}
+            </span>
+            <span className="text-sm">Le coach réfléchit…</span>
+          </div>
+        )}
         <div ref={endRef} />
       </div>
 

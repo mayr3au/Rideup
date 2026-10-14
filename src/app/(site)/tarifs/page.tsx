@@ -4,6 +4,7 @@ import { getSession, effectivePlan } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { getPlanSettings } from "@/lib/usage";
 import { PLANS, type PaidPlan } from "@/lib/plans";
+import { Reveal } from "@/components/reveal";
 
 export const metadata: Metadata = {
   title: "Tarifs",
@@ -16,8 +17,11 @@ export default async function PricingPage() {
   const settings = await getPlanSettings(session?.supabase ?? (await createClient()));
 
   return (
-    <div className="mx-auto max-w-5xl px-4 py-14 sm:px-6">
-      <h1 className="max-w-3xl text-4xl font-extrabold sm:text-5xl">Choisis ton rythme de progression</h1>
+    <div className="mx-auto max-w-5xl px-5 py-14 sm:px-6 sm:py-20">
+      <p className="eyebrow">Tarifs</p>
+      <h1 className="mt-2 max-w-3xl text-4xl font-extrabold sm:text-6xl">
+        Choisis ton rythme de <em className="italic text-brand">progression</em>.
+      </h1>
       <p className="mt-4 max-w-2xl text-lg text-slate">
         Sans engagement, résiliable en deux clics. À l&apos;inscription, {settings.free.monthly_analyses} analyse
         {settings.free.monthly_analyses > 1 ? "s" : ""} offerte{settings.free.monthly_analyses > 1 ? "s" : ""} pour essayer.
@@ -29,7 +33,8 @@ export default async function PricingPage() {
           const n = settings[key].monthly_analyses;
           const elite = key === "elite";
           return (
-            <section key={key} className={`panel flex flex-col p-6 sm:p-8 ${elite ? "border-2 !border-kite" : ""}`}>
+            <Reveal key={key} as="section" delay={elite ? 0.12 : 0} className={`panel relative flex flex-col p-6 sm:p-8 ${elite ? "ring-2 ring-brand" : ""}`}>
+              {elite && <span className="tag tag-solid absolute right-5 top-5">Le plus complet</span>}
               <h2 className="text-3xl font-bold">{plan.name}</h2>
               <p className="mt-1 text-slate">{plan.tagline}</p>
               <p className="mt-6">
@@ -63,21 +68,21 @@ export default async function PricingPage() {
                   Commencer avec une analyse offerte
                 </Link>
               )}
-            </section>
+            </Reveal>
           );
         })}
       </div>
 
-      <div className="mt-12 grid gap-8 text-[0.95rem] sm:grid-cols-3">
-        <div>
+      <div className="mt-12 grid gap-4 text-[0.95rem] sm:grid-cols-3">
+        <div className="rounded-2xl bg-salt p-5">
           <h2 className="font-semibold">Une analyse, c&apos;est quoi ?</h2>
           <p className="mt-1 text-slate">Un passage de 20 secondes maximum que tu choisis dans ta vidéo, analysé phase par phase.</p>
         </div>
-        <div>
+        <div className="rounded-2xl bg-salt p-5">
           <h2 className="font-semibold">Et si je renvoie le même clip ?</h2>
           <p className="mt-1 text-slate">Le même passage déjà analysé te redonne le résultat, sans décompter d&apos;analyse.</p>
         </div>
-        <div>
+        <div className="rounded-2xl bg-salt p-5">
           <h2 className="font-semibold">Si l&apos;analyse échoue ?</h2>
           <p className="mt-1 text-slate">Elle n&apos;est pas décomptée. Tu peux relancer avec le même clip.</p>
         </div>

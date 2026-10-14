@@ -36,6 +36,7 @@ export function AnalyseUploader({
   const [step, setStep] = useState<Step>("idle");
   const [progress, setProgress] = useState(0);
   const [error, setError] = useState<{ text: string; upgrade?: boolean } | null>(null);
+  const [dragging, setDragging] = useState(false);
 
   useEffect(() => () => { if (src) URL.revokeObjectURL(src); }, [src]);
 
@@ -155,15 +156,21 @@ export function AnalyseUploader({
       <div className="space-y-3">
         <label
           htmlFor="clip"
-          className="panel flex min-h-56 cursor-pointer flex-col items-center justify-center border-2 border-dashed border-brand/30 px-4 py-10 text-center hover:border-brand"
+          onDragOver={(e) => { e.preventDefault(); setDragging(true); }}
+          onDragLeave={() => setDragging(false)}
+          onDrop={(e) => { e.preventDefault(); setDragging(false); pick(e.dataTransfer.files?.[0]); }}
+          className={`panel flex min-h-56 cursor-pointer flex-col items-center justify-center border-2 border-dashed px-4 py-10 text-center transition-colors ${
+            dragging ? "border-brand bg-brand-light" : "border-brand/30 hover:border-brand"
+          }`}
         >
           <span className="flex h-14 w-14 items-center justify-center rounded-2xl bg-brand-light text-brand" aria-hidden="true">
             <svg viewBox="0 0 24 24" className="h-7 w-7" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round"><path d="M4 7h11v10H4zM15 10.5l5-3v9l-5-3" /></svg>
           </span>
-          <span className="mt-3 text-xl font-bold">Importer une vidéo</span>
+          <span className="mt-3 text-xl font-bold">{dragging ? "Lâche ta vidéo ici" : "Importer une vidéo"}</span>
           <span className="mt-2 max-w-xs text-slate">
-            Tu choisiras ensuite le passage de ta figure, 20 secondes maximum.
+            Depuis ta galerie, ou glisse le fichier ici. Tu choisiras ensuite le passage de ta figure, 20 secondes maximum.
           </span>
+          <span className="mt-3 text-xs text-slate">MP4, MOV ou WebM · 200 Mo max</span>
         </label>
         <input id="clip" type="file" accept="video/mp4,video/quicktime,video/webm" className="sr-only" onChange={(e) => pick(e.target.files?.[0])} />
         {error && <p role="alert" className="text-danger">{error.text}</p>}

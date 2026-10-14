@@ -13,7 +13,10 @@ export default function CoursesPage() {
 
   return (
     <div className="mx-auto max-w-4xl px-5 py-10 sm:px-6 sm:py-14">
-      <h1 className="text-3xl font-extrabold sm:text-4xl">Cours</h1>
+      <p className="eyebrow">Cours</p>
+      <h1 className="mt-2 text-4xl font-extrabold sm:text-6xl">
+        Figure par <em className="italic text-brand">figure</em>.
+      </h1>
       <p className="mt-3 max-w-2xl text-lg text-slate">
         Les étapes, les erreurs courantes et les exercices pour chaque figure. Lis le cours, va sur l&apos;eau, puis fais
         analyser ta tentative.
