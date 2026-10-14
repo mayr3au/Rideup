@@ -172,25 +172,15 @@ function Ribbon() {
   const items = ["Kitesurf", "Wingfoil", "Foil", "Surf", "Wakeboard", "Analyse vidéo", "Coach IA", "Spot Finder", "Progresse"];
   const row = [...items, ...items];
   return (
-    <div className="relative z-10 -my-2 overflow-hidden py-6" aria-hidden="true">
-      <div className="-rotate-[1.5deg] scale-x-105 bg-deep py-4 shadow-[0_20px_40px_-25px_rgba(14,42,71,0.8)]">
-        <div className="[mask-image:linear-gradient(90deg,transparent,black_8%,black_92%,transparent)]">
-          <div className="marquee flex w-max items-center gap-8 whitespace-nowrap">
-            {row.map((t, i) => (
-              <span key={i} className="flex items-center gap-8">
-                <span
-                  className={`text-2xl font-extrabold uppercase italic tracking-tight sm:text-3xl ${
-                    i % 2 ? "text-transparent [-webkit-text-stroke:1.5px_rgba(255,255,255,0.85)]" : "text-white"
-                  }`}
-                >
-                  {t}
-                </span>
-                <svg viewBox="0 0 32 16" className="h-4 w-8 shrink-0 text-brand" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round">
-                  <path d="M2 10c4-6 8-6 12 0s8 6 12 0 4-4 4-4" />
-                </svg>
-              </span>
-            ))}
-          </div>
+    <div className="border-y border-line bg-white py-5" aria-hidden="true">
+      <div className="overflow-hidden [mask-image:linear-gradient(90deg,transparent,black_10%,black_90%,transparent)]">
+        <div className="marquee flex w-max items-center gap-10 whitespace-nowrap">
+          {row.map((t, i) => (
+            <span key={i} className="flex items-center gap-10">
+              <span className="text-lg font-semibold text-deep/70 sm:text-xl">{t}</span>
+              <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-brand" />
+            </span>
+          ))}
         </div>
       </div>
     </div>
