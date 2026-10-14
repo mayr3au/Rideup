@@ -16,11 +16,20 @@ export const PHOTOS = {
   wakeAir: u("1666032234128-abc3e45bd1dc"), // wakeboarder en l'air
 };
 
-/** Photo représentative de chaque sport. Le foil n'a pas encore de photo dédiée. */
+/** Photo représentative de chaque sport (photos fournies par RIDE'UP dans /public/sports). */
 export const SPORT_PHOTOS: Record<SportId, string> = {
-  kitesurf: PHOTOS.splash,
+  kitesurf: "/sports/kite-v1.jpg",
   wingfoil: PHOTOS.wing,
-  foil: PHOTOS.blue,
-  surf: PHOTOS.surfBarrel,
-  wakeboard: PHOTOS.wakeCable,
+  foil: "/sports/foil-v1.jpg",
+  surf: "/sports/surf-v1.jpg",
+  wakeboard: "/sports/wake-v1.jpg",
+};
+
+/** Cadrage des photos dans les cartes verticales (le rider reste au centre). */
+export const SPORT_PHOTO_POS: Record<SportId, string> = {
+  kitesurf: "62% 50%",
+  wingfoil: "50% 50%",
+  foil: "40% 50%",
+  surf: "43% 50%",
+  wakeboard: "54% 50%",
 };

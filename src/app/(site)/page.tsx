@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { DEFAULT_SETTINGS, PLANS } from "@/lib/plans";
-import { PHOTOS, SPORT_PHOTOS } from "@/lib/photos";
+import { PHOTOS, SPORT_PHOTOS, SPORT_PHOTO_POS } from "@/lib/photos";
 import { SPORT_IDS, SPORTS } from "@/lib/sports";
 import { Reveal } from "@/components/reveal";
 import { Tilt } from "@/components/tilt";
@@ -207,7 +207,7 @@ function Sports() {
         {SPORT_IDS.map((sp, i) => (
           <Reveal as="li" key={sp} delay={i * 0.08} className="w-[42vw] max-w-[200px] shrink-0 snap-start sm:w-auto sm:max-w-none">
             <div className="photo-card lift relative aspect-[3/4] overflow-hidden">
-              <Image src={SPORT_PHOTOS[sp]} alt="" fill sizes="(min-width: 640px) 220px, 42vw" className="object-cover" />
+              <Image src={SPORT_PHOTOS[sp]} alt="" fill sizes="(min-width: 640px) 220px, 42vw" className="object-cover" style={{ objectPosition: SPORT_PHOTO_POS[sp] }} />
               <div className="photo-veil absolute inset-0" />
               <div className="absolute inset-x-0 bottom-0 p-3 text-white">
                 <p className="text-lg font-bold leading-tight">{SPORTS[sp].name}</p>
