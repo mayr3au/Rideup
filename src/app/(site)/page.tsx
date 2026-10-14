@@ -42,16 +42,16 @@ function Hero() {
   return (
     <section className="relative -mt-16 flex min-h-[100svh] flex-col justify-end overflow-hidden text-white">
       <Image
-        src="/hero-home.jpg"
-        alt="Rider sur une dune, son kite gonflé à la main, face à la mer"
+        src="/hero-surf.jpg"
+        alt="Surfeur dans le tube d'une vague, montagnes dans la brume"
         fill
         priority
         sizes="100vw"
-        className="object-cover object-[44%_40%]"
+        className="object-cover object-[52%_75%]"
       />
       {/* Voile : léger en haut pour l'en-tête, dense en bas pour le texte */}
-      <div className="absolute inset-0 bg-gradient-to-b from-white/35 via-transparent to-transparent" />
-      <div className="absolute inset-0 bg-gradient-to-t from-deep/90 via-deep/35 to-transparent" />
+      <div className="absolute inset-0 bg-gradient-to-b from-white/40 via-transparent to-transparent" />
+      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/25 to-transparent" />
 
       <div className="rise relative mx-auto w-full max-w-6xl px-5 pb-14 pt-40 sm:px-6 sm:pb-20">
         <p className="eyebrow text-white/80">Coach IA · kite, wing, foil, surf, wake</p>
