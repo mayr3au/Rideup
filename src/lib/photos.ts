@@ -19,7 +19,7 @@ export const PHOTOS = {
 /** Photo représentative de chaque sport (photos fournies par RIDE'UP dans /public/sports). */
 export const SPORT_PHOTOS: Record<SportId, string> = {
   kitesurf: "/sports/kite-v1.jpg",
-  wingfoil: PHOTOS.wing,
+  wingfoil: "/sports/wing-v1.jpg",
   foil: "/sports/foil-v1.jpg",
   surf: "/sports/surf-v1.jpg",
   wakeboard: "/sports/wake-v1.jpg",
