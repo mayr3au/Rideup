@@ -1,32 +1,20 @@
 "use client";
 
-import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 
-/**
- * En-tête du site : transparent par-dessus la photo d'accueil, puis verre dépoli dès qu'on défile
- * (et sur toutes les autres pages). Les enfants s'adaptent via `group-data-[solid=false]:…`.
- */
+/** En-tête fixe du site : blanc, avec une ombre légère dès qu'on défile. */
 export function HeaderBar({ children }: { children: React.ReactNode }) {
-  const path = usePathname();
   const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 24);
+    const onScroll = () => setScrolled(window.scrollY > 8);
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  const overlay = path === "/" && !scrolled;
-
   return (
-    <header
-      data-solid={overlay ? "false" : "true"}
-      className={`group fixed inset-x-0 top-0 z-40 transition-[background-color,box-shadow] duration-300 ${
-        overlay ? "bg-transparent text-deep" : "border-b border-line/60 bg-salt/80 text-deep backdrop-blur-xl"
-      }`}
-    >
+    <header className={`fixed inset-x-0 top-0 z-40 bg-white/90 backdrop-blur-xl transition-shadow ${scrolled ? "shadow-[0_1px_0_var(--line),0_10px_30px_-20px_rgba(14,42,71,0.35)]" : ""}`}>
       {children}
     </header>
   );

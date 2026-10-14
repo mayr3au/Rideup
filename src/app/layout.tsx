@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 // Police auto-hébergée (pas d'appel à Google Fonts)
 import "@fontsource-variable/plus-jakarta-sans";
+import "@fontsource-variable/plus-jakarta-sans/wght-italic.css";
 import "./globals.css";
 
 export const metadata: Metadata = {

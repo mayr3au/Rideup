@@ -16,6 +16,9 @@ export async function SiteHeader() {
 
   return (
     <HeaderBar>
+      <Link href="/#sports" className="block bg-brand px-4 py-2 text-center text-[0.82rem] font-semibold text-white hover:bg-lagoon">
+        <span className="font-bold">Nouveau.</span> RIDE&apos;UP coache aussi le wing, le foil, le surf et le wake. <span aria-hidden="true">→</span>
+      </Link>
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-4 px-5 sm:px-6">
         <Logo height={30} />
 
@@ -33,7 +36,7 @@ export async function SiteHeader() {
 
         <div className="flex items-center gap-2">
           {session ? (
-            <Link href="/dashboard" className="btn btn-primary !min-h-10 !rounded-xl !px-4 !py-2 !text-sm">
+            <Link href="/dashboard" className="btn btn-primary !min-h-11 !rounded-xl !px-5 !py-2 !text-sm">
               Mon espace
             </Link>
           ) : (
@@ -46,7 +49,7 @@ export async function SiteHeader() {
               </Link>
               <Link
                 href="/inscription"
-                className="btn btn-primary hidden !min-h-10 !rounded-xl !px-4 !py-2 !text-sm sm:inline-flex"
+                className="btn btn-primary hidden !min-h-11 !rounded-xl !px-5 !py-2 !text-sm sm:inline-flex"
               >
                 Essayer gratuitement
               </Link>

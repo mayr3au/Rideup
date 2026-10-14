@@ -10,7 +10,6 @@ export default function Home() {
       <Hero />
       <Sports />
       <Steps />
-      <Result />
       <Features />
       <PricingTeaser />
       <Faq />
@@ -37,43 +36,112 @@ function Icon({ name, className = "h-6 w-6" }: { name: "video" | "cut" | "check"
   );
 }
 
-/* ───────────── 1. Hero : la photo pleine hauteur, le message en bas ───────────── */
+/* ───────────── 1. Hero : fond blanc, gros titre, l'appli dans un téléphone ───────────── */
 function Hero() {
   return (
-    <section className="relative -mt-16 flex min-h-[100svh] flex-col justify-end overflow-hidden text-white">
-      <Image
-        src="/hero-surf.jpg"
-        alt="Surfeur dans le tube d'une vague, montagnes dans la brume"
-        fill
-        priority
-        sizes="100vw"
-        className="object-cover object-[52%_75%]"
-      />
-      {/* Voile : léger en haut pour l'en-tête, dense en bas pour le texte */}
-      <div className="absolute inset-0 bg-gradient-to-b from-white/40 via-transparent to-transparent" />
-      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/25 to-transparent" />
-
-      <div className="rise relative mx-auto w-full max-w-6xl px-5 pb-14 pt-40 sm:px-6 sm:pb-20">
-        <p className="eyebrow text-white/80">Coach IA · kite, wing, foil, surf, wake</p>
-        <h1 className="mt-3 max-w-3xl text-[2.6rem] leading-[1.02] sm:text-5xl lg:text-7xl">
-          Progresse à chaque session, même sans moniteur.
-        </h1>
-        <p className="mt-5 max-w-xl text-[1.05rem] text-white/85 sm:text-xl">
-          Envoie 20 secondes de ta figure. En une minute, tu sais exactement quoi corriger, et quoi bosser à la prochaine
-          session.
-        </p>
-        <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center">
-          <Link href="/inscription" className="btn btn-kite">
-            Essayer gratuitement
-            <Icon name="arrow" className="h-5 w-5" />
-          </Link>
-          <Link href="#analyse" className="btn btn-glass">
-            Voir comment ça marche
-          </Link>
+    <section className="relative overflow-hidden bg-white">
+      {/* halo bleu très léger en haut à droite */}
+      <div aria-hidden="true" className="pointer-events-none absolute -right-40 -top-40 h-[560px] w-[560px] rounded-full bg-brand-light/70 blur-3xl" />
+      <div className="relative mx-auto grid max-w-6xl items-center gap-12 px-5 pb-16 pt-12 sm:px-6 lg:grid-cols-[1.1fr_0.9fr] lg:pb-24 lg:pt-20">
+        <div className="rise">
+          <span className="tag">
+            <span aria-hidden="true" className="h-1.5 w-1.5 rounded-full bg-brand" />
+            Coach IA · 5 sports
+          </span>
+          <h1 className="mt-6 text-[3rem] leading-[0.98] sm:text-7xl lg:text-[5.4rem]">
+            Chaque session mérite un vrai <em className="italic text-brand">coach</em>.
+          </h1>
+          <p className="mt-6 max-w-xl text-lg text-slate sm:text-xl">
+            Kite, wing, foil, surf, wake. Envoie 20 secondes de ta figure : RIDE&apos;UP te dit exactement quoi corriger, et
+            quoi bosser à la prochaine session.
+          </p>
+          <div className="mt-8 flex flex-col gap-4 sm:flex-row sm:items-center">
+            <Link href="/inscription" className="btn btn-primary">
+              Essayer gratuitement
+            </Link>
+            <Link href="#analyse" className="inline-flex min-h-12 items-center gap-1.5 px-1 font-semibold text-deep hover:text-brand">
+              Comment ça marche
+              <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6" /></svg>
+            </Link>
+          </div>
+          <p className="mt-4 text-sm text-slate">1 analyse offerte. Sans carte bancaire.</p>
         </div>
-        <p className="mt-4 text-sm text-white/75">1 analyse offerte · sans carte bancaire · sans engagement</p>
+
+        <PhoneMock />
       </div>
     </section>
+  );
+}
+
+/* Un téléphone dessiné en HTML, avec un résultat d'analyse dedans */
+function PhoneMock() {
+  const phases: [string, number][] = [["Approche", 8], ["Appel", 7], ["En l'air", 5], ["Réception", 6]];
+  return (
+    <div className="relative mx-auto w-[290px] sm:w-[320px]">
+      <div className="rounded-[46px] bg-deep p-2.5 shadow-[0_40px_80px_-30px_rgba(14,42,71,0.55)] ring-1 ring-black/10">
+        <div className="relative overflow-hidden rounded-[38px] bg-salt text-deep">
+          {/* barre d'état */}
+          <div className="flex items-center justify-between px-6 pt-3 text-[0.7rem] font-bold">
+            <span>15:09</span>
+            <span aria-hidden="true" className="h-5 w-20 rounded-full bg-deep" />
+            <span>5G ▮</span>
+          </div>
+
+          {/* bandeau photo */}
+          <div className="relative mx-3 mt-3 h-36 overflow-hidden rounded-3xl">
+            <Image src={PHOTOS.splash} alt="" fill sizes="320px" className="object-cover" />
+            <div className="photo-veil absolute inset-0" />
+            <div className="absolute inset-x-0 bottom-0 flex items-end justify-between p-3 text-white">
+              <div>
+                <p className="text-[0.65rem] text-white/80">Kitesurf · 12 s · aujourd&apos;hui</p>
+                <p className="text-lg font-bold leading-tight">Backroll</p>
+              </div>
+              <p className="text-3xl font-extrabold leading-none">
+                7<span className="text-sm font-semibold text-white/80">/10</span>
+              </p>
+            </div>
+          </div>
+
+          {/* phases */}
+          <div className="mx-3 mt-3 grid grid-cols-4 gap-1.5 text-center">
+            {phases.map(([p, n]) => (
+              <div key={p} className="rounded-xl bg-white px-1 py-2 shadow-sm">
+                <p className="text-base font-extrabold">{n}</p>
+                <p className="text-[0.58rem] text-slate">{p}</p>
+              </div>
+            ))}
+          </div>
+
+          {/* à corriger */}
+          <div className="mx-3 mt-3 rounded-2xl bg-white p-3 shadow-sm">
+            <p className="text-[0.62rem] font-bold text-danger">À corriger en priorité</p>
+            <p className="mt-0.5 text-[0.82rem] font-semibold leading-snug">Ton regard reste devant pendant la rotation</p>
+            <p className="mt-0.5 text-[0.72rem] text-slate">Tourne la tête vers ton épaule arrière dès que tu quittes l&apos;eau.</p>
+          </div>
+          <div className="mx-3 mt-2 rounded-2xl bg-brand-light p-3">
+            <p className="text-[0.62rem] font-bold text-lagoon">À ta prochaine session</p>
+            <p className="mt-0.5 text-[0.78rem]">5 petits sauts en tournant juste la tête, sans chercher la rotation.</p>
+          </div>
+
+          {/* barre d'onglets */}
+          <div className="mt-3 grid grid-cols-5 border-t border-line bg-white px-2 py-2.5 text-[0.55rem] font-semibold text-slate">
+            {["Accueil", "Analyser", "Coach", "Progrès", "Spots"].map((t, i) => (
+              <span key={t} className={`flex flex-col items-center gap-1 ${i === 1 ? "text-lagoon" : ""}`}>
+                <span aria-hidden="true" className={`h-4 w-4 rounded-md ${i === 1 ? "bg-brand" : "bg-raised"}`} />
+                {t}
+              </span>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* carte flottante : Spot Finder */}
+      <div className="panel absolute -right-8 bottom-24 hidden w-44 p-3 sm:block lg:-right-14">
+        <p className="text-[0.62rem] font-bold text-lagoon">Spot Finder · samedi</p>
+        <p className="mt-0.5 text-sm font-bold">L&apos;Almanarre</p>
+        <p className="text-[0.75rem] text-slate">14 h – 18 h · 18 nds side · kite 9 m²</p>
+      </div>
+    </div>
   );
 }
 
@@ -171,72 +239,6 @@ function Steps() {
           </div>
         </li>
       </ol>
-    </section>
-  );
-}
-
-/* ───────────── 3. Exemple de résultat complet ───────────── */
-function Result() {
-  return (
-    <section className="mx-auto max-w-6xl px-3 pt-14 sm:px-6 sm:pt-20">
-      <div className="grid items-center gap-8 lg:grid-cols-[1fr_1.05fr]">
-        <div className="px-2 sm:px-0">
-          <p className="eyebrow">L&apos;analyse</p>
-          <h2 className="mt-2 text-3xl sm:text-4xl">Un vrai retour de coach, pas un résumé</h2>
-          <p className="mt-3 max-w-md text-slate">
-            Voici à quoi ressemble une analyse. Chaque erreur vient avec une consigne simple à appliquer sur l&apos;eau.
-          </p>
-          <ul className="mt-5 space-y-2.5">
-            {["Une note pour chaque phase de la figure", "Les erreurs, de la plus importante à la moins importante", "Les exercices à faire à ta prochaine session"].map((t) => (
-              <li key={t} className="flex items-start gap-3">
-                <span className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-brand-light text-brand">
-                  <Icon name="check" className="h-4 w-4" />
-                </span>
-                {t}
-              </li>
-            ))}
-          </ul>
-        </div>
-
-        <figure className="relative" aria-label="Exemple de résultat d'analyse">
-          <div className="photo-card relative h-56 overflow-hidden sm:h-72">
-            <Image src={PHOTOS.splash} alt="" fill sizes="(min-width: 1024px) 560px, 100vw" className="object-cover" />
-          </div>
-          <div className="panel relative mx-2 -mt-14 p-5 sm:mx-4 sm:p-6">
-            <div className="flex items-start justify-between gap-4">
-              <div>
-                <p className="text-xl font-bold">Backroll</p>
-                <p className="text-sm text-slate">Exemple d&apos;analyse</p>
-              </div>
-              <p className="text-3xl font-extrabold text-brand">
-                6<span className="text-base font-semibold text-slate">/10</span>
-              </p>
-            </div>
-            <div className="mt-4 grid grid-cols-4 gap-2 text-center">
-              {[
-                ["Approche", 8],
-                ["Appel", 7],
-                ["En l'air", 5],
-                ["Réception", 6],
-              ].map(([p, n]) => (
-                <div key={p} className="rounded-xl bg-raised px-1 py-2">
-                  <p className="text-lg font-extrabold">{n}</p>
-                  <p className="text-[0.68rem] text-slate">{p}</p>
-                </div>
-              ))}
-            </div>
-            <div className="mt-4 rounded-2xl border border-line p-3">
-              <p className="text-sm font-bold text-danger">À corriger</p>
-              <p className="mt-1 font-semibold">Ton regard reste devant pendant la rotation</p>
-              <p className="mt-0.5 text-[0.95rem] text-slate">Tourne la tête vers ton épaule arrière dès que tu quittes l&apos;eau.</p>
-            </div>
-            <div className="mt-3 rounded-2xl bg-brand-light p-3">
-              <p className="text-sm font-bold text-lagoon">À ta prochaine session</p>
-              <p className="mt-0.5 text-[0.95rem]">5 petits sauts en tournant juste la tête, sans chercher la rotation.</p>
-            </div>
-          </div>
-        </figure>
-      </div>
     </section>
   );
 }
@@ -384,8 +386,8 @@ function FinalCta() {
   return (
     <section className="mx-auto max-w-6xl px-3 pb-12 pt-14 sm:px-6 sm:pt-20">
       <div className="photo-card relative overflow-hidden">
-        <Image src={PHOTOS.wing} alt="" fill sizes="100vw" className="object-cover" />
-        <div className="absolute inset-0 bg-[#0e2a47]/60" />
+        <Image src="/hero-surf.jpg" alt="" fill sizes="100vw" className="object-cover object-[52%_60%]" />
+        <div className="absolute inset-0 bg-[#0e2a47]/55" />
         <div className="relative px-6 py-14 text-center text-white sm:py-20">
           <h2 className="text-3xl sm:text-5xl">Ta prochaine session commence ici</h2>
           <p className="mx-auto mt-3 max-w-sm text-white/90">Crée ton compte et analyse ta première figure gratuitement.</p>

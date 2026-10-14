@@ -5,7 +5,7 @@ export default function SiteLayout({ children }: { children: React.ReactNode }) 
   return (
     <>
       <SiteHeader />
-      <main className="pt-16">{children}</main>
+      <main className="bg-white pt-[6.25rem]">{children}</main>
       <SiteFooter />
     </>
   );

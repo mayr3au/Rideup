@@ -33,7 +33,7 @@ export function MobileMenu({ links, loggedIn }: { links: { href: string; label: 
       </button>
 
       {open && (
-        <div id="menu-mobile" className="fixed inset-0 z-50 overflow-y-auto bg-salt px-5 pb-10 text-deep lg:hidden">
+        <div id="menu-mobile" className="fixed inset-0 z-50 overflow-y-auto bg-white px-5 pb-10 text-deep lg:hidden">
           <div className="flex h-16 items-center justify-between">
             <Logo height={30} />
             <button onClick={() => setOpen(false)} aria-label="Fermer le menu" className="-mr-2 flex h-11 w-11 items-center justify-center">
