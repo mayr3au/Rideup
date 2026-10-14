@@ -331,7 +331,7 @@ p {
   }
 }
 .marquee {
-  animation: marquee 28s linear infinite;
+  animation: marquee 40s linear infinite;
 }
 .marquee:hover {
   animation-play-state: paused;
@@ -383,9 +383,12 @@ p {
   .float,
   .sweep,
   .fill,
-  .marquee,
   .breathe {
     animation: none;
+  }
+  /* Le ruban reste en mouvement, mais très lentement */
+  .marquee {
+    animation-duration: 90s;
   }
   .reveal {
     opacity: 1;
