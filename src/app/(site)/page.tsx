@@ -5,6 +5,7 @@ import { PHOTOS, SPORT_PHOTOS } from "@/lib/photos";
 import { SPORT_IDS, SPORTS } from "@/lib/sports";
 import { Reveal } from "@/components/reveal";
 import { Tilt } from "@/components/tilt";
+import { PhoneScreens } from "@/components/phone-screens";
 
 export default function Home() {
   return (
@@ -99,7 +100,6 @@ function Hero() {
 
 /* Un téléphone dessiné en HTML, avec un résultat d'analyse dedans */
 function PhoneMock() {
-  const phases: [string, number][] = [["Approche", 8], ["Appel", 7], ["En l'air", 5], ["Réception", 6]];
   return (
     <div className="relative mx-auto w-[270px] lg:w-[310px]">
       {/* ombre portée au sol */}
@@ -121,93 +121,17 @@ function PhoneMock() {
                 {/* reflet vitre */}
                 <div aria-hidden="true" className="pointer-events-none absolute inset-0 z-20 bg-[linear-gradient(115deg,rgba(255,255,255,0.35)_0%,rgba(255,255,255,0)_32%)]" />
 
-                {/* barre d'état + Dynamic Island */}
+                {/* barre d'état */}
                 <div className="relative z-10 flex h-11 items-center justify-between px-7 text-[0.72rem] font-semibold">
                   <span>9:41</span>
-                  <span aria-hidden="true" className="absolute left-1/2 top-2.5 h-[26px] w-[92px] -translate-x-1/2 rounded-full bg-black" />
                   <span aria-hidden="true" className="flex items-center gap-1">
                     <svg viewBox="0 0 18 12" className="h-2.5 w-4" fill="currentColor"><rect x="0" y="8" width="3" height="4" rx="1" /><rect x="5" y="5" width="3" height="7" rx="1" /><rect x="10" y="2.5" width="3" height="9.5" rx="1" /><rect x="15" y="0" width="3" height="12" rx="1" /></svg>
                     <svg viewBox="0 0 26 12" className="h-2.5 w-5" fill="none" stroke="currentColor"><rect x="0.5" y="0.5" width="22" height="11" rx="3" opacity="0.4" /><rect x="2" y="2" width="16" height="8" rx="1.8" fill="currentColor" stroke="none" /><path d="M24.5 4v4" strokeLinecap="round" opacity="0.4" /></svg>
                   </span>
                 </div>
 
-                {/* en-tête de l'appli */}
-                <div className="flex items-center justify-between px-4 pb-2 pt-1">
-                  <div>
-                    <p className="text-[0.62rem] text-slate">Analyse · aujourd&apos;hui</p>
-                    <p className="text-[0.95rem] font-bold leading-tight">Ta session kite</p>
-                  </div>
-                  <span className="rounded-full bg-brand-light px-2 py-0.5 text-[0.6rem] font-bold text-lagoon">Elite</span>
-                </div>
+                <PhoneScreens />
 
-                {/* vidéo + balayage IA */}
-                <div className="relative mx-3 h-40 overflow-hidden rounded-[22px]">
-                  <Image src={PHOTOS.splash} alt="" fill sizes="310px" className="object-cover" />
-                  <div className="photo-veil absolute inset-0" />
-                  <div aria-hidden="true" className="sweep absolute inset-x-0 top-0 h-12 bg-gradient-to-b from-transparent via-brand/40 to-transparent" />
-                  {/* coins de visée */}
-                  <span aria-hidden="true" className="absolute left-3 top-3 h-4 w-4 rounded-tl-md border-l-2 border-t-2 border-white/80" />
-                  <span aria-hidden="true" className="absolute right-3 top-3 h-4 w-4 rounded-tr-md border-r-2 border-t-2 border-white/80" />
-                  <span aria-hidden="true" className="absolute bottom-12 left-3 h-4 w-4 rounded-bl-md border-b-2 border-l-2 border-white/80" />
-                  <span aria-hidden="true" className="absolute bottom-12 right-3 h-4 w-4 rounded-br-md border-b-2 border-r-2 border-white/80" />
-                  <span className="tag-glass absolute left-1/2 top-3 -translate-x-1/2 rounded-full px-2 py-0.5 text-[0.58rem] font-bold">
-                    <span aria-hidden="true" className="mr-1 inline-block h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-300" />
-                    IA en analyse
-                  </span>
-                  <div className="absolute inset-x-0 bottom-0 flex items-end justify-between p-3 text-white">
-                    <div>
-                      <p className="text-[0.6rem] text-white/80">Kitesurf · 12 s</p>
-                      <p className="text-lg font-bold leading-tight">Backroll</p>
-                    </div>
-                    {/* jauge circulaire */}
-                    <div className="relative h-12 w-12">
-                      <svg viewBox="0 0 36 36" className="h-12 w-12 -rotate-90" aria-hidden="true">
-                        <circle cx="18" cy="18" r="15.5" fill="none" stroke="rgba(255,255,255,0.25)" strokeWidth="3" />
-                        <circle cx="18" cy="18" r="15.5" fill="none" stroke="#fff" strokeWidth="3" strokeLinecap="round" strokeDasharray="97.4" strokeDashoffset="29.2" />
-                      </svg>
-                      <span className="absolute inset-0 flex items-center justify-center text-sm font-extrabold">7</span>
-                    </div>
-                  </div>
-                </div>
-
-                {/* phases */}
-                <div className="mx-3 mt-2.5 grid grid-cols-4 gap-1.5 text-center">
-                  {phases.map(([p, n], i) => (
-                    <div key={p} className="rounded-2xl bg-white px-1.5 py-2 shadow-[0_6px_14px_-10px_rgba(14,42,71,0.5)]">
-                      <p className="text-[0.95rem] font-extrabold leading-none">{n}</p>
-                      <div className="mx-auto mt-1.5 h-1 w-full overflow-hidden rounded-full bg-raised">
-                        <div className="fill h-full rounded-full bg-gradient-to-r from-brand to-[#3fb3e8]" style={{ width: `${n * 10}%`, "--d": `${0.8 + i * 0.12}s` } as React.CSSProperties} />
-                      </div>
-                      <p className="mt-1 text-[0.55rem] text-slate">{p}</p>
-                    </div>
-                  ))}
-                </div>
-
-                {/* à corriger */}
-                <div className="mx-3 mt-2.5 flex gap-2.5 rounded-2xl bg-white p-3 shadow-[0_6px_14px_-10px_rgba(14,42,71,0.5)]">
-                  <span aria-hidden="true" className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-danger/10 text-[0.7rem] font-bold text-danger">!</span>
-                  <div>
-                    <p className="text-[0.8rem] font-semibold leading-snug">Ton regard reste devant</p>
-                    <p className="mt-0.5 text-[0.68rem] leading-snug text-slate">Tourne la tête vers l&apos;épaule arrière dès le décollage.</p>
-                  </div>
-                </div>
-                <div className="mx-3 mt-2 flex gap-2.5 rounded-2xl bg-gradient-to-br from-brand to-lagoon p-3 text-white">
-                  <span aria-hidden="true" className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-white/20 text-[0.7rem]">↗</span>
-                  <div>
-                    <p className="text-[0.62rem] font-bold text-white/80">Prochaine session</p>
-                    <p className="text-[0.74rem] leading-snug">5 petits sauts en tournant juste la tête.</p>
-                  </div>
-                </div>
-
-                {/* barre d'onglets */}
-                <div className="mt-3 grid grid-cols-5 items-end bg-white/90 px-2 pb-2 pt-2 text-[0.52rem] font-semibold text-slate backdrop-blur">
-                  {["Accueil", "Coach", "Analyser", "Progrès", "Spots"].map((t, i) => (
-                    <span key={t} className={`flex flex-col items-center gap-1 ${i === 2 ? "text-lagoon" : ""}`}>
-                      <span aria-hidden="true" className={i === 2 ? "-mt-5 h-9 w-9 rounded-full bg-brand ring-4 ring-white" : "h-4 w-4 rounded-md bg-raised"} />
-                      {t}
-                    </span>
-                  ))}
-                </div>
                 {/* barre home */}
                 <div className="flex justify-center bg-white/90 pb-2">
                   <span aria-hidden="true" className="h-1 w-24 rounded-full bg-deep" />
