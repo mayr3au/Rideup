@@ -24,7 +24,7 @@ export function HeaderBar({ children }: { children: React.ReactNode }) {
     <header
       data-solid={overlay ? "false" : "true"}
       className={`group fixed inset-x-0 top-0 z-40 transition-[background-color,box-shadow] duration-300 ${
-        overlay ? "bg-transparent text-white" : "border-b border-line/60 bg-salt/80 text-deep backdrop-blur-xl"
+        overlay ? "bg-transparent text-deep" : "border-b border-line/60 bg-salt/80 text-deep backdrop-blur-xl"
       }`}
     >
       {children}

@@ -50,7 +50,7 @@ function Hero() {
         className="object-cover object-[44%_40%]"
       />
       {/* Voile : léger en haut pour l'en-tête, dense en bas pour le texte */}
-      <div className="absolute inset-0 bg-gradient-to-b from-deep/40 via-transparent to-transparent" />
+      <div className="absolute inset-0 bg-gradient-to-b from-white/35 via-transparent to-transparent" />
       <div className="absolute inset-0 bg-gradient-to-t from-deep/90 via-deep/35 to-transparent" />
 
       <div className="rise relative mx-auto w-full max-w-6xl px-5 pb-14 pt-40 sm:px-6 sm:pb-20">
