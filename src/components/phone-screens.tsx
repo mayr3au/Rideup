@@ -5,6 +5,22 @@ import { useEffect, useState } from "react";
 import { PHOTOS } from "@/lib/photos";
 
 const TABS = ["Accueil", "Coach", "Analyser", "Progrès", "Spots"];
+/** Mêmes icônes que la vraie barre de l'appli */
+const ICONS = [
+  "M3 11 12 4l9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z",
+  "M12 3a4 4 0 1 1 0 8 4 4 0 0 1 0-8zM4 21v-1a6 6 0 0 1 6-6h4a6 6 0 0 1 6 6v1",
+  "M3 6h12v12H3zM15 10l6-3v10l-6-3z",
+  "M4 20V10M10 20V4M16 20v-7M22 20H2",
+  "M12 21s-7-6.1-7-11a7 7 0 0 1 14 0c0 4.9-7 11-7 11zm0-8.5a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5z",
+];
+
+function TabIcon({ d, size }: { d: string; size: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d={d} />
+    </svg>
+  );
+}
 /** Écran affiché → onglet actif */
 const SCREENS = [
   { id: "analyse", tab: 2, title: "Ta session kite", sub: "Analyse · aujourd'hui" },
@@ -92,15 +108,14 @@ export function PhoneScreens() {
       {/* barre d'onglets */}
       <div className="grid grid-cols-5 items-end bg-white/90 px-2 pb-2 pt-2 text-[0.52rem] font-semibold text-slate backdrop-blur">
         {TABS.map((t, k) => (
-          <span key={t} className={`flex flex-col items-center gap-1 transition-colors ${k === s.tab ? "text-lagoon" : ""}`}>
-            <span
-              aria-hidden="true"
-              className={
-                k === 2
-                  ? "-mt-5 h-9 w-9 rounded-full bg-brand ring-4 ring-white"
-                  : `h-4 w-4 rounded-md transition-colors ${k === s.tab ? "bg-brand" : "bg-raised"}`
-              }
-            />
+          <span key={t} className={`flex flex-col items-center gap-0.5 transition-colors ${k === s.tab ? "text-lagoon" : ""}`}>
+            {k === 2 ? (
+              <span aria-hidden="true" className="-mt-5 flex h-9 w-9 items-center justify-center rounded-full bg-brand text-white shadow-[0_8px_16px_-6px_rgba(22,136,200,0.8)] ring-4 ring-white">
+                <TabIcon d={ICONS[k]} size={16} />
+              </span>
+            ) : (
+              <TabIcon d={ICONS[k]} size={17} />
+            )}
             {t}
           </span>
         ))}
