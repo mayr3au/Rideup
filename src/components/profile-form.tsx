@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, useState } from "react";
+import { useActionState, useEffect, useRef, useState } from "react";
 import { saveProfile, type ProfileState } from "@/app/(app)/coach/actions";
 import { LEVEL_LABELS, LEVEL_ORDER, SPORT_IDS, SPORTS, type SportId } from "@/lib/sports";
 import { riderSports } from "@/lib/rider";
@@ -9,7 +9,15 @@ import type { Profile } from "@/lib/types";
 const chip =
   "cursor-pointer select-none rounded-full border border-line bg-spray px-4 py-2.5 font-semibold has-[:checked]:border-brand has-[:checked]:bg-brand has-[:checked]:text-white has-[:focus-visible]:outline has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-brand";
 
+type StepId = "sports" | `sport:${SportId}` | "you" | "place";
+
+/**
+ * Formulaire de profil.
+ * - Première fois (onboarding) : une étape à la fois, avec validation à chaque « Continuer ».
+ * - Ensuite : toutes les sections visibles, pour modifier vite.
+ */
 export function ProfileForm({ profile, submitLabel, showAlerts }: { profile: Profile; submitLabel: string; showAlerts?: boolean }) {
+  const stepped = !profile.onboarded;
   const [state, action, pending] = useActionState<ProfileState, FormData>(saveProfile, undefined);
   const [sports, setSports] = useState<SportId[]>(profile.onboarded ? riderSports(profile) : []);
   const [main, setMain] = useState<SportId>(profile.sport ?? "kitesurf");
@@ -20,6 +28,18 @@ export function ProfileForm({ profile, submitLabel, showAlerts }: { profile: Pro
   });
   const [locating, setLocating] = useState(false);
   const [geoError, setGeoError] = useState<string | null>(null);
+  const [step, setStep] = useState(0);
+  const formRef = useRef<HTMLFormElement>(null);
+  const topRef = useRef<HTMLDivElement>(null);
+
+  const steps: StepId[] = ["sports", ...sports.map((s) => `sport:${s}` as const), "you", "place"];
+  const current = steps[Math.min(step, steps.length - 1)];
+  const visible = (id: StepId) => !stepped || current === id;
+  const last = step >= steps.length - 1;
+
+  useEffect(() => {
+    if (stepped && step > 0) topRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+  }, [step, stepped]);
 
   function toggleSport(id: SportId) {
     setSports((list) => {
@@ -28,6 +48,18 @@ export function ProfileForm({ profile, submitLabel, showAlerts }: { profile: Pro
       if (next.length === 1) setMain(next[0]);
       return next;
     });
+  }
+
+  /** Valide uniquement les champs de l'étape affichée, puis passe à la suivante. */
+  function next() {
+    const section = formRef.current?.querySelector<HTMLElement>(`[data-step="${current}"]`);
+    const fields = section ? Array.from(section.querySelectorAll<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>("input, select, textarea")) : [];
+    const bad = fields.find((f) => !f.checkValidity());
+    if (bad) {
+      bad.reportValidity();
+      return;
+    }
+    setStep((s) => s + 1);
   }
 
   function locate() {
@@ -50,13 +82,36 @@ export function ProfileForm({ profile, submitLabel, showAlerts }: { profile: Pro
     );
   }
 
+  const stepTitle: Record<string, string> = {
+    sports: "Tes sports",
+    you: "Toi",
+    place: "Où tu rides",
+    ...Object.fromEntries(sports.map((s) => [`sport:${s}`, `Ton niveau en ${SPORTS[s].name.toLowerCase()}`])),
+  };
+
   return (
-    <form action={action} className="space-y-8">
+    <form ref={formRef} action={action} className="space-y-6">
+      <div ref={topRef} className="scroll-mt-32" />
+
+      {stepped && (
+        <div aria-live="polite">
+          <div className="flex items-baseline justify-between">
+            <p className="text-sm font-semibold text-brand">
+              Étape {step + 1} sur {steps.length}
+            </p>
+            <p className="text-sm text-slate">{stepTitle[current]}</p>
+          </div>
+          <div className="mt-2 h-2 overflow-hidden rounded-full bg-raised" aria-hidden="true">
+            <div className="h-full rounded-full bg-brand transition-[width]" style={{ width: `${((step + 1) / steps.length) * 100}%` }} />
+          </div>
+        </div>
+      )}
+
       {/* 1. Sports */}
-      <fieldset className="panel p-5">
+      <fieldset data-step="sports" className={`panel p-5 ${visible("sports") ? "" : "hidden"}`}>
         <legend className="sr-only">Tes sports</legend>
         <p className="text-lg font-bold">Quels sports tu pratiques ?</p>
-        <p className="text-sm text-slate">Choisis-en un ou plusieurs.</p>
+        <p className="text-sm text-slate">Choisis-en un ou plusieurs. Tu pourras en ajouter plus tard.</p>
         <div className="mt-4 flex flex-wrap gap-2">
           {SPORT_IDS.map((id) => (
             <label key={id} className={chip}>
@@ -83,9 +138,10 @@ export function ProfileForm({ profile, submitLabel, showAlerts }: { profile: Pro
       {sports.map((id) => {
         const sport = SPORTS[id];
         return (
-          <fieldset key={id} className="panel p-5">
+          <fieldset key={id} data-step={`sport:${id}`} className={`panel p-5 ${visible(`sport:${id}`) ? "" : "hidden"}`}>
             <legend className="sr-only">{sport.name}</legend>
             <p className="text-lg font-bold">{sport.name}</p>
+            <p className="text-sm text-slate">Le coach adapte ses conseils et sa roadmap à ton niveau.</p>
             <p className="mt-3 label">Ton niveau</p>
             <div className="grid gap-2 sm:grid-cols-2">
               {LEVEL_ORDER.map((lvl) => (
@@ -100,18 +156,19 @@ export function ProfileForm({ profile, submitLabel, showAlerts }: { profile: Pro
             </div>
             <label htmlFor={`gear_${id}`} className="label mt-4">{sport.gear.label}</label>
             <input id={`gear_${id}`} name={`gear_${id}`} defaultValue={profile.gear?.[id] ?? ""} placeholder={sport.gear.placeholder} className="field" />
+            {sport.spot === "wind" && <p className="mt-1 text-sm text-slate">Facultatif, mais le Spot Finder te dira alors quelle taille sortir.</p>}
           </fieldset>
         );
       })}
 
       {/* 3. Toi */}
-      <fieldset className="panel space-y-5 p-5">
+      <fieldset data-step="you" className={`panel space-y-5 p-5 ${visible("you") ? "" : "hidden"}`}>
         <legend className="sr-only">Toi</legend>
         <p className="text-lg font-bold">Toi</p>
         <div className="grid gap-5 sm:grid-cols-2">
           <div>
             <label htmlFor="full_name" className="label">Prénom</label>
-            <input id="full_name" name="full_name" defaultValue={profile.full_name ?? ""} required className="field" />
+            <input id="full_name" name="full_name" defaultValue={profile.full_name ?? ""} required autoComplete="given-name" className="field" />
           </div>
           <div>
             <label htmlFor="weight_kg" className="label">Poids (kg)</label>
@@ -131,15 +188,16 @@ export function ProfileForm({ profile, submitLabel, showAlerts }: { profile: Pro
           </div>
         </fieldset>
         <div>
-          <label htmlFor="goals" className="label">Ce que tu veux débloquer</label>
+          <label htmlFor="goals" className="label">Ce que tu veux débloquer <span className="font-normal text-slate">(facultatif)</span></label>
           <textarea id="goals" name="goals" rows={3} defaultValue={profile.goals ?? ""} placeholder="Ex. mon premier backroll cet été, tenir le vol en wing" className="field" />
         </div>
       </fieldset>
 
       {/* 4. Où tu rides */}
-      <fieldset className="panel space-y-4 p-5">
+      <fieldset data-step="place" className={`panel space-y-4 p-5 ${visible("place") ? "" : "hidden"}`}>
         <legend className="sr-only">Où tu rides</legend>
         <p className="text-lg font-bold">Où tu rides</p>
+        <p className="text-sm text-slate">Pour te proposer les spots autour de toi. Tu peux passer cette étape.</p>
         <div className="flex flex-col gap-2 sm:flex-row">
           <input
             name="home_label"
@@ -147,6 +205,7 @@ export function ProfileForm({ profile, submitLabel, showAlerts }: { profile: Pro
             value={place.label}
             onChange={(e) => setPlace({ label: e.target.value, lat: "", lng: "" })}
             placeholder="Ville de départ, ex. Montpellier"
+            autoComplete="address-level2"
             className="field flex-1"
           />
           <button type="button" onClick={locate} disabled={locating} className="btn btn-ghost">
@@ -174,11 +233,30 @@ export function ProfileForm({ profile, submitLabel, showAlerts }: { profile: Pro
       </fieldset>
 
       {state?.error && <p role="alert" className="text-danger">{state.error}</p>}
-      {state?.saved && <p role="status" className="font-semibold text-lagoon">Profil enregistré.</p>}
+      {state?.saved && <p role="status" className="rounded-2xl bg-brand-light p-3 font-semibold text-lagoon">Profil enregistré.</p>}
 
-      <button disabled={pending || sports.length === 0} className="btn btn-primary w-full sm:w-auto">
-        {pending ? "Enregistrement…" : sports.length === 0 ? "Choisis au moins un sport" : submitLabel}
-      </button>
+      {stepped ? (
+        <div className="flex items-center gap-3">
+          {step > 0 && (
+            <button type="button" onClick={() => setStep((s) => s - 1)} className="btn btn-ghost">
+              Retour
+            </button>
+          )}
+          {last ? (
+            <button disabled={pending} className="btn btn-primary flex-1 sm:flex-none">
+              {pending ? "Enregistrement…" : submitLabel}
+            </button>
+          ) : (
+            <button type="button" onClick={next} disabled={sports.length === 0} className="btn btn-primary flex-1 sm:flex-none">
+              {sports.length === 0 ? "Choisis au moins un sport" : "Continuer"}
+            </button>
+          )}
+        </div>
+      ) : (
+        <button disabled={pending || sports.length === 0} className="btn btn-primary w-full sm:w-auto">
+          {pending ? "Enregistrement…" : sports.length === 0 ? "Choisis au moins un sport" : submitLabel}
+        </button>
+      )}
     </form>
   );
 }

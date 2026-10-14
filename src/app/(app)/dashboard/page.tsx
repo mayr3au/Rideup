@@ -7,8 +7,8 @@ import { getQuota } from "@/lib/usage";
 import { getProgressData } from "@/lib/progress";
 import { PLANS } from "@/lib/plans";
 import { courseForTrick } from "@/lib/courses";
-import { activeSport } from "@/lib/rider";
-import { SPORTS } from "@/lib/sports";
+import { activeSport, levelFor } from "@/lib/rider";
+import { LEVEL_LABELS, SPORTS } from "@/lib/sports";
 import { SPORT_PHOTOS } from "@/lib/photos";
 
 export const metadata: Metadata = { title: "Accueil" };
@@ -69,7 +69,36 @@ export default async function Dashboard({ searchParams }: { searchParams: Promis
         </p>
       )}
 
+      {/* Premiers pas : tant qu'aucune analyse n'a été faite */}
+      {data.recentAttempts.length === 0 && (
+        <section className="panel p-5">
+          <h2 className="text-xl font-bold">Bien démarrer</h2>
+          <p className="mt-1 text-[0.95rem] text-slate">Trois étapes pour avoir ton premier retour de coach.</p>
+          <ol className="mt-4 space-y-3">
+            {[
+              { done: true, title: "Ton profil rider est créé", text: `${S.name}${levelFor(profile, sport) ? `, niveau ${LEVEL_LABELS[levelFor(profile, sport)!].toLowerCase()}` : ""}.`, href: "/profil", cta: "Modifier" },
+              { done: false, title: plan === "free" ? "Analyse ta première figure, c'est offert" : "Analyse ta première figure", text: "Une vidéo filmée de côté, 20 secondes de ta figure, et tu sais quoi corriger.", href: "/analyse", cta: "Analyser" },
+              { done: false, title: "Pose une question au coach", text: "Sur ton matériel, une figure, ta prochaine session.", href: "/coach?vue=chat", cta: "Demander" },
+            ].map((s, i) => (
+              <li key={i} className="flex items-start gap-3">
+                <span aria-hidden="true" className={`mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-sm font-bold ${s.done ? "bg-brand text-white" : "bg-brand-light text-brand"}`}>
+                  {s.done ? "✓" : i + 1}
+                </span>
+                <div className="min-w-0 flex-1">
+                  <p className={`font-semibold ${s.done ? "text-slate line-through decoration-1" : ""}`}>{s.title}</p>
+                  <p className="text-sm text-slate">{s.text}</p>
+                </div>
+                <Link href={s.href} className={`shrink-0 self-center ${s.done ? "text-sm font-semibold text-lagoon" : "btn btn-primary !min-h-10 !px-4 !py-2 !text-sm"}`}>
+                  {s.cta}
+                </Link>
+              </li>
+            ))}
+          </ol>
+        </section>
+      )}
+
       {/* Priorités */}
+      {data.recentAttempts.length > 0 && (
       <section>
         <h2 className="text-xl font-bold">À travailler à ta prochaine session</h2>
         {data.priorities.length ? (
@@ -85,9 +114,10 @@ export default async function Dashboard({ searchParams }: { searchParams: Promis
             ))}
           </ol>
         ) : (
-          <p className="panel mt-3 p-4 text-slate">Analyse ta première figure : tes priorités apparaîtront ici.</p>
+          <p className="panel mt-3 p-4 text-slate">Analyse une nouvelle figure : tes priorités apparaîtront ici.</p>
         )}
       </section>
+      )}
 
       <div className="grid gap-4 sm:grid-cols-2">
         {next && (

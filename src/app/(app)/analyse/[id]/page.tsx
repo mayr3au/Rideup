@@ -5,6 +5,7 @@ import { requireSession } from "@/lib/auth";
 import { errorLabel, phaseLabel, SPORTS, trickById } from "@/lib/sports";
 import type { VideoAnalysis } from "@/lib/types";
 import { ConfirmButton } from "@/components/confirm-button";
+import { AutoRefresh } from "@/components/auto-refresh";
 import { deleteAnalysis } from "../actions";
 import { setTrickStatus } from "../../coach/actions";
 
@@ -41,13 +42,13 @@ export default async function AnalysisDetail({
 
   return (
     <div className="mx-auto max-w-4xl">
-      <Link href="/historique" className="text-lagoon hover:underline">
-        Historique
+      <Link href="/historique" className="inline-flex min-h-10 items-center text-sm font-semibold text-lagoon">
+        ← Historique
       </Link>
 
       {deja && (
-        <p role="status" className="mt-4 rounded-md border border-lagoon/40 bg-lagoon/10 p-4">
-          Ce passage a déjà été analysé : voici le résultat, sans nouvelle analyse décomptée.
+        <p role="status" className="mt-4 rounded-2xl bg-brand-light p-4 font-semibold text-lagoon">
+          Ce passage avait déjà été analysé : voici le résultat, sans nouvelle analyse décomptée.
         </p>
       )}
 
@@ -69,16 +70,22 @@ export default async function AnalysisDetail({
       </div>
 
       {a.status === "erreur" && (
-        <p role="alert" className="mt-6 rounded-md border border-danger/40 bg-danger/5 p-4">
-          Cette analyse a échoué et n&apos;a pas été décomptée. Relance-la depuis la page Analyse.
-        </p>
+        <div role="alert" className="mt-6 rounded-2xl bg-danger/10 p-4">
+          <p className="font-semibold">Cette analyse a échoué et n&apos;a pas été décomptée.</p>
+          {a.error && <p className="mt-1 text-sm text-slate">{a.error}</p>}
+          <Link href={`/analyse${trick ? `?figure=${trick.id}` : ""}`} className="btn btn-primary mt-3 !min-h-10 !px-4 !py-2 !text-sm">Relancer une analyse</Link>
+        </div>
       )}
 
       {(a.status === "en-attente" || a.status === "en-cours") && (
-        <p role="status" className="mt-6 rounded-md border border-line bg-spray p-4">
-          Analyse en cours. Recharge la page dans un instant. Si elle reste bloquée plus de 10 minutes, elle sera
-          annulée et ne sera pas décomptée.
-        </p>
+        <div role="status" className="mt-6 flex items-center gap-3 rounded-2xl bg-brand-light p-4">
+          <AutoRefresh seconds={5} />
+          <span aria-hidden="true" className="h-5 w-5 shrink-0 animate-spin rounded-full border-2 border-brand border-t-transparent" />
+          <p>
+            Analyse en cours, la page se met à jour toute seule. Si elle reste bloquée plus de 10 minutes, elle sera annulée
+            et ne sera pas décomptée.
+          </p>
+        </div>
       )}
 
       <div className="mt-6 grid gap-8 md:grid-cols-[1fr_1.25fr]">

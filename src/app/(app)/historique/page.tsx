@@ -33,14 +33,14 @@ export default async function HistoryPage({ searchParams }: { searchParams: Prom
 
       {filterTricks.length > 1 && (
         <nav className="-mx-4 mt-6 flex gap-2 overflow-x-auto px-4 pb-1" aria-label="Filtrer par figure">
-          <Link href="/historique" className={`whitespace-nowrap rounded-sm px-4 py-2 text-[0.95rem] ${!figure ? "bg-brand text-white" : "border border-line"}`}>
+          <Link href="/historique" className={`min-h-10 whitespace-nowrap rounded-full px-4 py-2 text-[0.95rem] font-semibold ${!figure ? "bg-brand text-white" : "bg-raised"}`}>
             Toutes
           </Link>
           {tricksFor(sport).filter((t) => filterTricks.some((f) => f?.id === t.id)).map((t) => (
             <Link
               key={t.id}
               href={`/historique?figure=${t.id}`}
-              className={`whitespace-nowrap rounded-sm px-4 py-2 text-[0.95rem] ${figure === t.id ? "bg-brand text-white" : "border border-line"}`}
+              className={`min-h-10 whitespace-nowrap rounded-full px-4 py-2 text-[0.95rem] font-semibold ${figure === t.id ? "bg-brand text-white" : "bg-raised"}`}
             >
               {t.name}
             </Link>
@@ -49,10 +49,10 @@ export default async function HistoryPage({ searchParams }: { searchParams: Prom
       )}
 
       {analyses && analyses.length > 0 ? (
-        <ul className="mt-6 divide-y divide-line border-y border-line">
+        <ul className="mt-6 space-y-2">
           {analyses.map((a) => (
             <li key={a.id}>
-              <Link href={`/analyse/${a.id}`} className="flex items-center justify-between gap-4 py-4 hover:text-lagoon">
+              <Link href={`/analyse/${a.id}`} className="panel flex items-center justify-between gap-4 px-4 py-3.5 hover:ring-2 hover:ring-brand">
                 <span className="min-w-0">
                   <span className="block truncate font-semibold">
                     {a.result?.figure ?? trickById(a.trick ?? "")?.name ?? "Analyse"}
@@ -67,16 +67,17 @@ export default async function HistoryPage({ searchParams }: { searchParams: Prom
                     <span className="mt-1 line-clamp-1 block text-sm text-slate">{a.result.priorite_session}</span>
                   )}
                 </span>
-                <span className="shrink-0 font-display text-xl font-bold">
-                  {a.status === "termine" && a.result ? `${a.result.note}/10` : "Échec"}
+                <span className={`shrink-0 text-xl font-extrabold ${a.status === "termine" && a.result ? "text-brand" : "text-sm font-semibold text-slate"}`}>
+                  {a.status === "termine" && a.result ? `${a.result.note}/10` : a.status === "erreur" ? "Échec" : "En cours…"}
                 </span>
               </Link>
             </li>
           ))}
         </ul>
       ) : (
-        <div className="mt-6 rounded-lg border border-dashed border-line p-6">
-          <p>Aucune analyse pour l&apos;instant.</p>
+        <div className="panel mt-6 p-6 text-center">
+          <p className="text-lg font-bold">Aucune analyse pour l&apos;instant</p>
+          <p className="mt-1 text-slate">Filme une figure, garde 20 secondes, et reçois ton premier retour de coach.</p>
           <Link href="/analyse" className="btn btn-primary mt-4">Analyser une figure</Link>
         </div>
       )}

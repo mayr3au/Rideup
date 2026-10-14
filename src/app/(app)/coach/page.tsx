@@ -60,36 +60,64 @@ export default async function CoachPage({ searchParams }: { searchParams: Promis
             {LEVEL_ORDER.map((level) => {
               const list = tricks.filter((t) => t.level === level);
               if (!list.length) return null;
+              const validated = list.filter((t) => status.get(t.id) === "valide");
+              const open = list.filter((t) => status.get(t.id) !== "valide");
               return (
                 <div key={level}>
-                  <h2 className="text-lg font-bold">{LEVEL_LABELS[level]}</h2>
+                  <div className="flex items-baseline justify-between">
+                    <h2 className="text-lg font-bold">{LEVEL_LABELS[level]}</h2>
+                    <span className="text-sm text-slate">{validated.length}/{list.length}</span>
+                  </div>
+
+                  {/* Figures maîtrisées : compactes, pour ne pas noyer celles à travailler */}
+                  {validated.length > 0 && (
+                    <details className="mt-3 rounded-2xl bg-raised px-4 py-2">
+                      <summary className="flex min-h-9 cursor-pointer list-none items-center gap-2 text-sm font-semibold text-slate">
+                        <span aria-hidden="true" className="flex h-5 w-5 items-center justify-center rounded-full bg-brand text-[0.65rem] text-white">✓</span>
+                        {validated.length === list.length ? "Niveau maîtrisé" : `${validated.length} figure${validated.length > 1 ? "s" : ""} maîtrisée${validated.length > 1 ? "s" : ""}`}
+                        <span className="ml-auto text-xs font-medium">voir</span>
+                      </summary>
+                      <ul className="mt-1 divide-y divide-line/60 pb-1">
+                        {validated.map((t) => (
+                          <li key={t.id} className="flex items-center justify-between gap-3 py-2 text-[0.95rem]">
+                            <span>{t.name}</span>
+                            <form action={setTrickStatus}>
+                              <input type="hidden" name="trick" value={t.id} />
+                              <input type="hidden" name="status" value="aucun" />
+                              <button className="min-h-8 px-2 text-xs font-semibold text-slate hover:text-deep">Retirer</button>
+                            </form>
+                          </li>
+                        ))}
+                      </ul>
+                    </details>
+                  )}
+
                   <ol className="mt-3 space-y-2">
-                    {list.map((t) => {
+                    {open.map((t) => {
                       const s = status.get(t.id);
                       const isNext = t.id === firstOpen;
                       const course = courseForTrick(t.id);
+                      const focus = isNext || s === "en-cours";
                       return (
-                        <li key={t.id} className={`panel p-4 ${isNext ? "ring-2 ring-brand" : ""} ${s === "valide" ? "opacity-70" : ""}`}>
+                        <li key={t.id} className={`panel ${focus ? "p-4 ring-2 ring-brand" : "px-4 py-3"}`}>
                           <div className="flex items-start gap-3">
                             <span
                               aria-hidden="true"
                               className={`mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-xs font-bold ${
-                                s === "valide" ? "bg-brand text-white" : s === "en-cours" ? "bg-brand-light text-brand" : "border-2 border-line"
+                                s === "en-cours" ? "bg-brand-light text-brand" : "border-2 border-line"
                               }`}
-                            >
-                              {s === "valide" ? "✓" : ""}
-                            </span>
+                            />
                             <div className="min-w-0 flex-1">
                               <p className="font-semibold">
                                 {t.name}
                                 {isNext && <span className="ml-2 rounded-full bg-brand-light px-2 py-0.5 text-xs font-bold text-brand">Prochaine</span>}
-                                {s === "en-cours" && <span className="ml-2 rounded-full bg-brand-light px-2 py-0.5 text-xs font-bold text-brand">En cours</span>}
+                                {s === "en-cours" && <span className="ml-2 rounded-full bg-brand px-2 py-0.5 text-xs font-bold text-white">En cours</span>}
                               </p>
-                              {s !== "valide" && <p className="text-sm text-slate">{t.summary}</p>}
+                              <p className="text-sm text-slate">{t.summary}</p>
                             </div>
                           </div>
 
-                          {(isNext || s === "en-cours") && (
+                          {focus && (
                             <ul className="mt-3 space-y-1 rounded-xl bg-raised p-3 text-[0.92rem]">
                               {t.keys.map((k) => (
                                 <li key={k} className="flex gap-2">
@@ -102,12 +130,10 @@ export default async function CoachPage({ searchParams }: { searchParams: Promis
 
                           <div className="mt-3 flex flex-wrap items-center gap-2">
                             <TrickControls trickId={t.id} status={s} />
-                            {s !== "valide" && (
-                              <Link href={`/analyse?figure=${t.id}`} className="inline-flex min-h-9 items-center px-1 text-sm font-semibold text-lagoon">
-                                Analyser
-                              </Link>
-                            )}
-                            {course && s !== "valide" && (
+                            <Link href={`/analyse?figure=${t.id}`} className="inline-flex min-h-9 items-center px-1 text-sm font-semibold text-lagoon">
+                              Analyser
+                            </Link>
+                            {course && (
                               <Link href={`/cours/${course.slug}`} className="inline-flex min-h-9 items-center px-1 text-sm font-semibold text-lagoon">
                                 Cours
                               </Link>
@@ -133,9 +159,7 @@ export default async function CoachPage({ searchParams }: { searchParams: Promis
 
 function TrickControls({ trickId, status }: { trickId: string; status?: string }) {
   const options =
-    status === "valide"
-      ? [{ value: "aucun", label: "Annuler" }]
-      : status === "en-cours"
+    status === "en-cours"
         ? [{ value: "valide", label: "Je la maîtrise" }, { value: "aucun", label: "Retirer" }]
         : [{ value: "en-cours", label: "Je bosse dessus" }, { value: "valide", label: "Je la maîtrise" }];
 

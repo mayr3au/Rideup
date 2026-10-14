@@ -22,7 +22,7 @@ export type ErrorTrend = {
   total: number;
   recent: number; // dans les 5 dernières analyses
   older: number; // dans les 5 précédentes
-  trend: "en-baisse" | "en-hausse" | "stable" | "nouvelle";
+  trend: "en-baisse" | "en-hausse" | "stable" | "nouvelle" | "unique";
   lastCorrection: string | null;
 };
 
@@ -80,8 +80,9 @@ export async function getProgressData(db: SupabaseClient, userId: string, sport:
     .map(([code, total]) => {
       const rc = r.get(code) ?? 0;
       const oc = o.get(code) ?? 0;
+      // Vue une seule fois : « nouvelle ». Sans historique suffisant, on ne parle pas de tendance.
       const trend: ErrorTrend["trend"] =
-        older.length === 0 ? "stable" : oc === 0 && rc > 0 ? "nouvelle" : rc < oc ? "en-baisse" : rc > oc ? "en-hausse" : "stable";
+        total <= 1 ? "unique" : older.length === 0 ? "stable" : oc === 0 && rc > 0 ? "nouvelle" : rc < oc ? "en-baisse" : rc > oc ? "en-hausse" : "stable";
       const last = [...analyses].reverse().find((a) => a.result.erreurs.some((e) => e.code === code));
       return {
         code,

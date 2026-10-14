@@ -13,8 +13,9 @@ export const metadata: Metadata = { title: "Progression" };
 const TREND = {
   "en-baisse": { label: "En baisse", cls: "bg-lagoon/15 text-lagoon-dark" },
   "en-hausse": { label: "En hausse", cls: "bg-danger/10 text-danger" },
-  stable: { label: "Persistante", cls: "bg-kite/25" },
+  stable: { label: "Revient souvent", cls: "bg-kite/25" },
   nouvelle: { label: "Nouvelle", cls: "bg-raised" },
+  unique: { label: "Vue une fois", cls: "bg-raised" },
 } as const;
 
 export default async function ProgressionPage() {

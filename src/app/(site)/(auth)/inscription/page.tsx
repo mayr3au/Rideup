@@ -10,6 +10,14 @@ export default function SignupPage() {
     <>
       <h1 className="text-4xl font-bold">Crée ton compte</h1>
       <p className="mt-2 text-slate">Ta première analyse vidéo est offerte, sans carte bancaire.</p>
+      <ul className="mt-5 space-y-2 text-[0.95rem]">
+        {["Une analyse de ta figure, phase par phase", "Un coach qui connaît ton niveau et ton matériel", "La roadmap de tes prochaines figures"].map((t) => (
+          <li key={t} className="flex gap-2.5">
+            <span aria-hidden="true" className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-brand-light text-xs font-bold text-brand">✓</span>
+            {t}
+          </li>
+        ))}
+      </ul>
       <div className="mt-8">
         <AuthForm
           action={signUp}

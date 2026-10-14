@@ -21,15 +21,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
         <header className="border-b border-line bg-spray">
           <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-5 py-3 sm:px-6">
             <Logo href="/dashboard" height={28} />
-            <AppNav isAdmin={profile.is_admin} />
-            <div className="flex items-center gap-3">
-              <a href="/compte" className="rounded-full bg-brand-light px-3 py-1 text-sm font-semibold text-lagoon">
-                {plan === "free" ? "Essai" : PLANS[plan].name}
-              </a>
-              <form action="/auth/deconnexion" method="post" className="hidden lg:block">
-                <button className="text-sm text-slate hover:text-deep">Déconnexion</button>
-              </form>
-            </div>
+            <AppNav isAdmin={profile.is_admin} planLabel={plan === "free" ? "Essai" : PLANS[plan].name} />
           </div>
         </header>
         {profile.onboarded && <SportSwitcher sports={riderSports(profile)} active={activeSport(profile)} />}

@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useState } from "react";
 import type { FormState } from "@/app/(site)/(auth)/actions";
 
 type Field = {
@@ -26,12 +26,14 @@ export function AuthForm({
   children?: React.ReactNode;
 }) {
   const [state, formAction, pending] = useActionState(action, undefined);
+  const [showPassword, setShowPassword] = useState(false);
 
   if (state?.message) {
     return (
-      <p role="status" className="rounded-md border border-lagoon/40 bg-lagoon/10 p-4">
-        {state.message}
-      </p>
+      <div role="status" className="panel p-5">
+        <p className="text-lg font-bold">C&apos;est presque bon</p>
+        <p className="mt-1">{state.message}</p>
+      </div>
     );
   }
 
@@ -44,14 +46,27 @@ export function AuthForm({
           <label htmlFor={f.name} className="label">
             {f.label}
           </label>
-          <input
-            id={f.name}
-            name={f.name}
-            type={f.type ?? "text"}
-            autoComplete={f.autoComplete}
-            required
-            className="field"
-          />
+          <div className="relative">
+            <input
+              id={f.name}
+              name={f.name}
+              type={f.type === "password" && showPassword ? "text" : (f.type ?? "text")}
+              autoComplete={f.autoComplete}
+              required
+              minLength={f.type === "password" && f.autoComplete === "new-password" ? 8 : undefined}
+              className={`field ${f.type === "password" ? "pr-20" : ""}`}
+            />
+            {f.type === "password" && (
+              <button
+                type="button"
+                onClick={() => setShowPassword((v) => !v)}
+                aria-pressed={showPassword}
+                className="absolute inset-y-0 right-0 px-3 text-sm font-semibold text-lagoon"
+              >
+                {showPassword ? "Masquer" : "Afficher"}
+              </button>
+            )}
+          </div>
         </div>
       ))}
       {children}

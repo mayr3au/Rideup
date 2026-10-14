@@ -33,16 +33,12 @@ export default function CoursesPage() {
           <ul className="mt-3 space-y-3">
             {g.list.map((c) => (
               <li key={c.slug}>
-                <Link href={`/cours/${c.slug}`} className="panel flex items-center justify-between gap-4 p-4 hover:ring-2 hover:ring-brand">
-                  <span className="min-w-0">
-                    <span className="block text-lg font-bold">{c.title}</span>
-                    <span className="text-[0.95rem] text-slate">{c.intro}</span>
+                <Link href={`/cours/${c.slug}`} className="panel block p-4 hover:ring-2 hover:ring-brand">
+                  <span className="flex items-center justify-between gap-3">
+                    <span className="text-lg font-bold">{c.title}</span>
+                    <span className="shrink-0 rounded-full bg-raised px-2.5 py-1 text-xs font-semibold text-slate">{c.level} · {c.minutes} min</span>
                   </span>
-                  <span className="shrink-0 text-right text-sm text-slate">
-                    {c.level}
-                    <br />
-                    {c.minutes} min
-                  </span>
+                  <span className="mt-1 block text-[0.95rem] text-slate">{c.intro}</span>
                 </Link>
               </li>
             ))}

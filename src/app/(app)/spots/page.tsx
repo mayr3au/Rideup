@@ -114,6 +114,19 @@ export default async function SpotsPage({ searchParams }: { searchParams: Promis
         <Link href="/profil" className="text-sm font-semibold text-lagoon">Modifier mes réglages</Link>
       </div>
 
+      <nav className="-mx-5 mt-4 flex gap-2 overflow-x-auto px-5 pb-1" aria-label="Rayon de recherche">
+        {[50, 100, 250, 500, 1000].map((r) => (
+          <Link
+            key={r}
+            href={`/spots?rayon=${r}${sp.lat && sp.lng ? `&lat=${sp.lat}&lng=${sp.lng}` : ""}`}
+            aria-current={radius === r ? "true" : undefined}
+            className={`min-h-9 whitespace-nowrap rounded-full px-3.5 py-1.5 text-sm font-semibold ${radius === r ? "bg-brand text-white" : "bg-raised"}`}
+          >
+            {r} km
+          </Link>
+        ))}
+      </nav>
+
       {needsGear && !rider.gear.length && (
         <p className="mt-4 rounded-2xl bg-brand-light p-3 text-[0.95rem]">
           Ajoute les tailles de ton matériel dans ton profil : le Spot Finder te dira lequel sortir.

@@ -167,9 +167,38 @@ export function AnalyseUploader({
         </label>
         <input id="clip" type="file" accept="video/mp4,video/quicktime,video/webm" className="sr-only" onChange={(e) => pick(e.target.files?.[0])} />
         {error && <p role="alert" className="text-danger">{error.text}</p>}
+        <p className="text-center text-sm text-slate">
+          Il te reste {remaining} analyse{remaining > 1 ? "s" : ""} sur cette période.
+        </p>
+
+        <div className="panel mt-4 p-5">
+          <p className="font-bold">Pour une analyse précise</p>
+          <ul className="mt-3 grid gap-2.5 text-[0.95rem] sm:grid-cols-2">
+            {[
+              ["De côté", "Filme perpendiculairement à ta trajectoire, pas de face."],
+              ["Pas trop loin", "20 à 40 m : le rider doit rester bien visible, kite ou aile compris."],
+              ["Stable", "Téléphone à l'horizontale, sans zoomer pendant la figure."],
+              ["Une figure", "Garde juste l'approche, la figure et la réception : 20 s max."],
+            ].map(([t, d]) => (
+              <li key={t} className="flex gap-2.5">
+                <span aria-hidden="true" className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-brand-light text-xs font-bold text-brand">✓</span>
+                <span>
+                  <span className="font-semibold">{t}.</span> <span className="text-slate">{d}</span>
+                </span>
+              </li>
+            ))}
+          </ul>
+        </div>
       </div>
     );
   }
+
+  const STEPS: { id: Step; label: string }[] = [
+    { id: "empreinte", label: "Préparation du clip" },
+    { id: "images", label: "Extraction des images" },
+    { id: "analyse", label: deep ? "Analyse approfondie par le coach" : "Analyse par le coach" },
+  ];
+  const stepIndex = STEPS.findIndex((x) => x.id === step);
 
   return (
     <form onSubmit={submit} className="space-y-6">
@@ -246,9 +275,28 @@ export function AnalyseUploader({
         <button disabled={busy || seg.end <= seg.start} className="btn btn-primary w-full sm:w-auto">
           {busy ? "Analyse en cours…" : `Analyser ce passage (${(seg.end - seg.start).toFixed(1)} s)`}
         </button>
-        <p role="status" className="mt-2 text-sm text-slate">
-          {busy ? statusText : `Il te reste ${remaining} analyse${remaining > 1 ? "s" : ""} sur cette période.`}
-        </p>
+        {busy ? (
+          <ol role="status" className="mt-3 space-y-1.5 text-sm" aria-label={statusText}>
+            {STEPS.map((x, i) => {
+              const done = i < stepIndex;
+              const now = i === stepIndex;
+              return (
+                <li key={x.id} className={`flex items-center gap-2 ${done ? "text-lagoon" : now ? "font-semibold" : "text-slate"}`}>
+                  <span aria-hidden="true" className={`flex h-5 w-5 items-center justify-center rounded-full text-[0.65rem] font-bold ${done ? "bg-brand text-white" : now ? "border-2 border-brand" : "border-2 border-line"}`}>
+                    {done ? "✓" : ""}
+                  </span>
+                  {x.label}
+                  {now && x.id === "images" && ` · ${progress} %`}
+                  {now && x.id === "analyse" && " · 30 à 60 s, tu peux rester sur la page"}
+                </li>
+              );
+            })}
+          </ol>
+        ) : (
+          <p className="mt-2 text-sm text-slate">
+            Il te reste {remaining} analyse{remaining > 1 ? "s" : ""} sur cette période.
+          </p>
+        )}
       </div>
     </form>
   );

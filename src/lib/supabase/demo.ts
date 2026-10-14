@@ -227,9 +227,9 @@ function seed(): Store {
           focus: "Kiteloop contrôlé",
           diagnostic: "Ton backroll est acquis (8/10). Sur le kiteloop, le problème principal est le timing de la boucle, lancée trop tard, avec une barre qui s'éloigne.",
           sessions: [
-            { titre: "Session 1 : sentir la traction", objectif: "Apprivoiser la boucle sans sauter", exercices: ["5 downloops de chaque côté en navigation", "Barre collée aux hanches pendant toute la boucle"] },
-            { titre: "Session 2 : le timing", objectif: "Tirer au sommet du saut", exercices: ["Petits sauts en comptant 1-2 puis tirer", "Filmer 3 tentatives et les faire analyser"] },
-            { titre: "Session 3 : le kiteloop", objectif: "Boucle complète, réception sur la carre", exercices: ["Kiteloops en vent modéré (15-18 nœuds)", "Renvoyer le kite vers l'avant en sortie de boucle"] },
+            { titre: "Sentir la traction", objectif: "Apprivoiser la boucle sans sauter", exercices: ["5 downloops de chaque côté en navigation", "Barre collée aux hanches pendant toute la boucle"] },
+            { titre: "Le timing", objectif: "Tirer au sommet du saut", exercices: ["Petits sauts en comptant 1-2 puis tirer", "Filmer 3 tentatives et les faire analyser"] },
+            { titre: "Le kiteloop", objectif: "Boucle complète, réception sur la carre", exercices: ["Kiteloops en vent modéré (15-18 nœuds)", "Renvoyer le kite vers l'avant en sortie de boucle"] },
           ],
           criteres_reussite: ["Boucle lancée au sommet", "Réception sans être arraché", "Note de 7/10 ou plus sur une analyse"],
         },

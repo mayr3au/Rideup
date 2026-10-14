@@ -83,7 +83,7 @@ export function CoachChat({
             <p className="text-slate">Pose une question sur une figure, ton matériel ou ta progression.</p>
             <div className="mt-4 flex flex-col items-start gap-2">
               {SUGGESTIONS[sport].map((s) => (
-                <button key={s} onClick={() => send(s)} className="rounded-sm border border-line px-4 py-2 text-left text-[0.95rem] hover:border-deep">
+                <button key={s} onClick={() => send(s)} className="min-h-10 rounded-xl border border-line bg-spray px-4 py-2 text-left text-[0.95rem] hover:border-brand hover:bg-brand-light">
                   {s}
                 </button>
               ))}
