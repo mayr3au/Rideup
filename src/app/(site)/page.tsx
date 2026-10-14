@@ -37,38 +37,42 @@ function Icon({ name, className = "h-6 w-6" }: { name: "video" | "cut" | "check"
   );
 }
 
-/* ───────────── 1. Hero : la photo en plein écran, le logo au centre ───────────── */
+/* ───────────── 1. Hero : la photo pleine hauteur, le message en bas ───────────── */
 function Hero() {
   return (
-    <section className="relative flex min-h-[calc(100svh-4rem)] flex-col items-center justify-center overflow-hidden px-5 py-16 text-center text-white sm:min-h-[min(92svh,860px)]">
+    <section className="relative -mt-16 flex min-h-[100svh] flex-col justify-end overflow-hidden text-white">
       <Image
         src="/hero-home.jpg"
         alt="Rider sur une dune, son kite gonflé à la main, face à la mer"
         fill
         priority
         sizes="100vw"
-        className="object-cover object-[46%_50%]"
+        className="object-cover object-[44%_40%]"
       />
-      {/* Voile pour la lisibilité : sombre en bas, léger en haut */}
-      <div className="absolute inset-0 bg-deep/20" />
-      <div className="absolute inset-0 bg-gradient-to-t from-deep/80 via-deep/10 to-deep/25" />
+      {/* Voile : léger en haut pour l'en-tête, dense en bas pour le texte */}
+      <div className="absolute inset-0 bg-gradient-to-b from-deep/40 via-transparent to-transparent" />
+      <div className="absolute inset-0 bg-gradient-to-t from-deep/90 via-deep/35 to-transparent" />
 
-      <div className="rise relative flex max-w-2xl flex-col items-center">
-        <Image src="/logo.png" alt="RIDE'UP, progress your ride" width={765} height={350} priority className="h-28 w-auto drop-shadow-lg sm:h-40" />
-        <h1 className="mt-8 text-[2.1rem] leading-tight sm:text-5xl">Ton coach de glisse dans ta poche</h1>
-        <p className="mt-4 max-w-md text-[1.05rem] text-white/90 sm:text-lg">
-          Kite, wing, foil, surf ou wake : envoie la vidéo d&apos;une figure. En une minute, tu sais exactement quoi corriger.
+      <div className="rise relative mx-auto w-full max-w-6xl px-5 pb-14 pt-40 sm:px-6 sm:pb-20">
+        <p className="eyebrow text-white/80">Coach IA · kite, wing, foil, surf, wake</p>
+        <h1 className="mt-3 max-w-3xl text-[2.6rem] leading-[1.02] sm:text-5xl lg:text-7xl">
+          Progresse à chaque session, même sans moniteur.
+        </h1>
+        <p className="mt-5 max-w-xl text-[1.05rem] text-white/85 sm:text-xl">
+          Envoie 20 secondes de ta figure. En une minute, tu sais exactement quoi corriger, et quoi bosser à la prochaine
+          session.
         </p>
-        <Link href="/inscription" className="btn btn-kite mt-8 w-full sm:w-auto">
-          Essayer gratuitement
-          <Icon name="arrow" className="h-5 w-5" />
-        </Link>
-        <p className="mt-3 text-sm text-white/85">1 analyse offerte · sans carte bancaire</p>
+        <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center">
+          <Link href="/inscription" className="btn btn-kite">
+            Essayer gratuitement
+            <Icon name="arrow" className="h-5 w-5" />
+          </Link>
+          <Link href="#analyse" className="btn btn-glass">
+            Voir comment ça marche
+          </Link>
+        </div>
+        <p className="mt-4 text-sm text-white/75">1 analyse offerte · sans carte bancaire · sans engagement</p>
       </div>
-
-      <a href="#sports" aria-label="Découvrir" className="absolute bottom-5 left-1/2 -translate-x-1/2 text-white/80">
-        <svg viewBox="0 0 24 24" className="h-7 w-7 animate-bounce" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M6 10l6 6 6-6" /></svg>
-      </a>
     </section>
   );
 }
@@ -85,7 +89,8 @@ const SPORT_TAGLINE: Record<(typeof SPORT_IDS)[number], string> = {
 function Sports() {
   return (
     <section id="sports" className="mx-auto max-w-6xl scroll-mt-20 pt-10 sm:px-6 sm:pt-14">
-      <h2 className="px-5 text-2xl sm:px-0 sm:text-3xl">Cinq sports, un seul coach</h2>
+      <p className="eyebrow px-5 sm:px-0">Cinq sports</p>
+      <h2 className="mt-2 px-5 text-3xl sm:px-0 sm:text-4xl">Un seul coach, qui connaît ta discipline</h2>
       <ul className="snap-row mt-4 flex scroll-px-5 gap-3 overflow-x-auto px-5 pb-2 sm:grid sm:grid-cols-5 sm:overflow-visible sm:px-0">
         {SPORT_IDS.map((sp) => (
           <li key={sp} className="w-[42vw] max-w-[200px] shrink-0 snap-start sm:w-auto sm:max-w-none">
@@ -108,8 +113,8 @@ function Sports() {
 function Steps() {
   return (
     <section id="analyse" className="mx-auto max-w-6xl scroll-mt-20 px-5 pt-14 sm:px-6 sm:pt-20">
-      <h2 className="text-3xl sm:text-4xl">Comment ça marche</h2>
-      <p className="mt-2 text-slate">Trois étapes, depuis ton téléphone, sur la plage.</p>
+      <p className="eyebrow">Comment ça marche</p>
+      <h2 className="mt-2 text-3xl sm:text-4xl">Trois étapes, depuis ton téléphone, sur la plage</h2>
 
       <ol className="mt-8 grid gap-4 sm:grid-cols-3">
         {/* Étape 1 */}
@@ -176,7 +181,8 @@ function Result() {
     <section className="mx-auto max-w-6xl px-3 pt-14 sm:px-6 sm:pt-20">
       <div className="grid items-center gap-8 lg:grid-cols-[1fr_1.05fr]">
         <div className="px-2 sm:px-0">
-          <h2 className="text-3xl sm:text-4xl">Un vrai retour de coach, pas un résumé</h2>
+          <p className="eyebrow">L&apos;analyse</p>
+          <h2 className="mt-2 text-3xl sm:text-4xl">Un vrai retour de coach, pas un résumé</h2>
           <p className="mt-3 max-w-md text-slate">
             Voici à quoi ressemble une analyse. Chaque erreur vient avec une consigne simple à appliquer sur l&apos;eau.
           </p>
@@ -263,7 +269,8 @@ function Features() {
   ];
   return (
     <section id="spots" className="mx-auto max-w-6xl scroll-mt-20 px-5 pt-14 sm:px-6 sm:pt-20">
-      <h2 className="text-3xl sm:text-4xl">Et aussi dans l&apos;appli</h2>
+      <p className="eyebrow">Entre deux sessions</p>
+      <h2 className="mt-2 text-3xl sm:text-4xl">Et aussi dans l&apos;appli</h2>
       <ul className="mt-6 grid gap-4 lg:grid-cols-3">
         {items.map((it) => (
           <li key={it.title} className="panel flex gap-4 p-3 lg:flex-col lg:p-0">
@@ -293,7 +300,8 @@ function Features() {
 function PricingTeaser() {
   return (
     <section className="mx-auto max-w-6xl px-5 pt-14 sm:px-6 sm:pt-20">
-      <h2 className="text-3xl sm:text-4xl">Combien ça coûte</h2>
+      <p className="eyebrow">Tarifs</p>
+      <h2 className="mt-2 text-3xl sm:text-4xl">Combien ça coûte</h2>
       <p className="mt-2 text-slate">Ta première analyse est gratuite. Ensuite, deux formules sans engagement.</p>
       <div className="mt-6 grid gap-4 md:grid-cols-2">
         {(Object.keys(PLANS) as (keyof typeof PLANS)[]).map((key) => {
@@ -352,7 +360,8 @@ function Faq() {
   ];
   return (
     <section className="mx-auto max-w-3xl px-5 pt-14 sm:px-6 sm:pt-20">
-      <h2 className="text-3xl sm:text-4xl">Questions fréquentes</h2>
+      <p className="eyebrow">FAQ</p>
+      <h2 className="mt-2 text-3xl sm:text-4xl">Questions fréquentes</h2>
       <div className="mt-6 space-y-3">
         {items.map((it) => (
           <details key={it.q} className="panel group px-5">
