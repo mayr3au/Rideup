@@ -2,7 +2,6 @@
 
 import Image from "next/image";
 import { useEffect, useState } from "react";
-import { PHOTOS } from "@/lib/photos";
 
 const TABS = ["Accueil", "Coach", "Analyser", "Progrès", "Spots"];
 /** Mêmes icônes que la vraie barre de l'appli */
@@ -58,8 +57,8 @@ export function PhoneScreens() {
       {/* Notification qui sort de la Dynamic Island */}
       <div
         aria-hidden="true"
-        className={`absolute left-1/2 top-2.5 z-30 flex -translate-x-1/2 items-center gap-2 overflow-hidden rounded-[22px] bg-black text-white transition-all duration-500 ease-[cubic-bezier(0.2,0.8,0.2,1)] ${
-          notif ? "h-12 w-[88%] px-3" : "h-[26px] w-[92px] px-0"
+        className={`absolute left-1/2 top-3 z-30 flex -translate-x-1/2 items-center gap-2 overflow-hidden rounded-[22px] bg-black text-white transition-all duration-500 ease-[cubic-bezier(0.2,0.8,0.2,1)] ${
+          notif ? "h-12 w-[88%] px-3" : "h-[28px] w-[96px] px-0"
         }`}
       >
         <span className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-brand text-[0.6rem] font-extrabold transition-opacity ${notif ? "opacity-100 delay-200" : "opacity-0"}`}>
@@ -81,7 +80,7 @@ export function PhoneScreens() {
       </div>
 
       {/* écrans empilés en fondu */}
-      <div className="relative h-[338px]">
+      <div className="relative h-[400px] lg:h-[440px]">
         <Screen on={i === 0}>
           <AnalyseScreen />
         </Screen>
@@ -93,17 +92,7 @@ export function PhoneScreens() {
         </Screen>
       </div>
 
-      {/* indicateur de page */}
-      <div className="flex justify-center gap-1.5 pb-1 pt-2" aria-hidden="true">
-        {SCREENS.map((x, k) => (
-          <button
-            key={x.id}
-            tabIndex={-1}
-            onClick={() => setI(k)}
-            className={`h-1.5 rounded-full transition-all ${k === i ? "w-4 bg-brand" : "w-1.5 bg-deep/20"}`}
-          />
-        ))}
-      </div>
+      <div className="h-4" aria-hidden="true" />
 
       {/* barre d'onglets */}
       <div className="grid grid-cols-5 items-end bg-white/90 px-2 pb-2 pt-2 text-[0.52rem] font-semibold text-slate backdrop-blur">
@@ -143,8 +132,8 @@ function AnalyseScreen() {
   const phases: [string, number][] = [["Approche", 8], ["Appel", 7], ["En l'air", 5], ["Réception", 6]];
   return (
     <div>
-      <div className="relative mx-3 h-40 overflow-hidden rounded-[22px]">
-        <Image src={PHOTOS.splash} alt="" fill sizes="310px" className="object-cover" />
+      <div className="relative mx-3 h-52 overflow-hidden rounded-[22px] lg:h-60">
+        <Image src="/sports/kite-v1.jpg" alt="" fill sizes="310px" className="object-cover object-[62%_50%]" />
         <div className="photo-veil absolute inset-0" />
         <div aria-hidden="true" className="sweep absolute inset-x-0 top-0 h-12 bg-gradient-to-b from-transparent via-brand/40 to-transparent" />
         <span aria-hidden="true" className="absolute left-3 top-3 h-4 w-4 rounded-tl-md border-l-2 border-t-2 border-white/80" />

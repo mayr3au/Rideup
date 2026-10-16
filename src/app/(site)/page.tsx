@@ -101,40 +101,52 @@ function Hero() {
 /* Un téléphone dessiné en HTML, avec un résultat d'analyse dedans */
 function PhoneMock() {
   return (
-    <div className="relative mx-auto w-[270px] lg:w-[310px]">
-      {/* ombre portée au sol */}
-      <div aria-hidden="true" className="absolute -bottom-8 left-1/2 h-10 w-3/4 -translate-x-1/2 rounded-[50%] bg-deep/25 blur-2xl" />
+    <div className="relative mx-auto w-[268px] lg:w-[300px]">
+      {/* ombre au sol, détachée comme sur un rendu produit */}
+      <div aria-hidden="true" className="absolute -bottom-14 left-1/2 h-7 w-[78%] -translate-x-1/2 rounded-[50%] bg-black/40 blur-xl" />
 
       <Tilt>
         <div className="float relative">
-          {/* boutons latéraux */}
-          <span aria-hidden="true" className="absolute -left-[3px] top-[18%] h-7 w-[3px] rounded-l bg-gradient-to-b from-[#3a4656] to-[#1b2430]" />
-          <span aria-hidden="true" className="absolute -left-[3px] top-[27%] h-12 w-[3px] rounded-l bg-gradient-to-b from-[#3a4656] to-[#1b2430]" />
-          <span aria-hidden="true" className="absolute -left-[3px] top-[37%] h-12 w-[3px] rounded-l bg-gradient-to-b from-[#3a4656] to-[#1b2430]" />
-          <span aria-hidden="true" className="absolute -right-[3px] top-[30%] h-16 w-[3px] rounded-r bg-gradient-to-b from-[#3a4656] to-[#1b2430]" />
+          {/* boutons latéraux en titane noir */}
+          {[
+            { side: "left", top: "17%", h: "h-7" },
+            { side: "left", top: "25%", h: "h-14" },
+            { side: "left", top: "36%", h: "h-14" },
+            { side: "right", top: "28%", h: "h-20" },
+          ].map((b, k) => (
+            <span
+              key={k}
+              aria-hidden="true"
+              style={{ top: b.top }}
+              className={`absolute ${b.h} w-[4px] ${b.side === "left" ? "-left-[3px] rounded-l-[3px]" : "-right-[3px] rounded-r-[3px]"} bg-[linear-gradient(90deg,#1a1a1c,#4a4a4e_45%,#1a1a1c)]`}
+            />
+          ))}
 
-          {/* cadre titane */}
-          <div className="rounded-[54px] bg-gradient-to-br from-[#4b5868] via-[#1d2633] to-[#3b4757] p-[3px] shadow-[0_60px_100px_-35px_rgba(14,42,71,0.65),0_25px_50px_-30px_rgba(14,42,71,0.5)]">
-            <div className="rounded-[51px] bg-[#05080c] p-[9px]">
-              {/* écran */}
-              <div className="relative overflow-hidden rounded-[43px] bg-salt text-deep">
-                {/* reflet vitre */}
-                <div aria-hidden="true" className="pointer-events-none absolute inset-0 z-20 bg-[linear-gradient(115deg,rgba(255,255,255,0.35)_0%,rgba(255,255,255,0)_32%)]" />
+          {/* cadre titane noir : liseré brossé + reflet sur l'arête */}
+          <div className="rounded-[58px] bg-[linear-gradient(145deg,#5a5a5f_0%,#232326_18%,#111113_50%,#2a2a2d_82%,#57575c_100%)] p-[2.5px] shadow-[0_50px_80px_-40px_rgba(0,0,0,0.55),0_30px_40px_-30px_rgba(0,0,0,0.35)]">
+            <div className="rounded-[55.5px] bg-[#0b0b0c] p-[1.5px]">
+              {/* bordure noire de l'écran, très fine */}
+              <div className="rounded-[54px] bg-black p-[7px] ring-1 ring-inset ring-white/[0.06]">
+                {/* écran */}
+                <div className="relative overflow-hidden rounded-[47px] bg-salt text-deep">
+                  {/* reflet vitre discret */}
+                  <div aria-hidden="true" className="pointer-events-none absolute inset-0 z-20 bg-[linear-gradient(120deg,rgba(255,255,255,0.18)_0%,rgba(255,255,255,0)_28%)]" />
 
-                {/* barre d'état */}
-                <div className="relative z-10 flex h-11 items-center justify-between px-7 text-[0.72rem] font-semibold">
-                  <span>9:41</span>
-                  <span aria-hidden="true" className="flex items-center gap-1">
-                    <svg viewBox="0 0 18 12" className="h-2.5 w-4" fill="currentColor"><rect x="0" y="8" width="3" height="4" rx="1" /><rect x="5" y="5" width="3" height="7" rx="1" /><rect x="10" y="2.5" width="3" height="9.5" rx="1" /><rect x="15" y="0" width="3" height="12" rx="1" /></svg>
-                    <svg viewBox="0 0 26 12" className="h-2.5 w-5" fill="none" stroke="currentColor"><rect x="0.5" y="0.5" width="22" height="11" rx="3" opacity="0.4" /><rect x="2" y="2" width="16" height="8" rx="1.8" fill="currentColor" stroke="none" /><path d="M24.5 4v4" strokeLinecap="round" opacity="0.4" /></svg>
-                  </span>
-                </div>
+                  {/* barre d'état */}
+                  <div className="relative z-10 flex h-12 items-center justify-between px-8 pt-1 text-[0.74rem] font-semibold">
+                    <span>9:41</span>
+                    <span aria-hidden="true" className="flex items-center gap-1">
+                      <svg viewBox="0 0 18 12" className="h-2.5 w-4" fill="currentColor"><rect x="0" y="8" width="3" height="4" rx="1" /><rect x="5" y="5" width="3" height="7" rx="1" /><rect x="10" y="2.5" width="3" height="9.5" rx="1" /><rect x="15" y="0" width="3" height="12" rx="1" /></svg>
+                      <svg viewBox="0 0 26 12" className="h-2.5 w-5" fill="none" stroke="currentColor"><rect x="0.5" y="0.5" width="22" height="11" rx="3" opacity="0.4" /><rect x="2" y="2" width="16" height="8" rx="1.8" fill="currentColor" stroke="none" /><path d="M24.5 4v4" strokeLinecap="round" opacity="0.4" /></svg>
+                    </span>
+                  </div>
 
-                <PhoneScreens />
+                  <PhoneScreens />
 
-                {/* barre home */}
-                <div className="flex justify-center bg-white/90 pb-2">
-                  <span aria-hidden="true" className="h-1 w-24 rounded-full bg-deep" />
+                  {/* barre home */}
+                  <div className="flex justify-center bg-white/90 pb-2">
+                    <span aria-hidden="true" className="h-[5px] w-28 rounded-full bg-deep" />
+                  </div>
                 </div>
               </div>
             </div>
@@ -142,27 +154,6 @@ function PhoneMock() {
         </div>
       </Tilt>
 
-      {/* cartes flottantes autour du téléphone (grands écrans) */}
-      <div className="panel float absolute -left-28 top-14 hidden w-40 p-3 xl:block [--d:-4s]">
-        <p className="text-[0.62rem] font-bold text-lagoon">Progression · backroll</p>
-        <div className="mt-2 flex h-10 items-end gap-1.5">
-          {[5, 6, 8].map((n, i) => (
-            <div key={i} className="flex-1 rounded-t-md bg-brand" style={{ height: `${n * 10}%`, opacity: 0.45 + i * 0.27 }} />
-          ))}
-        </div>
-        <p className="mt-1.5 text-[0.72rem] text-slate">
-          5 → 6 → <span className="font-bold text-deep">8/10</span>
-        </p>
-      </div>
-      <div className="panel float absolute -right-28 bottom-32 hidden w-44 p-3 xl:block [--d:-2s]">
-        <p className="text-[0.62rem] font-bold text-lagoon">Spot Finder · samedi</p>
-        <p className="mt-0.5 text-sm font-bold">L&apos;Almanarre</p>
-        <p className="text-[0.75rem] text-slate">14 h – 18 h · 18 nds · kite 9 m²</p>
-      </div>
-      <div className="float absolute -left-24 bottom-10 hidden max-w-[180px] rounded-2xl rounded-bl-md bg-deep px-3 py-2.5 text-[0.75rem] leading-snug text-white shadow-lg xl:block [--d:-1s]">
-        <span className="block text-[0.6rem] font-bold text-white/60">Ton coach</span>
-        Lance la tête dès le décollage, pas au sommet.
-      </div>
     </div>
   );
 }
