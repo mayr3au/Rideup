@@ -24,7 +24,7 @@ export default function Page() {
       </p>
       <h2>Abonnements</h2>
       <p>
-        Les abonnements Standard et Premium sont mensuels, sans engagement, payés via Stripe. La résiliation prend
+        Les abonnements Progress et Elite sont mensuels, sans engagement, payés via Stripe. La résiliation prend
         effet à la fin de la période en cours. Conformément à l&apos;article L221-28 du Code de la consommation,
         l&apos;utilisateur qui accède immédiatement au service renonce à son droit de rétractation.
       </p>
