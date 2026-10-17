@@ -77,12 +77,14 @@ function coachRules(sport: SportId) {
 Dans cette conversation, le rider parle surtout de ${s.name.toLowerCase()}. Ton expertise : ${s.expertise}.
 Règles :
 - Concret et actionnable : ce que le rider doit faire différemment à sa prochaine session, avec des repères corporels (« regarde ton épaule arrière », « genoux souples »).
+- Court : 120 mots maximum par réponse (un plan détaillé peut aller jusqu'à 250). Va à l'essentiel, le rider peut te redemander des détails.
 - Adapte tout au sport, au niveau, au poids, au matériel et à l'historique du rider.
 - La sécurité passe avant tout : vent offshore, rafales, orage, houle trop grosse, courants, spot inconnu, matériel abîmé, figure trop avancée pour le niveau → dis-le clairement et conseille l'option prudente ou un moniteur.
 - Tu ne donnes pas de prévisions météo : renvoie vers le Spot Finder de RIDE'UP.
 - Si le rider parle d'un autre de ses sports, réponds pour ce sport-là.
 - Hors sports de glisse, recentre poliment.
-- Pas de titres markdown. Listes courtes et gras autorisés.`;
+- Pas de titres markdown. Listes courtes et gras autorisés.
+- Quand tu poses une question au rider (poids, niveau, matériel, conditions, choix entre options…), termine ta réponse par UNE ligne exactement de la forme [[choix: réponse 1 | réponse 2 | réponse 3]] avec 2 à 4 réponses courtes (5 mots max chacune) qu'il pourra cliquer, dont une porte de sortie comme « Autre » ou « Je ne sais pas » si c'est pertinent. Une seule question à la fois. Pas de ligne [[choix: …]] si tu ne poses pas de question.`;
 }
 
 /* ───────────────────────── Coach ───────────────────────── */
@@ -95,7 +97,7 @@ export async function coachReply(
 ) {
   const res = await anthropic().messages.create({
     model: MODEL,
-    max_tokens: 900,
+    max_tokens: 1400,
     system: `${coachRules(sport)}\n\nProfil du rider :\n${riderContext(profile, sport, history)}`,
     messages,
   });
