@@ -6,7 +6,8 @@ import { generateProgram } from "@/lib/ai";
 import { getProgressData } from "@/lib/progress";
 import { getRiderHistory } from "@/lib/usage";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { activeSport } from "@/lib/rider";
+import { activeSport, levelFor } from "@/lib/rider";
+import { LEVEL_ORDER, tricksFor } from "@/lib/sports";
 
 export type ProgramState = { error?: string } | undefined;
 
@@ -37,4 +38,22 @@ export async function createProgram(_prev: ProgramState): Promise<ProgramState> 
   }
   revalidatePath("/progression");
   return undefined;
+}
+
+/**
+ * Valide d'un coup toutes les figures des paliers inférieurs au niveau déclaré dans le profil
+ * (utile quand on s'inscrit déjà intermédiaire ou avancé : la roadmap part de zéro sinon).
+ */
+export async function validateBelowDeclaredLevel() {
+  const { supabase, user, profile } = await requireSession();
+  const sport = activeSport(profile);
+  const declared = levelFor(profile, sport);
+  if (!declared) return;
+  const toValidate = tricksFor(sport).filter((t) => LEVEL_ORDER.indexOf(t.level) < LEVEL_ORDER.indexOf(declared));
+  if (!toValidate.length) return;
+  await supabase.from("trick_progress").upsert(
+    toValidate.map((t) => ({ user_id: user.id, trick_id: t.id, status: "valide", updated_at: new Date().toISOString() })),
+    { onConflict: "user_id,trick_id", ignoreDuplicates: true },
+  );
+  revalidatePath("/", "layout");
 }
