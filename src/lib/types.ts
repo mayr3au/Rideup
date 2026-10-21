@@ -1,5 +1,6 @@
 import type { Level, SportId } from "./sports";
 import type { Plan } from "./plans";
+import type { RiderDetails } from "./rider-details";
 
 export type Profile = {
   id: string;
@@ -11,8 +12,10 @@ export type Profile = {
   sports: SportId[];
   /** Niveau par sport */
   levels: Partial<Record<SportId, Level>>;
-  /** Matériel par sport, texte libre */
+  /** Matériel par sport, résumé texte (généré depuis details.quiver + précisions) */
   gear: Partial<Record<SportId, string>>;
+  /** Détails par sport : discipline, quiver structuré, auto-évaluation (absent sur les anciens profils) */
+  details?: RiderDetails | null;
   stance: "regular" | "goofy" | null;
   weight_kg: number | null;
   goals: string | null;

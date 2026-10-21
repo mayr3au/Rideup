@@ -2,9 +2,12 @@
 
 import { useActionState, useEffect, useRef, useState } from "react";
 import { saveProfile, type ProfileState } from "@/app/(app)/coach/actions";
-import { LEVEL_LABELS, LEVEL_ORDER, SPORT_IDS, SPORTS, type SportId } from "@/lib/sports";
+import { LEVEL_LABELS, LEVEL_ORDER, SPORT_IDS, SPORTS, type Level, type SportId } from "@/lib/sports";
 import { riderSports } from "@/lib/rider";
+import { DISCIPLINES, type Assessment, type Quiver, type SportDetails } from "@/lib/rider-details";
 import type { Profile } from "@/lib/types";
+import { LevelQuiz } from "./level-quiz";
+import { QuiverEditor } from "./quiver-editor";
 
 const chip =
   "cursor-pointer select-none rounded-full border border-line bg-spray px-4 py-2.5 font-semibold has-[:checked]:border-brand has-[:checked]:bg-brand has-[:checked]:text-white has-[:focus-visible]:outline has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-brand";
@@ -26,6 +29,17 @@ export function ProfileForm({ profile, submitLabel, showAlerts }: { profile: Pro
     lat: profile.home_lat?.toString() ?? "",
     lng: profile.home_lng?.toString() ?? "",
   });
+  const [levels, setLevels] = useState<Partial<Record<SportId, Level>>>(profile.levels ?? {});
+  const [details, setDetails] = useState<Partial<Record<SportId, SportDetails>>>(() => {
+    const d: Partial<Record<SportId, SportDetails>> = { ...(profile.details ?? {}) };
+    // Ancien profil : le texte libre du matériel devient les « précisions » du quiver.
+    for (const id of SPORT_IDS) {
+      const legacy = profile.gear?.[id];
+      if (legacy && !d[id]?.quiver) d[id] = { ...d[id], quiver: { notes: legacy } };
+    }
+    return d;
+  });
+  const patchDetails = (id: SportId, patch: Partial<SportDetails>) => setDetails((d) => ({ ...d, [id]: { ...d[id], ...patch } }));
   const [locating, setLocating] = useState(false);
   const [geoError, setGeoError] = useState<string | null>(null);
   const [step, setStep] = useState(0);
@@ -86,7 +100,7 @@ export function ProfileForm({ profile, submitLabel, showAlerts }: { profile: Pro
     sports: "Tes sports",
     you: "Toi",
     place: "Où tu rides",
-    ...Object.fromEntries(sports.map((s) => [`sport:${s}`, `Ton niveau en ${SPORTS[s].name.toLowerCase()}`])),
+    ...Object.fromEntries(sports.map((s) => [`sport:${s}`, `Ton ${SPORTS[s].name.toLowerCase()}`])),
   };
 
   return (
@@ -134,29 +148,78 @@ export function ProfileForm({ profile, submitLabel, showAlerts }: { profile: Pro
         {sports.length === 1 && <input type="hidden" name="sport" value={sports[0]} />}
       </fieldset>
 
-      {/* 2. Niveau et matériel par sport */}
+      {/* 2. Discipline, niveau et matériel par sport */}
       {sports.map((id) => {
         const sport = SPORTS[id];
+        const d = details[id] ?? {};
+        const quiver: Quiver = d.quiver ?? {};
         return (
-          <fieldset key={id} data-step={`sport:${id}`} className={`panel p-5 ${visible(`sport:${id}`) ? "" : "hidden"}`}>
+          <fieldset key={id} data-step={`sport:${id}`} className={`panel space-y-6 p-5 ${visible(`sport:${id}`) ? "" : "hidden"}`}>
             <legend className="sr-only">{sport.name}</legend>
-            <p className="text-lg font-bold">{sport.name}</p>
-            <p className="text-sm text-slate">Le coach adapte ses conseils et sa roadmap à ton niveau.</p>
-            <p className="mt-3 label">Ton niveau</p>
-            <div className="grid gap-2 sm:grid-cols-2">
-              {LEVEL_ORDER.map((lvl) => (
-                <label key={lvl} className="flex cursor-pointer gap-3 rounded-2xl border border-line bg-spray p-3 has-[:checked]:border-brand has-[:checked]:bg-brand-light">
-                  <input type="radio" name={`level_${id}`} value={lvl} defaultChecked={profile.levels?.[id] === lvl} required className="mt-1 accent-[var(--brand)]" />
-                  <span>
-                    <span className="font-semibold">{LEVEL_LABELS[lvl]}</span>
-                    <span className="block text-sm text-slate">{sport.levelHints[lvl]}</span>
-                  </span>
-                </label>
-              ))}
+            <input type="hidden" name={`details_${id}`} value={JSON.stringify({ discipline: d.discipline, quiver, evaluation: d.evaluation })} />
+            <div>
+              <p className="text-lg font-bold">Ton {sport.name.toLowerCase()}</p>
+              <p className="text-sm text-slate">Le coach adapte ses conseils, la roadmap et les spots à ta pratique.</p>
             </div>
-            <label htmlFor={`gear_${id}`} className="label mt-4">{sport.gear.label}</label>
-            <input id={`gear_${id}`} name={`gear_${id}`} defaultValue={profile.gear?.[id] ?? ""} placeholder={sport.gear.placeholder} className="field" />
-            {sport.spot === "wind" && <p className="mt-1 text-sm text-slate">Facultatif, mais le Spot Finder te dira alors quelle taille sortir.</p>}
+
+            <div>
+              <p className="label">Ta discipline</p>
+              <div className="grid gap-2 sm:grid-cols-2">
+                {DISCIPLINES[id].map((disc) => (
+                  <label key={disc.id} className="flex cursor-pointer gap-3 rounded-2xl border border-line bg-spray p-3 has-[:checked]:border-brand has-[:checked]:bg-brand-light">
+                    <input
+                      type="radio"
+                      name={`discipline_${id}`}
+                      value={disc.id}
+                      checked={d.discipline === disc.id}
+                      onChange={() => patchDetails(id, { discipline: disc.id })}
+                      className="mt-1 accent-[var(--brand)]"
+                    />
+                    <span>
+                      <span className="font-semibold">{disc.name}</span>
+                      <span className="block text-sm text-slate">{disc.hint}</span>
+                    </span>
+                  </label>
+                ))}
+              </div>
+            </div>
+
+            <div>
+              <p className="label">Ton niveau</p>
+              <LevelQuiz
+                sport={id}
+                initial={d.evaluation}
+                onResult={(r) => {
+                  const evaluation: Assessment = { score: r.score, level: r.level, at: r.at, reponses: r.reponses };
+                  patchDetails(id, { evaluation });
+                  setLevels((l) => ({ ...l, [id]: r.level }));
+                }}
+              />
+              <div className="mt-3 grid gap-2 sm:grid-cols-2">
+                {LEVEL_ORDER.map((lvl) => (
+                  <label key={lvl} className="flex cursor-pointer gap-3 rounded-2xl border border-line bg-spray p-3 has-[:checked]:border-brand has-[:checked]:bg-brand-light">
+                    <input
+                      type="radio"
+                      name={`level_${id}`}
+                      value={lvl}
+                      checked={levels[id] === lvl}
+                      onChange={() => setLevels((l) => ({ ...l, [id]: lvl }))}
+                      required
+                      className="mt-1 accent-[var(--brand)]"
+                    />
+                    <span>
+                      <span className="font-semibold">{LEVEL_LABELS[lvl]}</span>
+                      <span className="block text-sm text-slate">{sport.levelHints[lvl]}</span>
+                    </span>
+                  </label>
+                ))}
+              </div>
+            </div>
+
+            <div>
+              <p className="label">Ton matériel</p>
+              <QuiverEditor sport={id} value={quiver} onChange={(q) => patchDetails(id, { quiver: q })} />
+            </div>
           </fieldset>
         );
       })}

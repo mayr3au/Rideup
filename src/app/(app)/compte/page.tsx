@@ -3,7 +3,8 @@ import Link from "next/link";
 import { requireSession, effectivePlan } from "@/lib/auth";
 import { PLANS } from "@/lib/plans";
 import { getQuota } from "@/lib/usage";
-import { riderSports } from "@/lib/rider";
+import { detailsFor, disciplineFor, riderSports } from "@/lib/rider";
+import { assessmentLabel } from "@/lib/rider-details";
 import { SPORTS } from "@/lib/sports";
 
 export const metadata: Metadata = { title: "Compte" };
@@ -96,7 +97,11 @@ export default async function AccountPage() {
           {sports.map((s) => (
             <div key={s} className="rounded-xl bg-raised p-3">
               <dt className="text-xs text-slate">{SPORTS[s].name}</dt>
-              <dd className="font-semibold">{profile.levels?.[s] ? { debutant: "Débutant", intermediaire: "Intermédiaire", avance: "Avancé", expert: "Expert" }[profile.levels[s]!] : "Niveau à renseigner"}</dd>
+              <dd className="font-semibold">
+                {profile.levels?.[s] ? { debutant: "Débutant", intermediaire: "Intermédiaire", avance: "Avancé", expert: "Expert" }[profile.levels[s]!] : "Niveau à renseigner"}
+                {disciplineFor(profile, s) ? ` · ${disciplineFor(profile, s)}` : ""}
+              </dd>
+              {assessmentLabel(detailsFor(profile, s).evaluation) && <dd className="text-xs font-semibold text-lagoon">Évalué : {assessmentLabel(detailsFor(profile, s).evaluation)}</dd>}
               {profile.gear?.[s] && <dd className="text-sm text-slate">{profile.gear[s]}</dd>}
             </div>
           ))}

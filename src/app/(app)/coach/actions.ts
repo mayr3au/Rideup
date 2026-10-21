@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import { z } from "zod";
 import { requireSession } from "@/lib/auth";
 import { geocode } from "@/lib/weather";
+import { DISCIPLINES, sportDetailsSchema, summarizeQuiver, type RiderDetails } from "@/lib/rider-details";
 import { isSport, LEVEL_ORDER, SPORTS, TRICKS, type Level, type SportId } from "@/lib/sports";
 
 export type ProfileState = { error?: string; saved?: boolean } | undefined;
@@ -37,12 +38,29 @@ export async function saveProfile(_: ProfileState, formData: FormData): Promise<
 
   const levels: Partial<Record<SportId, Level>> = {};
   const gear: Partial<Record<SportId, string>> = {};
+  const details: RiderDetails = {};
   for (const s of sports) {
     const lvl = String(formData.get(`level_${s}`) ?? "");
     if (!LEVEL_ORDER.includes(lvl as Level)) return { error: `Choisis ton niveau en ${SPORTS[s].name.toLowerCase()}.` };
     levels[s] = lvl as Level;
-    const g = String(formData.get(`gear_${s}`) ?? "").trim().slice(0, 300);
-    if (g) gear[s] = g;
+
+    // Discipline, quiver structuré, auto-évaluation (JSON construit par le formulaire)
+    let raw: unknown = null;
+    try {
+      raw = JSON.parse(String(formData.get(`details_${s}`) ?? "null"));
+    } catch {
+      raw = null;
+    }
+    const parsedDetails = sportDetailsSchema.safeParse(raw ?? {});
+    if (!parsedDetails.success) return { error: `Matériel en ${SPORTS[s].name.toLowerCase()} : une valeur est hors limites.` };
+    const d = parsedDetails.data;
+    if (d.discipline && !DISCIPLINES[s].some((x) => x.id === d.discipline)) delete d.discipline;
+    details[s] = d;
+
+    // Résumé texte du matériel : ce que lisent le coach, la page compte et le Spot Finder.
+    const legacy = String(formData.get(`gear_${s}`) ?? "").trim().slice(0, 300);
+    const summary = summarizeQuiver(s, d.quiver) || legacy;
+    if (summary) gear[s] = summary.slice(0, 400);
   }
 
   const { supabase, user, profile } = await requireSession();
@@ -63,7 +81,7 @@ export async function saveProfile(_: ProfileState, formData: FormData): Promise<
 
   const { error } = await supabase
     .from("profiles")
-    .update({ ...data, sport, sports, levels, gear, onboarded: true })
+    .update({ ...data, sport, sports, levels, gear, details, onboarded: true })
     .eq("id", user.id);
   if (error) return { error: "Enregistrement impossible. Réessaie." };
 
