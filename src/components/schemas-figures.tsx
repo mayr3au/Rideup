@@ -177,22 +177,22 @@ function TrajetSaut() {
       <Kite x={k12[0]} y={k12[1]} rot={-8} scale={0.95} />
       <Arc from={12.3} to={11.2} r={W.R - 34} color={C.lagoon} dashed />
       <Kite x={k1[0]} y={k1[1]} rot={25} scale={0.7} color={C.lagoon} />
-      <Note x={W.cx - 150} y={W.cy - 70} anchor="start" color={C.slate}>
+      <Note x={W.cx - 152} y={W.cy - 40} anchor="start" color={C.slate}>
         1. Vitesse + carre
       </Note>
-      <Note x={W.cx - 150} y={W.cy - 57} anchor="start" color={C.slate} size={9.5}>
+      <Note x={W.cx - 152} y={W.cy - 27} anchor="start" color={C.slate} size={9.5}>
         kite à 11 h
       </Note>
-      <Note x={W.cx + 10} y={W.cy - W.R - 30} anchor="start" color={C.brand}>
+      <Note x={W.cx + 30} y={W.cy - W.R - 30} anchor="start" color={C.brand}>
         2. Envoi franc, stop au zénith
       </Note>
-      <Note x={W.cx + 10} y={W.cy - W.R - 17} anchor="start" color={C.slate} size={9.5}>
+      <Note x={W.cx + 30} y={W.cy - W.R - 17} anchor="start" color={C.slate} size={9.5}>
         (jamais au-delà de 12 h)
       </Note>
-      <Note x={W.cx - 20} y={W.cy - 98} anchor="end" color={C.lagoon}>
+      <Note x={W.cx - 152} y={W.cy - 120} anchor="start" color={C.lagoon}>
         3. Renvoi vers l&apos;avant
       </Note>
-      <Note x={W.cx - 20} y={W.cy - 85} anchor="end" color={C.slate} size={9.5}>
+      <Note x={W.cx - 152} y={W.cy - 107} anchor="start" color={C.slate} size={9.5}>
         avant de toucher l&apos;eau
       </Note>
       <Note x={W.cx} y={W.cy + 24} color={C.slate} size={10}>
@@ -580,11 +580,11 @@ function WakeKicker() {
       {/* câble */}
       <line x1="100" y1="88" x2="60" y2="20" stroke={C.slate} strokeWidth={1.5} />
       <line x1="310" y1="28" x2="300" y2="-10" stroke={C.slate} strokeWidth={1.5} />
-      <Note x={70} y={150} color={C.deep}>
+      <Note x={90} y={150} color={C.deep}>
         1. Ligne droite, à plat
       </Note>
-      <Note x={70} y={163} color={C.slate} size={9.5}>
-        poignée aux hanches, genoux souples
+      <Note x={90} y={163} color={C.slate} size={9.5}>
+        poignée basse, genoux souples
       </Note>
       <Note x={230} y={54} color={C.brand} anchor="end">
         2. Carre progressive
@@ -619,10 +619,10 @@ function WakeBox() {
       <path d="M320 94 C 345 100, 360 118, 380 122" fill="none" stroke={C.brand} strokeWidth={3} markerEnd="url(#arr-brand)" />
       <Rider x={60} y={104} scale={0.8} />
       <Rider x={225} y={80} scale={0.8} />
-      <Note x={60} y={160} color={C.deep}>
+      <Note x={72} y={160} color={C.deep}>
         1. Alignement tôt
       </Note>
-      <Note x={60} y={173} color={C.slate} size={9.5}>
+      <Note x={72} y={173} color={C.slate} size={9.5}>
         planche à plat, pas de carre
       </Note>
       <Note x={225} y={46} color={C.brand}>
