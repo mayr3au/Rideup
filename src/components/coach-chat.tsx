@@ -7,6 +7,27 @@ import type { SportId } from "@/lib/sports";
 
 type Msg = { role: "user" | "assistant"; content: string };
 
+/**
+ * Le coach termine ses questions par une ligne « [[choix: a | b | c]] » (voir coachRules dans lib/ai.ts).
+ * On la retire du texte affiché et on la transforme en boutons de réponse rapide.
+ */
+export function splitQuickReplies(content: string): { text: string; options: string[] } {
+  const re = /\[\[\s*choix\s*:\s*([^\]]*)\]\]/gi;
+  let options: string[] = [];
+  const text = content
+    .replace(re, (_, list: string) => {
+      options = list
+        .split("|")
+        .map((o) => o.trim())
+        .filter(Boolean)
+        .slice(0, 4);
+      return "";
+    })
+    .replace(/[ \t]+\n/g, "\n")
+    .trim();
+  return { text, options };
+}
+
 const SUGGESTIONS: Record<SportId, string[]> = {
   kitesurf: ["Pourquoi je retombe sur les fesses en saut ?", "Quelle taille de kite pour 18 nœuds, je fais 75 kg ?", "Comment je prépare mon premier backroll ?"],
   wingfoil: ["Je n'arrive pas à décoller, je fais quoi ?", "Quelle taille d'aile pour 15 nœuds, je fais 75 kg ?", "Comment réussir mon premier jibe en vol ?"],
@@ -90,17 +111,37 @@ export function CoachChat({
             </div>
           </div>
         )}
-        {messages.map((m, i) =>
-          m.role === "user" ? (
-            <div key={i} className="ml-auto max-w-[85%] rounded-lg rounded-br-md bg-brand px-4 py-2.5 text-white">
-              {m.content}
+        {messages.map((m, i) => {
+          if (m.role === "user")
+            return (
+              <div key={i} className="ml-auto max-w-[85%] rounded-lg rounded-br-md bg-brand px-4 py-2.5 text-white">
+                {m.content}
+              </div>
+            );
+          const { text, options } = splitQuickReplies(m.content);
+          const isLast = i === messages.length - 1;
+          return (
+            <div key={i} className="max-w-[90%]">
+              <div className="rounded-lg rounded-bl-md bg-salt px-4 py-3">
+                <RichText text={text} />
+              </div>
+              {isLast && !pending && options.length > 0 && (
+                <div className="mt-2 flex flex-wrap gap-2" role="group" aria-label="Réponses rapides">
+                  {options.map((o) => (
+                    <button
+                      key={o}
+                      type="button"
+                      onClick={() => send(o)}
+                      className="min-h-10 rounded-full border border-brand bg-white px-4 py-2 text-[0.95rem] font-medium text-brand hover:bg-brand-light"
+                    >
+                      {o}
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
-          ) : (
-            <div key={i} className="max-w-[90%] rounded-lg rounded-bl-md bg-salt px-4 py-3">
-              <RichText text={m.content} />
-            </div>
-          ),
-        )}
+          );
+        })}
         {pending && (
           <div className="flex items-center gap-2 text-slate" aria-label="Le coach réfléchit">
             <span className="flex gap-1 rounded-2xl rounded-bl-md bg-salt px-3 py-2.5" aria-hidden="true">
