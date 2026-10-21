@@ -73,6 +73,7 @@ textarea {
 
 /* Liste horizontale (pastilles sport, onglets) : défilement doux, sans barre visible */
 .scroll-x {
+  position: relative; /* les descendants absolus (sr-only…) restent coupés par le défilement */
   overflow-x: auto;
   scroll-snap-type: x proximity;
   -webkit-overflow-scrolling: touch;
