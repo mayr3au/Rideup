@@ -2,7 +2,8 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
+import { Portal, useEscape, useScrollLock } from "./portal";
 
 type Item = { href: string; label: string; short?: string; icon: React.ReactNode };
 
@@ -14,6 +15,8 @@ const I = {
   map: <path d="M12 21s-7-6.1-7-11a7 7 0 0 1 14 0c0 4.9-7 11-7 11zm0-8.5a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5z" />,
   more: <path d="M4 7h16M4 12h16M4 17h16" />,
   close: <path d="M6 6l12 12M18 6 6 18" />,
+  chevron: <path d="m9 6 6 6-6 6" />,
+  out: <path d="M10 17l5-5-5-5M15 12H3M21 3v18" />,
 };
 
 function Icon({ children, size = 24 }: { children: React.ReactNode; size?: number }) {
@@ -44,16 +47,13 @@ const SECONDARY = [
 export function AppNav({ isAdmin, planLabel }: { isAdmin: boolean; planLabel: string }) {
   const path = usePathname();
   const [open, setOpen] = useState(false);
+  const close = useCallback(() => setOpen(false), []);
   const secondary = isAdmin ? [...SECONDARY, { href: "/admin", label: "Administration" }] : SECONDARY;
   const active = (href: string) => path === href || path.startsWith(href + "/");
 
   useEffect(() => setOpen(false), [path]);
-  useEffect(() => {
-    if (!open) return;
-    const onKey = (e: KeyboardEvent) => e.key === "Escape" && setOpen(false);
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, [open]);
+  useScrollLock(open);
+  useEscape(open, close);
 
   return (
     <>
@@ -93,7 +93,7 @@ export function AppNav({ isAdmin, planLabel }: { isAdmin: boolean; planLabel: st
           onClick={() => setOpen((o) => !o)}
           aria-expanded={open}
           aria-label={open ? "Fermer le menu" : "Ouvrir le menu"}
-          className="-mr-2 flex h-11 w-11 items-center justify-center rounded-xl hover:bg-raised lg:hidden"
+          className={`-mr-2 flex h-11 w-11 items-center justify-center rounded-xl transition-colors active:bg-raised lg:hidden ${open ? "bg-raised" : ""}`}
         >
           <Icon>{open ? I.close : I.more}</Icon>
         </button>
@@ -101,7 +101,7 @@ export function AppNav({ isAdmin, planLabel }: { isAdmin: boolean; planLabel: st
 
       {/* … et barre d'onglets en bas */}
       <nav
-        className="fixed inset-x-0 bottom-0 z-40 border-t border-line bg-spray/95 pb-[env(safe-area-inset-bottom)] backdrop-blur lg:hidden"
+        className="fixed inset-x-0 bottom-0 z-40 border-t border-line bg-spray/92 pb-[env(safe-area-inset-bottom)] backdrop-blur-xl lg:hidden"
         aria-label="Navigation principale"
       >
         <ul className="grid grid-cols-5">
@@ -112,11 +112,11 @@ export function AppNav({ isAdmin, planLabel }: { isAdmin: boolean; planLabel: st
                 <Link
                   href={l.href}
                   aria-current={active(l.href) ? "page" : undefined}
-                  className="flex flex-col items-center gap-0.5 pb-2 pt-1 text-[0.72rem] font-semibold text-lagoon"
+                  className="group flex min-h-16 flex-col items-center gap-0.5 pb-2 pt-1 text-[0.72rem] font-semibold text-lagoon"
                 >
                   <span
                     aria-hidden="true"
-                    className={`-mt-6 flex h-14 w-14 items-center justify-center rounded-full text-white shadow-[0_12px_24px_-8px_rgba(22,136,200,0.8)] ring-4 ring-spray transition-transform active:scale-95 ${active(l.href) ? "bg-lagoon-dark" : "bg-brand"}`}
+                    className={`-mt-6 flex h-14 w-14 items-center justify-center rounded-full text-white shadow-[0_12px_24px_-8px_rgba(22,136,200,0.8)] ring-4 ring-spray transition-[transform,background-color] duration-200 group-active:scale-90 ${active(l.href) ? "bg-lagoon-dark" : "bg-brand"}`}
                   >
                     <Icon size={26}>{I.video}</Icon>
                   </span>
@@ -128,9 +128,13 @@ export function AppNav({ isAdmin, planLabel }: { isAdmin: boolean; planLabel: st
                 <Link
                   href={l.href}
                   aria-current={active(l.href) ? "page" : undefined}
-                  className={`flex flex-col items-center gap-0.5 py-2 text-[0.72rem] font-medium ${active(l.href) ? "text-lagoon" : "text-slate"}`}
+                  className={`group flex min-h-16 flex-col items-center justify-center gap-0.5 py-2 text-[0.72rem] font-medium transition-colors duration-200 ${active(l.href) ? "text-lagoon" : "text-slate"}`}
                 >
-                  {l.icon}
+                  <span
+                    className={`flex h-8 w-12 items-center justify-center rounded-full transition-[background-color,transform] duration-200 group-active:scale-90 ${active(l.href) ? "bg-brand-light" : ""}`}
+                  >
+                    {l.icon}
+                  </span>
                   {l.short ?? l.label}
                 </Link>
               </li>
@@ -140,19 +144,40 @@ export function AppNav({ isAdmin, planLabel }: { isAdmin: boolean; planLabel: st
       </nav>
 
       {open && (
-        <div className="fixed inset-0 z-30 bg-black/60 lg:hidden" onClick={() => setOpen(false)}>
-          <div className="absolute inset-x-0 bottom-[calc(64px+env(safe-area-inset-bottom))] rounded-t-3xl bg-spray p-3 pb-4 shadow-xl" onClick={(e) => e.stopPropagation()}>
-            <p className="px-4 pb-2 pt-1 text-sm font-semibold text-slate">Plus</p>
-            {secondary.map((l) => (
-              <Link key={l.href} href={l.href} className={`block rounded-xl px-4 py-3.5 text-lg ${active(l.href) ? "bg-salt font-semibold" : ""}`}>
-                {l.label}
-              </Link>
-            ))}
-            <form action="/auth/deconnexion" method="post" className="mt-1 border-t border-line pt-1">
-              <button className="block w-full rounded-xl px-4 py-3.5 text-left text-lg text-slate">Se déconnecter</button>
-            </form>
+        <Portal>
+          <div className="fixed inset-0 z-50 lg:hidden" role="dialog" aria-modal="true" aria-label="Plus">
+            <button type="button" aria-label="Fermer le menu" onClick={close} className="fade-in absolute inset-0 bg-deep/45" />
+            <div className="slide-up absolute inset-x-0 bottom-0 max-h-[85dvh] overflow-y-auto overscroll-contain rounded-t-3xl bg-spray px-3 pb-[max(1rem,env(safe-area-inset-bottom))] pt-2 shadow-2xl">
+              <div aria-hidden="true" className="mx-auto mb-2 h-1.5 w-10 rounded-full bg-line" />
+              <div className="flex items-center justify-between px-3 pb-2 pt-1">
+                <p className="text-sm font-semibold text-slate">Plus</p>
+                <Link href="/compte" onClick={close} className="rounded-full bg-brand-light px-3 py-1 text-sm font-semibold text-lagoon">
+                  {planLabel}
+                </Link>
+              </div>
+              <ul>
+                {secondary.map((l) => (
+                  <li key={l.href}>
+                    <Link
+                      href={l.href}
+                      onClick={close}
+                      className={`flex min-h-14 items-center justify-between rounded-2xl px-4 py-3 text-[1.05rem] transition-colors active:bg-raised ${active(l.href) ? "bg-salt font-semibold text-lagoon" : ""}`}
+                    >
+                      {l.label}
+                      <span className="text-slate/60"><Icon size={20}>{I.chevron}</Icon></span>
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+              <form action="/auth/deconnexion" method="post" className="mt-2 border-t border-line pt-2">
+                <button className="flex min-h-14 w-full items-center gap-3 rounded-2xl px-4 py-3 text-left text-[1.05rem] text-slate transition-colors active:bg-raised">
+                  <Icon size={20}>{I.out}</Icon>
+                  Se déconnecter
+                </button>
+              </form>
+            </div>
           </div>
-        </div>
+        </Portal>
       )}
     </>
   );

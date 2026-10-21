@@ -56,6 +56,33 @@ html {
   color: var(--deep);
   -webkit-font-smoothing: antialiased;
   -webkit-tap-highlight-color: transparent;
+  /* Pas de rebond de page entier sur mobile (les feuilles et listes gèrent le leur) */
+  overscroll-behavior-y: none;
+}
+
+/* Réponse immédiate au toucher : pas de délai de double-tap, pas de zoom accidentel */
+a,
+button,
+summary,
+label,
+input,
+select,
+textarea {
+  touch-action: manipulation;
+}
+
+/* Liste horizontale (pastilles sport, onglets) : défilement doux, sans barre visible */
+.scroll-x {
+  overflow-x: auto;
+  scroll-snap-type: x proximity;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+.scroll-x::-webkit-scrollbar {
+  display: none;
+}
+.scroll-x > * {
+  scroll-snap-align: start;
 }
 
 body {
@@ -269,6 +296,56 @@ p {
   animation-delay: var(--d, 0s);
 }
 
+/* Changement de page dans l'espace membre : court, pour que la navigation reste vive */
+@keyframes page-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.page-in {
+  animation: page-in 0.28s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+/* Menus et feuilles mobiles */
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@keyframes slide-up {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: none;
+  }
+}
+@keyframes slide-in-right {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: none;
+  }
+}
+.fade-in {
+  animation: fade-in 0.2s ease-out both;
+}
+.slide-up {
+  animation: slide-up 0.32s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+.slide-in-right {
+  animation: slide-in-right 0.3s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
 @keyframes float {
   0%,
   100% {
@@ -379,6 +456,10 @@ p {
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .page-in,
+  .fade-in,
+  .slide-up,
+  .slide-in-right,
   .rise,
   .float,
   .sweep,

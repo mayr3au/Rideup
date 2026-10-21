@@ -14,7 +14,7 @@ export function SportSwitcher({ sports, active }: { sports: SportId[]; active: S
 
   return (
     <div className="border-b border-line bg-spray/95 backdrop-blur">
-      <nav aria-label="Sport" className="mx-auto flex max-w-6xl items-center gap-2 overflow-x-auto px-5 py-2 sm:px-6">
+      <nav aria-label="Sport" className="scroll-x mx-auto flex max-w-6xl items-center gap-2 px-5 py-2 sm:px-6">
         {sports.map((id) => {
           const on = id === active;
           return (
