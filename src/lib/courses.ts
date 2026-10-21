@@ -1,3 +1,4 @@
+import { LESSONS } from "./lessons";
 import { trickById, type SportId } from "./sports";
 
 export type Course = {
@@ -219,8 +220,9 @@ export function courseBySlug(slug: string) {
   return COURSES.find((c) => c.slug === slug);
 }
 
-export function courseForTrick(trickId: string) {
-  return COURSES.find((c) => c.trickId === trickId);
+/** Cours (figure) ou leçon (fondamentaux) qui enseigne cette figure de la roadmap. */
+export function courseForTrick(trickId: string): { slug: string; title: string } | undefined {
+  return COURSES.find((c) => c.trickId === trickId) ?? LESSONS.find((l) => l.trickId === trickId);
 }
 
 /** Sport d'un cours, déduit de la figure qu'il enseigne. */
