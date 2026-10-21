@@ -1,3 +1,4 @@
+import { disciplineName, type SportDetails } from "./rider-details";
 import { isSport, parseSizes, SPORTS, type Level, type SportId } from "./sports";
 import type { Profile } from "./types";
 
@@ -21,7 +22,18 @@ export function gearFor(profile: Pick<Profile, "gear">, sport: SportId): string 
   return profile.gear?.[sport] ?? "";
 }
 
-export function gearSizes(profile: Pick<Profile, "gear">, sport: SportId) {
+export function detailsFor(profile: Pick<Profile, "details">, sport: SportId): SportDetails {
+  return profile.details?.[sport] ?? {};
+}
+
+export function disciplineFor(profile: Pick<Profile, "details">, sport: SportId) {
+  return disciplineName(sport, detailsFor(profile, sport).discipline);
+}
+
+/** Tailles d'ailes/kites : le quiver structuré d'abord, sinon les nombres du texte libre. */
+export function gearSizes(profile: Pick<Profile, "gear" | "details">, sport: SportId) {
+  const ailes = detailsFor(profile, sport).quiver?.ailes;
+  if (ailes?.length) return [...ailes].sort((a, b) => a - b);
   return parseSizes(sport, gearFor(profile, sport));
 }
 

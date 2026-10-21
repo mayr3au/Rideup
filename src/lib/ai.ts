@@ -2,7 +2,7 @@ import "server-only";
 import Anthropic from "@anthropic-ai/sdk";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { errorLabel, errorsFor, LEVEL_LABELS, SPORTS, SPORT_IDS, tricksFor, trickById, type SportId } from "@/lib/sports";
-import { gearFor, levelFor, riderSports } from "@/lib/rider";
+import { detailsFor, disciplineFor, gearFor, levelFor, riderSports } from "@/lib/rider";
 import type { AnalysisResult, Profile, Program, TrickProgress } from "@/lib/types";
 
 let client: Anthropic | null = null;
@@ -48,10 +48,12 @@ function riderContext(profile: Profile, sport: SportId, history?: RiderHistory) 
     .filter((s) => s !== sport)
     .map((s) => `${SPORTS[s].name} (${LEVEL_LABELS[levelFor(profile, s) ?? "debutant"].toLowerCase()})`);
   const lvl = levelFor(profile, sport);
+  const evaluation = detailsFor(profile, sport).evaluation;
   const lines = [
     `Prénom : ${profile.full_name || "inconnu"}`,
     `Sport concerné : ${SPORTS[sport].name}`,
-    `Niveau déclaré dans ce sport : ${lvl ? LEVEL_LABELS[lvl] : "non renseigné"}`,
+    `Niveau déclaré dans ce sport : ${lvl ? LEVEL_LABELS[lvl] : "non renseigné"}${evaluation ? ` (auto-évaluation : ${evaluation.score}/100, ${LEVEL_LABELS[evaluation.level].toLowerCase()})` : ""}`,
+    `Discipline : ${disciplineFor(profile, sport) ?? "non précisée"}`,
     `Pied avant : ${profile.stance === "goofy" ? "droit (goofy)" : profile.stance === "regular" ? "gauche (regular)" : "?"}`,
     `Poids : ${profile.weight_kg ? `${profile.weight_kg} kg` : "non renseigné"}`,
     `Matériel : ${gearFor(profile, sport) || "non renseigné"}`,
