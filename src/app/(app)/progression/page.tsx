@@ -13,6 +13,8 @@ import { ProgramButton } from "@/components/program-button";
 import { validateBelowDeclaredLevel } from "./actions";
 
 export const metadata: Metadata = { title: "Progression" };
+// La génération du programme Elite (action serveur) peut prendre plus d'une minute.
+export const maxDuration = 300;
 
 const TREND = {
   "en-baisse": { label: "En baisse", cls: "bg-lagoon/15 text-lagoon-dark" },

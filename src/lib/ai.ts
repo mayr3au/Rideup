@@ -4,6 +4,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { errorLabel, errorsFor, LEVEL_LABELS, SPORTS, SPORT_IDS, tricksFor, trickById, type SportId } from "@/lib/sports";
 import { detailsFor, disciplineFor, gearFor, levelFor, riderSports } from "@/lib/rider";
 import type { AnalysisResult, Profile, Program, TrickProgress } from "@/lib/types";
+import { normalizeResult } from "@/lib/analysis-result";
 
 let client: Anthropic | null = null;
 function anthropic() {
@@ -15,6 +16,12 @@ export const MODEL = process.env.ANTHROPIC_MODEL || "claude-sonnet-5-5";
 // Tarifs en $ par million de tokens (Claude Sonnet 5.5 : 2 $ en entrée, 10 $ en sortie).
 const PRICE_IN = Number(process.env.AI_PRICE_INPUT_PER_MTOK ?? 2);
 const PRICE_OUT = Number(process.env.AI_PRICE_OUTPUT_PER_MTOK ?? 10);
+
+/**
+ * Les modèles récents réfléchissent avant de répondre (blocs « thinking »), et cette réflexion
+ * est décomptée de max_tokens. Sans marge, la réponse est coupée avant la fin.
+ */
+const THINKING_HEADROOM = Number(process.env.AI_THINKING_HEADROOM ?? 8000);
 
 export function costUsd(usage: { input_tokens: number; output_tokens: number }) {
   return (usage.input_tokens * PRICE_IN + usage.output_tokens * PRICE_OUT) / 1_000_000;
@@ -31,6 +38,55 @@ async function recordUsage(userId: string, kind: "analyse" | "coach" | "programm
     cost_usd: cost,
   });
   return cost;
+}
+
+/**
+ * Appelle le modèle en lui demandant de répondre via un outil.
+ * Certains modèles refusent tool_choice forcé ("tool"/"any") : on laisse le choix ("auto"),
+ * on insiste dans la consigne, et si le modèle répond quand même en texte, on relance une fois.
+ */
+async function callWithTool(
+  userId: string,
+  kind: "analyse" | "programme",
+  params: { system: string; max_tokens: number; tool: Anthropic.Tool; content: string | Anthropic.ContentBlockParam[] },
+): Promise<{ input: unknown; cost: number }> {
+  const required = ((params.tool.input_schema as { required?: string[] }).required ?? []) as string[];
+  const messages: Anthropic.MessageParam[] = [{ role: "user", content: params.content }];
+  let cost = 0;
+  let maxTokens = params.max_tokens + THINKING_HEADROOM;
+  for (let attempt = 0; attempt < 2; attempt++) {
+    const res = await anthropic().messages.create({
+      model: MODEL,
+      max_tokens: maxTokens,
+      system: `${params.system}\n\nRéponds obligatoirement en appelant l'outil ${params.tool.name}, sans aucun texte avant ni après, et remplis tous ses champs.`,
+      tools: [params.tool],
+      tool_choice: { type: "auto" },
+      messages,
+    });
+    cost += await recordUsage(userId, kind, res.usage);
+    const block = res.content.find((b) => b.type === "tool_use");
+    const input = block && block.type === "tool_use" ? (block.input as Record<string, unknown>) : null;
+    const missing = input ? required.filter((k) => !(k in input)) : required;
+    if (process.env.NODE_ENV !== "production" || missing.length) {
+      console.info(`[ia ${kind}] essai ${attempt + 1} : stop=${res.stop_reason}, blocs=${res.content.map((b) => b.type).join("+")}, manquants=${missing.join(",") || "aucun"}`);
+    }
+    if (input && !missing.length && res.stop_reason !== "max_tokens") return { input, cost };
+    if (attempt === 0) {
+      // Réponse tronquée ou incomplète : on relance avec plus de marge, en demandant l'outil seul.
+      maxTokens = Math.round(maxTokens * 1.6);
+      messages.splice(1);
+      messages[0] = {
+        role: "user",
+        content:
+          typeof params.content === "string"
+            ? `${params.content}\n\nAppelle directement l'outil ${params.tool.name} avec tous ses champs remplis, sans texte.`
+            : [...params.content, { type: "text", text: `Appelle directement l'outil ${params.tool.name} avec tous ses champs remplis, sans texte.` }],
+      };
+    } else if (input) {
+      return { input, cost }; // dernier recours : on garde ce qu'on a, normalisé ensuite
+    }
+  }
+  throw new Error(`Le modèle n'a pas utilisé l'outil ${params.tool.name}`);
 }
 
 /* ───────────────────────── Contexte rider ───────────────────────── */
@@ -99,7 +155,7 @@ export async function coachReply(
 ) {
   const res = await anthropic().messages.create({
     model: MODEL,
-    max_tokens: 1400,
+    max_tokens: 1400 + THINKING_HEADROOM,
     system: `${coachRules(sport)}\n\nProfil du rider :\n${riderContext(profile, sport, history)}`,
     messages,
   });
@@ -118,7 +174,7 @@ function analysisTool(sport: SportId, withEvolution: boolean): Anthropic.Tool {
   const phases = SPORTS[sport].phases;
   return {
     name: "rapport_analyse",
-    description: "Rapport technique d'une tentative de figure de kitesurf.",
+    description: `Rapport technique d'une tentative de figure de ${SPORTS[sport].name.toLowerCase()}.`,
     input_schema: {
       type: "object",
       properties: {
@@ -232,23 +288,17 @@ export async function analyseClip(opts: {
   });
 
   const tool = analysisTool(opts.sport, Boolean(opts.previous?.length));
-  const res = await anthropic().messages.create({
-    model: MODEL,
-    max_tokens: opts.maxTokens,
+  const { input, cost } = await callWithTool(opts.profile.id, "analyse", {
     system: `${coachRules(opts.sport)}\n\nProfil du rider :\n${riderContext(opts.profile, opts.sport, opts.history)}`,
-    tools: [tool],
-    tool_choice: { type: "tool", name: tool.name },
-    messages: [{ role: "user", content }],
+    max_tokens: opts.maxTokens,
+    tool,
+    content,
   });
 
-  const cost = await recordUsage(opts.profile.id, "analyse", res.usage);
-  const block = res.content.find((b) => b.type === "tool_use");
-  if (!block || block.type !== "tool_use") throw new Error("Réponse d'analyse vide");
-
   const codes = errorsFor(opts.sport);
-  const result = block.input as AnalysisResult;
+  const result: AnalysisResult = normalizeResult(input);
   result.sport = opts.sport;
-  result.erreurs = (result.erreurs ?? []).map((e) => ({ ...e, code: e.code in codes ? e.code : "autre" }));
+  result.erreurs = result.erreurs.map((e) => ({ ...e, code: e.code in codes ? e.code : "autre" }));
   if (result.figure_id && trickById(result.figure_id)?.sport !== opts.sport) result.figure_id = null;
   return { result, cost };
 }
@@ -289,25 +339,15 @@ export async function generateProgram(
   history: RiderHistory,
   recent: (PreviousAttempt & { figure?: string })[],
 ) {
-  const res = await anthropic().messages.create({
-    model: MODEL,
-    max_tokens: 2000,
+  const { input } = await callWithTool(profile.id, "programme", {
     system: `${coachRules(sport)}\n\nProfil du rider :\n${riderContext(profile, sport, history)}`,
-    tools: [PROGRAM_TOOL],
-    tool_choice: { type: "tool", name: PROGRAM_TOOL.name },
-    messages: [
-      {
-        role: "user",
-        content: `Construis un programme de 3 à 5 sessions de ${SPORTS[sport].name.toLowerCase()} pour faire progresser ce rider vers son objectif, en s'attaquant d'abord à ses erreurs récurrentes. Chaque session doit être faisable sur l'eau en 1 h 30 à 2 h, avec des exercices progressifs et sûrs pour son niveau.\n\nDernières analyses :\n${
+    max_tokens: 2000,
+    tool: PROGRAM_TOOL,
+    content: `Construis un programme de 3 à 5 sessions de ${SPORTS[sport].name.toLowerCase()} pour faire progresser ce rider vers son objectif, en s'attaquant d'abord à ses erreurs récurrentes. Chaque session doit être faisable sur l'eau en 1 h 30 à 2 h, avec des exercices progressifs et sûrs pour son niveau.\n\nDernières analyses :\n${
           recent.length
             ? recent.map((r) => `- ${r.date} ${r.figure ?? ""} : ${r.note}/10, erreurs ${r.codes.map(errorLabel).join(", ") || "aucune"}`).join("\n")
             : "aucune"
         }`,
-      },
-    ],
   });
-  await recordUsage(profile.id, "programme", res.usage);
-  const block = res.content.find((b) => b.type === "tool_use");
-  if (!block || block.type !== "tool_use") throw new Error("Programme vide");
-  return block.input as Program;
+  return input as Program;
 }

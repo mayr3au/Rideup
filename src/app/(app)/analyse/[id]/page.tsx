@@ -1,3 +1,4 @@
+import { normalizeResult } from "@/lib/analysis-result";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -37,7 +38,7 @@ export default async function AnalysisDetail({
     : { data: null };
 
   const trick = a.trick ? trickById(a.trick) : undefined;
-  const r = a.result;
+  const r = a.result ? normalizeResult(a.result) : null;
   const start = Number(a.seg_start);
   const end = Number(a.seg_end);
 

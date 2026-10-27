@@ -1,3 +1,4 @@
+import { normalizeResult } from "./analysis-result";
 import "server-only";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { errorLabel, tricksFor, type SportId } from "@/lib/sports";
@@ -43,7 +44,9 @@ export async function getProgressData(db: SupabaseClient, userId: string, sport:
     db.from("trick_progress").select("*").eq("user_id", userId).returns<TrickProgress[]>(),
   ]);
 
-  const analyses = (rows ?? []).filter((r) => r.result) as (Row & { result: AnalysisResult })[];
+  const analyses = (rows ?? [])
+    .filter((r) => r.result)
+    .map((r) => ({ ...r, result: normalizeResult(r.result) })) as (Row & { result: AnalysisResult })[];
   const status = new Map((progress ?? []).map((p) => [p.trick_id, p.status]));
 
   // Statistiques par figure
