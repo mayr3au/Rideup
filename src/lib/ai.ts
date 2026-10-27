@@ -190,44 +190,44 @@ function analysisTool(sport: SportId, withEvolution: boolean): Anthropic.Tool {
           enum: ["bonne", "partielle", "faible"],
           description: "Qualité de ce qui est visible (rider trop loin, aile ou kite hors cadre, contre-jour…).",
         },
-        resume: { type: "string", description: "2 à 3 phrases : ce qui se passe et le point décisif." },
+        resume: { type: "string", description: "2 phrases maximum : le diagnostic et le point décisif. Si un élément est hors champ, une seule courte phrase pour le dire." },
         phases: {
           type: "array",
-          description: `Une entrée par phase visible. approche = ${phases.approche}, appel = ${phases.appel}, vol = ${phases.vol}, reception = ${phases.reception}.`,
+          description: `Une entrée par phase réellement visible ; omets une phase que tu ne vois pas. approche = ${phases.approche}, appel = ${phases.appel}, vol = ${phases.vol}, reception = ${phases.reception}.`,
           items: {
             type: "object",
             properties: {
               phase: { type: "string", enum: ["approche", "appel", "vol", "reception"] },
               note: { type: "integer", minimum: 1, maximum: 10 },
-              commentaire: { type: "string" },
+              commentaire: { type: "string", description: "Une phrase, 25 mots maximum, affirmative." },
             },
             required: ["phase", "note", "commentaire"],
           },
         },
-        points_forts: { type: "array", items: { type: "string" }, maxItems: 4 },
+        points_forts: { type: "array", items: { type: "string" }, maxItems: 3, description: "Courts, 12 mots maximum chacun." },
         erreurs: {
           type: "array",
-          maxItems: 5,
-          description: "Erreurs visibles, de la plus importante à la moins importante.",
+          maxItems: 4,
+          description: "Erreurs réellement visibles, de la plus importante à la moins importante. Aucune erreur sur un point que tu ne vois pas.",
           items: {
             type: "object",
             properties: {
               code: { type: "string", enum: codes },
-              probleme: { type: "string", description: "Ce qui est visible, avec le moment (ex. « image 7 »)." },
-              correction: { type: "string", description: "Consigne concrète pour corriger." },
+              probleme: { type: "string", description: "Ce qui ne va pas et pourquoi, en une phrase, situé par la phase (« à l'appel », « en l'air ») : jamais de numéro d'image ni d'horodatage." },
+              correction: { type: "string", description: "Consigne concrète, 1 à 2 phrases, à l'impératif." },
               gravite: { type: "string", enum: ["majeure", "moyenne", "mineure"] },
             },
             required: ["code", "probleme", "correction", "gravite"],
           },
         },
-        drills: { type: "array", items: { type: "string" }, maxItems: 4, description: "Exercices précis pour la prochaine session." },
+        drills: { type: "array", items: { type: "string" }, maxItems: 3, description: "Exercices précis pour la prochaine session, une phrase chacun." },
         priorite_session: { type: "string", description: "LA chose à travailler en priorité à la prochaine session, en une phrase." },
-        securite: { type: ["string", "null"], description: "Alerte sécurité si quelque chose de dangereux est visible, sinon null." },
+        securite: { type: ["string", "null"], description: "Alerte sécurité en une phrase si quelque chose de dangereux est visible, sinon null (pas de rappel générique)." },
         ...(withEvolution
           ? {
               evolution: {
                 type: ["string", "null"],
-                description: "Comparaison avec les tentatives précédentes : ce qui s'améliore, ce qui persiste. null si pas d'historique.",
+                description: "2 phrases maximum : ce qui s'améliore, ce qui persiste. null si pas d'historique.",
               },
             }
           : {}),
@@ -265,11 +265,13 @@ export async function analyseClip(opts: {
     opts.notes ? `Ce qui coince selon lui : « ${opts.notes} ».` : "",
     `Analyse comme un moniteur de ${sport.name.toLowerCase()} : ${sport.checklist}.`,
     `Phases à noter : ${sport.phases.approche}, ${sport.phases.appel}, ${sport.phases.vol}, ${sport.phases.reception}.`,
-    "Ne décris pas la vidéo de façon générique : chaque erreur doit être un point technique précis, rattaché à une image ou à une phase.",
-    "Si un élément n'est pas visible (rider trop loin, matériel hors cadre), ne l'invente pas : baisse « visibilite » et dis-le dans le résumé.",
+    "Les numéros et horodatages des images servent seulement à ta lecture : ne les cite jamais dans le rapport, ni les planches. Situe tout par phase (approche, appel, en l'air, réception).",
+    "Ton : moniteur sûr de son diagnostic. Affirmatif et direct, phrases courtes, à l'impératif pour les consignes. Pas de conditionnel ni de « semble », « peut-être », « probablement », « lecture incertaine ».",
+    "Ce que tu ne vois pas (rider trop loin, planche ou aile hors cadre) : dis-le une seule fois, en une courte phrase dans le résumé, baisse « visibilite », puis n'en parle plus. Ne note pas une phase invisible et ne relève aucune erreur que tu ne vois pas : juge uniquement ce qui est visible.",
+    "Chaque erreur est un point technique précis : pas de description générique de la vidéo.",
     "Si la vidéo ne correspond pas au sport indiqué, dis-le dans le résumé et analyse ce que tu vois.",
     opts.deep
-      ? "Analyse approfondie : sois exhaustif sur chaque phase, explique la cause de chaque erreur (pas seulement le symptôme) et l'enchaînement entre elles."
+      ? "Analyse approfondie : pour chaque erreur, donne la cause (pas seulement le symptôme) et son effet sur la suite de la figure, toujours en une phrase."
       : "",
     opts.previous?.length
       ? `Tentatives précédentes de cette figure :\n${opts.previous
