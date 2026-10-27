@@ -6,8 +6,9 @@ import { getRiderHistory, releaseAnalysis } from "@/lib/usage";
 import { ANALYSIS_DEPTH, FRAMES_PER_SHEET } from "@/lib/plans";
 import { createAdminClient } from "@/lib/supabase/admin";
 import type { AnalysisResult, VideoAnalysis } from "@/lib/types";
+import { normalizeResult } from "@/lib/analysis-result";
 
-export const maxDuration = 120;
+export const maxDuration = 300;
 
 const MAX_SHEET_B64 = 900_000; // ~650 Ko par planche
 
@@ -67,6 +68,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
       .returns<Pick<VideoAnalysis, "id" | "created_at" | "result">[]>();
     previous = (past ?? [])
       .filter((p) => p.result)
+      .map((p) => ({ ...p, result: normalizeResult(p.result) }))
       .map((p) => ({
         date: new Date(p.created_at).toLocaleDateString("fr-FR"),
         note: p.result!.note,
