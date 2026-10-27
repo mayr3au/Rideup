@@ -43,7 +43,7 @@ function Icon({ name, className = "h-6 w-6" }: { name: "video" | "cut" | "check"
 /* ───────────── 1. Hero : fond blanc, gros titre, l'appli dans un téléphone ───────────── */
 function Hero() {
   return (
-    <section className="relative overflow-hidden bg-white">
+    <section className="relative -mt-[8.25rem] overflow-hidden bg-white pt-[8.25rem]">
       {/* halos qui respirent */}
       <div aria-hidden="true" className="breathe pointer-events-none absolute -right-48 -top-48 h-[640px] w-[640px] rounded-full bg-brand-light blur-3xl" />
       <div aria-hidden="true" className="breathe pointer-events-none absolute -bottom-56 -left-40 h-[480px] w-[480px] rounded-full bg-brand-light/60 blur-3xl [animation-delay:-7s]" />
