@@ -109,25 +109,26 @@ export function AnalyseUploader({
         throw new Error("Ta formule vient de changer : recharge la page puis relance l'analyse.");
       }
 
-      const upload = created.needsUpload
-        ? createClient()
-            .storage.from("clips")
-            .upload(created.videoPath, file, { contentType: file.type, upsert: false })
-            .catch((e: unknown) => ({ error: e }))
-        : Promise.resolve({ error: null });
+      // Le clip complet (souvent 30 à 100 Mo depuis un téléphone) ne sert qu'à le revoir à côté du rapport :
+      // il part en parallèle et n'empêche pas d'afficher le résultat dès que l'IA a répondu.
+      if (created.needsUpload) {
+        const id = created.id as string;
+        void createClient()
+          .storage.from("clips")
+          .upload(created.videoPath, file, { contentType: file.type, upsert: false })
+          .catch((e: unknown) => ({ error: e }))
+          .then((up) => {
+            if (up.error) fetch(`/api/analyses/${id}`, { method: "POST", body: JSON.stringify({ action: "video-missing" }) });
+          });
+      }
 
-      const run = fetch(`/api/analyses/${created.id}/run`, {
+      const runRes = await fetch(`/api/analyses/${created.id}/run`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ sheets, frameTimes: times }),
       });
-
-      const [up, runRes] = await Promise.all([upload, run]);
       const done = await runRes.json();
       analysisId = null; // le serveur a pris en charge l'analyse (réussie ou marquée en échec)
-      if (up.error) {
-        await fetch(`/api/analyses/${created.id}`, { method: "POST", body: JSON.stringify({ action: "video-missing" }) });
-      }
       if (!runRes.ok) throw new Error(done.error);
 
       router.push(`/analyse/${created.id}`);
