@@ -16,6 +16,7 @@ const body = z
     clipHash: z.string().regex(/^[a-f0-9]{64}$/),
     segStart: z.number().min(0),
     segEnd: z.number().positive(),
+    crop: z.array(z.number().min(0).max(1)).length(3).nullish(), // x, y, largeur (fractions) si l'image est zoomée
   })
   .refine((b) => b.trick === "" || trickById(b.trick)?.sport === b.sport, { message: "Cette figure ne correspond pas au sport choisi." })
   .refine((b) => b.segEnd > b.segStart && b.segEnd - b.segStart <= MAX_SEGMENT_SECONDS + 0.2, {
@@ -44,7 +45,7 @@ export async function POST(request: NextRequest) {
   const depth = ANALYSIS_DEPTH[plan];
 
   const cacheKey = createHash("sha256")
-    .update([b.clipHash, b.segStart.toFixed(1), b.segEnd.toFixed(1), b.sport, b.trick || "-", depth.depth].join("|"))
+    .update([b.clipHash, b.segStart.toFixed(1), b.segEnd.toFixed(1), b.sport, b.trick || "-", depth.depth, b.crop?.join(",") ?? "full"].join("|"))
     .digest("hex");
 
   // 1. Résultat déjà disponible ?

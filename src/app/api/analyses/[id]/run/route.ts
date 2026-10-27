@@ -15,6 +15,7 @@ const MAX_SHEET_B64 = 900_000; // ~650 Ko par planche
 const body = z.object({
   sheets: z.array(z.string().max(MAX_SHEET_B64)).min(1).max(4),
   frameTimes: z.array(z.number()).max(48),
+  trace: z.string().max(MAX_SHEET_B64).nullish(), // chronophotographie (toutes les positions superposées)
 });
 
 /** Étape 2 : reçoit les planches d'images du passage choisi et lance l'analyse IA. */
@@ -86,6 +87,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
       history,
       sheets: parsed.data.sheets.map((s) => s.replace(/^data:image\/jpeg;base64,/, "")),
       frameTimes: parsed.data.frameTimes,
+      trace: parsed.data.trace?.replace(/^data:image\/jpeg;base64,/, "") ?? null,
       trickId: analysis.trick,
       notes: analysis.notes,
       deep: depth.depth === "approfondie",

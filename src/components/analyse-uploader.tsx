@@ -7,6 +7,7 @@ import { createClient } from "@/lib/supabase/client";
 import { buildContactSheets, clipFingerprint, loadVideo } from "@/lib/frames";
 import { LEVEL_LABELS, LEVEL_ORDER, SPORTS, trickById, tricksFor, type SportId } from "@/lib/sports";
 import { ClipTrimmer } from "./clip-trimmer";
+import { CropPicker, FULL_FRAME, type Crop } from "./crop-picker";
 
 const MAX_SIZE = 200 * 1024 * 1024;
 
@@ -33,6 +34,7 @@ export function AnalyseUploader({
   const [file, setFile] = useState<File | null>(null);
   const [src, setSrc] = useState<string | null>(null);
   const [seg, setSeg] = useState({ start: 0, end: 0 });
+  const [crop, setCrop] = useState<Crop>(FULL_FRAME);
   const [step, setStep] = useState<Step>("idle");
   const [progress, setProgress] = useState(0);
   const [error, setError] = useState<{ text: string; upgrade?: boolean } | null>(null);
@@ -54,6 +56,7 @@ export function AnalyseUploader({
       return;
     }
     setFile(f);
+    setCrop(FULL_FRAME);
     setSrc(URL.createObjectURL(f));
   }
 
@@ -74,8 +77,13 @@ export function AnalyseUploader({
       setStep("images");
       setProgress(0);
       const video = await loadVideo(src);
-      const { sheets, times } = await buildContactSheets(video, seg.start, seg.end, sheetCount, (d, t) =>
-        setProgress(Math.round((d / t) * 100)),
+      const { sheets, times, trace } = await buildContactSheets(
+        video,
+        seg.start,
+        seg.end,
+        sheetCount,
+        (d, t) => setProgress(Math.round((d / t) * 100)),
+        crop,
       );
 
       setStep("analyse");
@@ -90,6 +98,7 @@ export function AnalyseUploader({
           clipHash,
           segStart: seg.start,
           segEnd: seg.end,
+          crop: crop.w < 1 ? [crop.x, crop.y, crop.w].map((v) => Math.round(v * 100) / 100) : null,
         }),
       });
       const created = await res.json();
@@ -125,7 +134,7 @@ export function AnalyseUploader({
       const runRes = await fetch(`/api/analyses/${created.id}/run`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ sheets, frameTimes: times }),
+        body: JSON.stringify({ sheets, frameTimes: times, trace }),
       });
       const done = await runRes.json();
       analysisId = null; // le serveur a pris en charge l'analyse (réussie ou marquée en échec)
@@ -226,8 +235,21 @@ export function AnalyseUploader({
         )}
       </section>
 
+      {seg.end > seg.start && (
+        <section>
+          <h2 className="text-xl font-bold">2. Zoome sur ta figure</h2>
+          <p className="mt-1 text-[0.95rem] text-slate">
+            Tu es loin ? Zoome sur la zone où se passe ta figure, en gardant ton kite ou ton aile dans le cadre.
+            L&apos;analyse verra jusqu&apos;à 4× plus de détails.
+          </p>
+          <div className="mt-3">
+            <CropPicker src={src} start={seg.start} end={seg.end} value={crop} onChange={setCrop} disabled={busy} />
+          </div>
+        </section>
+      )}
+
       <section className="space-y-4">
-        <h2 className="text-xl font-bold">2. Dis ce que tu tentes</h2>
+        <h2 className="text-xl font-bold">3. Dis ce que tu tentes</h2>
         {sports.length > 1 && (
           <fieldset>
             <legend className="label">Sport</legend>

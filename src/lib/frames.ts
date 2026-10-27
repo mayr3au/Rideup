@@ -148,6 +148,59 @@ async function captureByPlayback(
   return done;
 }
 
+/**
+ * Chronophotographie : toutes les positions superposées sur une seule image.
+ * Le décor (médiane des images) reste fixe ; tout ce qui bouge (kite, aile, rider, gerbes) est peint
+ * par-dessus dans l'ordre du temps. Une boucle de kite devient un cercle, un saut devient une parabole.
+ * Utile surtout quand le rider est loin. Renvoie null si la caméra bouge trop (image brouillée).
+ */
+function buildTrace(cells: HTMLCanvasElement[], w: number, h: number): string | null {
+  const frames = cells.map((c) => c.getContext("2d")!.getImageData(0, 0, w, h).data);
+  const n = frames.length;
+  const size = w * h;
+  const sample = frames.filter((_, i) => i % 2 === 0);
+  const bg = new Uint8ClampedArray(size * 4);
+  const buf = new Uint8Array(sample.length);
+  for (let p = 0; p < size; p++) {
+    for (let ch = 0; ch < 3; ch++) {
+      for (let k = 0; k < sample.length; k++) buf[k] = sample[k][p * 4 + ch];
+      buf.sort();
+      bg[p * 4 + ch] = buf[buf.length >> 1];
+    }
+    bg[p * 4 + 3] = 255;
+  }
+  const out = new Uint8ClampedArray(bg);
+  let moving = 0;
+  for (let i = 0; i < n; i++) {
+    const f = frames[i];
+    for (let p = 0; p < size; p++) {
+      const o = p * 4;
+      const d = Math.abs(f[o] - bg[o]) + Math.abs(f[o + 1] - bg[o + 1]) + Math.abs(f[o + 2] - bg[o + 2]);
+      if (d > 70) {
+        out[o] = f[o];
+        out[o + 1] = f[o + 1];
+        out[o + 2] = f[o + 2];
+        moving++;
+      }
+    }
+  }
+  // Caméra qui bouge : presque tout « bouge », la synthèse n'apporte rien.
+  if (moving / (size * n) > 0.12) return null;
+  const c = document.createElement("canvas");
+  c.width = w;
+  c.height = h;
+  const ctx = c.getContext("2d")!;
+  ctx.putImageData(new ImageData(out, w, h), 0, 0);
+  // Agrandie ×2 pour que le modèle distingue bien les trajectoires
+  const big = document.createElement("canvas");
+  big.width = w * 2;
+  big.height = h * 2;
+  const bctx = big.getContext("2d")!;
+  bctx.imageSmoothingQuality = "high";
+  bctx.drawImage(c, 0, 0, w * 2, h * 2);
+  return big.toDataURL("image/jpeg", 0.85);
+}
+
 /** Construit `sheets` planches de 4 × 3 images numérotées couvrant [start, end]. */
 export async function buildContactSheets(
   video: HTMLVideoElement,
@@ -155,6 +208,7 @@ export async function buildContactSheets(
   end: number,
   sheets: number,
   onProgress?: (done: number, total: number) => void,
+  crop: { x: number; y: number; w: number; h: number } = { x: 0, y: 0, w: 1, h: 1 },
 ) {
   const total = sheets * FRAMES_PER_SHEET;
   const times = frameTimesFor(start, end, total);
@@ -173,7 +227,17 @@ export async function buildContactSheets(
     c.height = cellH;
     return c;
   });
-  const drawCell = (idx: number) => cells[idx].getContext("2d")?.drawImage(video, 0, 0, cellW, cellH);
+  // Zone recadrée prise à la résolution d'origine : zoomer donne réellement plus de détails au rider lointain.
+  const sx = crop.x * video.videoWidth;
+  const sy = crop.y * video.videoHeight;
+  const sw = crop.w * video.videoWidth;
+  const sh = crop.h * video.videoHeight;
+  const drawCell = (idx: number) => {
+    const ctx = cells[idx].getContext("2d");
+    if (!ctx) return;
+    ctx.imageSmoothingQuality = "high";
+    ctx.drawImage(video, sx, sy, sw, sh, 0, 0, cellW, cellH);
+  };
   let captured = 0;
   const tick = () => onProgress?.(++captured, total);
 
@@ -214,5 +278,11 @@ export async function buildContactSheets(
     }
     out.push(canvas.toDataURL("image/jpeg", 0.8));
   }
-  return { sheets: out, times };
+  let trace: string | null = null;
+  try {
+    trace = buildTrace(cells, cellW, cellH);
+  } catch {
+    trace = null;
+  }
+  return { sheets: out, times, trace };
 }
