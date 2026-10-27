@@ -103,8 +103,8 @@ export default async function AdminOverview() {
           </tbody>
         </table>
         <p className="mt-3 text-sm text-slate">
-          Coûts calculés à partir des tokens réellement facturés par Anthropic (tarifs réglables par AI_PRICE_INPUT_PER_MTOK et
-          AI_PRICE_OUTPUT_PER_MTOK).
+          Coûts calculés à partir des tokens réellement facturés par Anthropic, au tarif de chaque modèle (cache compris).
+          Modèles : AI_MODEL_ANALYSE, AI_MODEL_COACH, AI_MODEL_PROGRAMME.
         </p>
       </section>
     </div>

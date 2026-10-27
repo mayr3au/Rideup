@@ -12,32 +12,96 @@ function anthropic() {
   return client;
 }
 
-export const MODEL = process.env.ANTHROPIC_MODEL || "claude-sonnet-5-5";
-// Tarifs en $ par million de tokens (Claude Sonnet 5.5 : 2 $ en entrée, 10 $ en sortie).
-const PRICE_IN = Number(process.env.AI_PRICE_INPUT_PER_MTOK ?? 2);
-const PRICE_OUT = Number(process.env.AI_PRICE_OUTPUT_PER_MTOK ?? 10);
+/* ───────────────────────── Modèles, effort et coûts ───────────────────────── */
+
+type Task = "analyse" | "coach" | "programme";
+type Effort = "low" | "medium" | "high";
+type TaskConfig = { model: string; effort: Effort; thinking: Anthropic.ThinkingConfigParam | null; headroom: number };
 
 /**
- * Les modèles récents réfléchissent avant de répondre (blocs « thinking »), et cette réflexion
- * est décomptée de max_tokens. Sans marge, la réponse est coupée avant la fin.
+ * Un modèle par tâche, au plus juste :
+ * - analyse vidéo : Sonnet 5.5 (vision fine), effort moyen : il réfléchit sur les images sans s'étendre ;
+ * - coach : Haiku 5.5, 20× moins cher, sans réflexion préalable : réponses courtes et rapides ;
+ * - programme Elite : Sonnet 5.5, effort moyen.
+ * Chaque réglage reste modifiable par variable d'environnement sans toucher au code.
+ * La réflexion est décomptée de max_tokens : `headroom` est la marge réservée en plus de la réponse.
  */
-const THINKING_HEADROOM = Number(process.env.AI_THINKING_HEADROOM ?? 8000);
+const TASKS: Record<Task, TaskConfig> = {
+  analyse: {
+    model: process.env.AI_MODEL_ANALYSE || "claude-sonnet-5-5",
+    effort: (process.env.AI_EFFORT_ANALYSE as Effort) || "medium",
+    thinking: null, // réflexion adaptative : utile pour relier les images entre elles
+    headroom: Number(process.env.AI_HEADROOM_ANALYSE ?? 4000),
+  },
+  coach: {
+    model: process.env.AI_MODEL_COACH || "claude-haiku-5-5",
+    effort: (process.env.AI_EFFORT_COACH as Effort) || "medium",
+    thinking: { type: "disabled" },
+    headroom: 0,
+  },
+  programme: {
+    model: process.env.AI_MODEL_PROGRAMME || "claude-sonnet-5-5",
+    effort: (process.env.AI_EFFORT_PROGRAMME as Effort) || "medium",
+    thinking: null,
+    headroom: Number(process.env.AI_HEADROOM_PROGRAMME ?? 3000),
+  },
+};
 
-export function costUsd(usage: { input_tokens: number; output_tokens: number }) {
-  return (usage.input_tokens * PRICE_IN + usage.output_tokens * PRICE_OUT) / 1_000_000;
+/** Modèle utilisé pour l'analyse vidéo (enregistré avec chaque analyse). */
+export const MODEL = TASKS.analyse.model;
+
+/** Tarifs Anthropic en $ par million de tokens : entrée, sortie, écriture cache (5 min), lecture cache. */
+const PRICES: Record<string, { in: number; out: number; cacheWrite: number; cacheRead: number }> = {
+  "claude-haiku-5-5": { in: 0.1, out: 0.5, cacheWrite: 0.125, cacheRead: 0.01 },
+  "claude-sonnet-5-5": { in: 2, out: 10, cacheWrite: 2.5, cacheRead: 0.1 },
+  "claude-opus-5-5": { in: 4, out: 20, cacheWrite: 5, cacheRead: 0.2 },
+  "claude-fable-5-1": { in: 10, out: 50, cacheWrite: 12.5, cacheRead: 0.25 },
+};
+
+function priceFor(model: string) {
+  const key = Object.keys(PRICES).find((k) => model.startsWith(k));
+  return key ? PRICES[key] : PRICES["claude-sonnet-5-5"];
 }
 
-async function recordUsage(userId: string, kind: "analyse" | "coach" | "programme", usage: Anthropic.Usage) {
-  const cost = costUsd(usage);
+export function costUsd(
+  usage: Pick<Anthropic.Usage, "input_tokens" | "output_tokens"> & Partial<Pick<Anthropic.Usage, "cache_creation_input_tokens" | "cache_read_input_tokens">>,
+  model: string = MODEL,
+) {
+  const p = priceFor(model);
+  return (
+    (usage.input_tokens * p.in +
+      usage.output_tokens * p.out +
+      (usage.cache_creation_input_tokens ?? 0) * p.cacheWrite +
+      (usage.cache_read_input_tokens ?? 0) * p.cacheRead) /
+    1_000_000
+  );
+}
+
+async function recordUsage(userId: string, kind: Task, model: string, usage: Anthropic.Usage) {
+  const cost = costUsd(usage, model);
   await createAdminClient().from("ai_usage").insert({
     user_id: userId,
     kind,
-    model: MODEL,
-    input_tokens: usage.input_tokens,
+    model,
+    input_tokens: usage.input_tokens + (usage.cache_creation_input_tokens ?? 0) + (usage.cache_read_input_tokens ?? 0),
     output_tokens: usage.output_tokens,
     cost_usd: cost,
   });
   return cost;
+}
+
+/** Paramètres communs d'un appel : modèle, effort, réflexion, et prompt système mis en cache. */
+function callParams(task: Task, system: string, maxTokens: number) {
+  const cfg = TASKS[task];
+  return {
+    model: cfg.model,
+    max_tokens: maxTokens + cfg.headroom,
+    // Le prompt système (règles + profil du rider) est identique d'un appel à l'autre : mis en cache,
+    // il coûte 10 à 20 fois moins cher à la relecture (messages du coach qui s'enchaînent, analyses successives).
+    system: [{ type: "text" as const, text: system, cache_control: { type: "ephemeral" as const } }],
+    output_config: { effort: cfg.effort },
+    ...(cfg.thinking ? { thinking: cfg.thinking } : {}),
+  };
 }
 
 /**
@@ -53,22 +117,31 @@ async function callWithTool(
   const required = ((params.tool.input_schema as { required?: string[] }).required ?? []) as string[];
   const messages: Anthropic.MessageParam[] = [{ role: "user", content: params.content }];
   let cost = 0;
-  let maxTokens = params.max_tokens + THINKING_HEADROOM;
+  let maxTokens = params.max_tokens;
+  // Définition de l'outil (longue, identique pour tous les riders d'un même sport) mise en cache elle aussi.
+  const tool: Anthropic.Tool = { ...params.tool, cache_control: { type: "ephemeral" } };
   for (let attempt = 0; attempt < 2; attempt++) {
+    const base = callParams(
+      kind,
+      `${params.system}\n\nRéponds obligatoirement en appelant l'outil ${params.tool.name}, sans aucun texte avant ni après, et remplis tous ses champs.`,
+      maxTokens,
+    );
     const res = await anthropic().messages.create({
-      model: MODEL,
-      max_tokens: maxTokens,
-      system: `${params.system}\n\nRéponds obligatoirement en appelant l'outil ${params.tool.name}, sans aucun texte avant ni après, et remplis tous ses champs.`,
-      tools: [params.tool],
+      ...base,
+      tools: [tool],
       tool_choice: { type: "auto" },
       messages,
     });
-    cost += await recordUsage(userId, kind, res.usage);
+    cost += await recordUsage(userId, kind, base.model, res.usage);
     const block = res.content.find((b) => b.type === "tool_use");
     const input = block && block.type === "tool_use" ? (block.input as Record<string, unknown>) : null;
     const missing = input ? required.filter((k) => !(k in input)) : required;
     if (process.env.NODE_ENV !== "production" || missing.length) {
-      console.info(`[ia ${kind}] essai ${attempt + 1} : stop=${res.stop_reason}, blocs=${res.content.map((b) => b.type).join("+")}, manquants=${missing.join(",") || "aucun"}`);
+      console.info(
+        `[ia ${kind}] essai ${attempt + 1} : ${base.model}, stop=${res.stop_reason}, blocs=${res.content.map((b) => b.type).join("+")}, ` +
+          `entrée=${res.usage.input_tokens}+cache ${res.usage.cache_read_input_tokens ?? 0}/${res.usage.cache_creation_input_tokens ?? 0}, sortie=${res.usage.output_tokens}, ` +
+          `coût=${costUsd(res.usage, base.model).toFixed(4)} $, manquants=${missing.join(",") || "aucun"}`,
+      );
     }
     if (input && !missing.length && res.stop_reason !== "max_tokens") return { input, cost };
     if (attempt === 0) {
@@ -153,13 +226,21 @@ export async function coachReply(
   history: RiderHistory,
   messages: { role: "user" | "assistant"; content: string }[],
 ) {
-  const res = await anthropic().messages.create({
-    model: MODEL,
-    max_tokens: 1400 + THINKING_HEADROOM,
-    system: `${coachRules(sport)}\n\nProfil du rider :\n${riderContext(profile, sport, history)}`,
-    messages,
-  });
-  await recordUsage(profile.id, "coach", res.usage);
+  // Le début de la conversation est mis en cache : chaque nouveau message ne paie plein tarif que la fin.
+  const convo: Anthropic.MessageParam[] = messages.map((m, i) =>
+    i === messages.length - 2
+      ? { role: m.role, content: [{ type: "text", text: m.content, cache_control: { type: "ephemeral" } }] }
+      : { role: m.role, content: m.content },
+  );
+  const base = callParams("coach", `${coachRules(sport)}\n\nProfil du rider :\n${riderContext(profile, sport, history)}`, 1400);
+  const res = await anthropic().messages.create({ ...base, messages: convo });
+  await recordUsage(profile.id, "coach", base.model, res.usage);
+  if (process.env.NODE_ENV !== "production") {
+    console.info(
+      `[ia coach] ${base.model}, entrée=${res.usage.input_tokens}+cache ${res.usage.cache_read_input_tokens ?? 0}/${res.usage.cache_creation_input_tokens ?? 0}, ` +
+        `sortie=${res.usage.output_tokens}, coût=${costUsd(res.usage, base.model).toFixed(5)} $`,
+    );
+  }
   return res.content
     .filter((b) => b.type === "text")
     .map((b) => b.text)
