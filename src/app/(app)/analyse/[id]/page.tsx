@@ -94,6 +94,13 @@ export default async function AnalysisDetail({
         <div className="md:sticky md:top-6 md:self-start">
           {signed?.signedUrl ? (
             <video src={`${signed.signedUrl}#t=${start},${end}`} controls playsInline className="w-full rounded-lg bg-brand" />
+          ) : a.video_path && Date.now() - new Date(a.created_at).getTime() < 15 * 60_000 ? (
+            // Le clip part en arrière-plan après l'analyse : on rafraîchit jusqu'à ce qu'il soit arrivé.
+            <div className="rounded-lg bg-raised p-6 text-slate">
+              <span className="font-semibold text-deep">Ta vidéo est en cours d&apos;envoi.</span> Elle apparaîtra ici dans un instant, garde
+              cette page ouverte.
+              <AutoRefresh seconds={8} />
+            </div>
           ) : (
             <div className="rounded-lg bg-raised p-6 text-slate">Vidéo indisponible.</div>
           )}

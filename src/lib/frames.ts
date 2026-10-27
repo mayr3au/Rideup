@@ -83,6 +83,71 @@ export function frameTimesFor(start: number, end: number, count: number) {
   return Array.from({ length: count }, (_, i) => Math.round((start + step * (i + 0.5)) * 100) / 100);
 }
 
+type FrameCallbackVideo = HTMLVideoElement & {
+  requestVideoFrameCallback?: (cb: (now: number, meta: { mediaTime: number }) => void) => number;
+  cancelVideoFrameCallback?: (handle: number) => void;
+};
+
+/**
+ * Capture rapide : on lit le passage en accéléré et on attrape chaque image au vol.
+ * Sur une vidéo de téléphone (HEVC, 4K, 60 i/s), 48 sauts peuvent prendre 30 s ou plus ;
+ * une lecture accélérée du même passage prend quelques secondes.
+ * Renvoie les index capturés ; ceux qui manquent sont récupérés ensuite par des sauts classiques.
+ */
+async function captureByPlayback(
+  video: FrameCallbackVideo,
+  times: number[],
+  draw: (idx: number) => void,
+  onProgress?: () => void,
+): Promise<Set<number>> {
+  const done = new Set<number>();
+  if (!video.requestVideoFrameCallback || times.length === 0) return done;
+  const end = times[times.length - 1];
+  const span = end - times[0];
+
+  try {
+    await seek(video, Math.max(0, times[0] - 0.05));
+    video.muted = true;
+    video.playbackRate = span > 8 ? 4 : span > 3 ? 3 : 2;
+  } catch {
+    return done;
+  }
+
+  await new Promise<void>((resolve) => {
+    let next = 0;
+    let handle = 0;
+    const timeout = setTimeout(finish, Math.max(8000, (span / video.playbackRate) * 1000 * 3));
+    function finish() {
+      clearTimeout(timeout);
+      if (handle && video.cancelVideoFrameCallback) video.cancelVideoFrameCallback(handle);
+      video.pause();
+      video.onended = null;
+      resolve();
+    }
+    const onFrame = (_now: number, meta: { mediaTime: number }) => {
+      // On dessine l'image affichée pour toutes les cibles qu'elle a atteintes (à une image près).
+      while (next < times.length && meta.mediaTime >= times[next] - 0.02) {
+        draw(next);
+        done.add(next);
+        next++;
+        onProgress?.();
+      }
+      if (next >= times.length || meta.mediaTime > end + 0.3) return finish();
+      handle = video.requestVideoFrameCallback!(onFrame);
+    };
+    video.onended = finish;
+    handle = video.requestVideoFrameCallback!(onFrame);
+    video.play().catch(finish);
+    // Navigateur qui refuse la lecture hors page : on passe tout de suite aux sauts classiques.
+    setTimeout(() => {
+      if (next === 0) finish();
+    }, 1500);
+  });
+
+  video.playbackRate = 1;
+  return done;
+}
+
 /** Construit `sheets` planches de 4 × 3 images numérotées couvrant [start, end]. */
 export async function buildContactSheets(
   video: HTMLVideoElement,
@@ -101,6 +166,26 @@ export async function buildContactSheets(
   const cols = 4;
   const rows = FRAMES_PER_SHEET / cols;
 
+  // 1. Capture de chaque image dans une petite vignette (lecture accélérée, puis sauts pour les manquantes)
+  const cells = times.map(() => {
+    const c = document.createElement("canvas");
+    c.width = cellW;
+    c.height = cellH;
+    return c;
+  });
+  const drawCell = (idx: number) => cells[idx].getContext("2d")?.drawImage(video, 0, 0, cellW, cellH);
+  let captured = 0;
+  const tick = () => onProgress?.(++captured, total);
+
+  const fast = await captureByPlayback(video as FrameCallbackVideo, times, drawCell, tick);
+  for (let idx = 0; idx < total; idx++) {
+    if (fast.has(idx)) continue;
+    await seek(video, times[idx]);
+    drawCell(idx);
+    tick();
+  }
+
+  // 2. Assemblage des planches numérotées
   const canvas = document.createElement("canvas");
   canvas.width = cellW * cols;
   canvas.height = cellH * rows;
@@ -113,10 +198,9 @@ export async function buildContactSheets(
     ctx.fillRect(0, 0, canvas.width, canvas.height);
     for (let i = 0; i < FRAMES_PER_SHEET; i++) {
       const idx = s * FRAMES_PER_SHEET + i;
-      await seek(video, times[idx]);
       const x = (i % cols) * cellW;
       const y = Math.floor(i / cols) * cellH;
-      ctx.drawImage(video, x, y, cellW, cellH);
+      ctx.drawImage(cells[idx], x, y);
       // Numéro de l'image et horodatage, pour que l'IA puisse citer un moment précis
       const label = `${idx + 1} · ${times[idx].toFixed(1)}s`;
       ctx.font = "bold 15px system-ui, sans-serif";
@@ -127,7 +211,6 @@ export async function buildContactSheets(
       ctx.fillText(label, x + 9, y + 20);
       ctx.strokeStyle = "#000";
       ctx.strokeRect(x, y, cellW, cellH);
-      onProgress?.(idx + 1, total);
     }
     out.push(canvas.toDataURL("image/jpeg", 0.8));
   }
