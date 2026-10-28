@@ -387,6 +387,88 @@ export async function analyseClip(opts: {
   return { result, cost };
 }
 
+/* ───────────────────────── Analyse photo ───────────────────────── */
+
+export const MOMENTS = ["navigation", "approche", "appel", "en l'air", "réception", "autre"] as const;
+
+function photoTool(sport: SportId): Anthropic.Tool {
+  return {
+    name: "rapport_photo",
+    description: `Retour de moniteur de ${SPORTS[sport].name.toLowerCase()} sur la position du rider, à partir d'une photo.`,
+    input_schema: {
+      type: "object",
+      properties: {
+        vu: { type: "string", description: "Ce que tu vois sur la photo, en une ou deux phrases factuelles. À remplir en premier." },
+        figure: { type: "string", description: "Ce que fait le rider, en quelques mots (ex. « Navigation », « Premier saut, en l'air »)." },
+        figure_id: {
+          type: ["string", "null"],
+          enum: [...tricksFor(sport).map((t) => t.id), null],
+          description: `Figure de la liste qui correspond (${tricksFor(sport).map((t) => `${t.id} = ${t.name}`).join(", ")}), ou null.`,
+        },
+        moment: { type: "string", enum: [...MOMENTS], description: "Moment de la figure visible sur la photo." },
+        note: { type: "integer", minimum: 1, maximum: 10, description: "Note de la position sur cette photo." },
+        visibilite: { type: "string", enum: ["bonne", "partielle", "faible"], description: "Le rider est-il assez grand et net pour juger sa position ?" },
+        resume: { type: "string", description: "2 phrases maximum : le diagnostic principal sur la position." },
+        points_forts: { type: "array", items: { type: "string" }, maxItems: 3, description: "Ce qui est bien placé, 12 mots maximum chacun." },
+        erreurs: {
+          type: "array",
+          maxItems: 3,
+          description: "Défauts de position visibles sur la photo, du plus important au moins important.",
+          items: {
+            type: "object",
+            properties: {
+              code: { type: "string", enum: Object.keys(errorsFor(sport)) },
+              probleme: { type: "string", description: "Ce qui ne va pas et pourquoi, en une phrase." },
+              correction: { type: "string", description: "Consigne concrète, 1 à 2 phrases, à l'impératif." },
+              gravite: { type: "string", enum: ["majeure", "moyenne", "mineure"] },
+            },
+            required: ["code", "probleme", "correction", "gravite"],
+          },
+        },
+        drills: { type: "array", items: { type: "string" }, maxItems: 3, description: "Exercices pour corriger, une phrase chacun." },
+        priorite_session: { type: "string", description: "LA chose à corriger à la prochaine session, en une phrase." },
+        securite: { type: ["string", "null"], description: "Alerte sécurité en une phrase si un danger est visible, sinon null." },
+      },
+      required: ["vu", "figure", "figure_id", "moment", "note", "visibilite", "resume", "points_forts", "erreurs", "drills", "priorite_session", "securite"],
+    },
+  };
+}
+
+/** Analyse simple : une photo (ou une image de vidéo) + ce que le rider fait → retour sur sa position. */
+export async function analysePhoto(opts: {
+  userId: string;
+  sport: SportId;
+  image: string; // JPEG base64
+  intention: string;
+}): Promise<{ result: AnalysisResult; cost: number }> {
+  const sport = SPORTS[opts.sport];
+  const text = [
+    `Photo de ${sport.name.toLowerCase()}. Ce que le rider fait, avec ses mots : « ${opts.intention} ».`,
+    "Regarde la photo et juge sa position : posture (jambes, buste, bras, tête), placement sur la planche, angle de la planche, position du kite ou de l'aile, et ce que tout ça donne pour ce qu'il veut faire.",
+    `Repères : ${sport.checklist}.`,
+    "Ne juge que ce qui est visible. Si le rider est trop petit ou flou pour voir un détail, n'en parle pas. Ton direct et affirmatif, phrases courtes, consignes à l'impératif. Ne tiens pas compte de son niveau : juge la position telle qu'elle est.",
+  ].join("\n\n");
+
+  const { input, cost } = await callWithTool(opts.userId, "analyse", {
+    system: `Tu es moniteur de ${sport.name.toLowerCase()}. Tu réponds en français, en tutoyant, uniquement avec l'outil rapport_photo.`,
+    max_tokens: 1500,
+    tool: photoTool(opts.sport),
+    content: [
+      { type: "text", text },
+      { type: "image", source: { type: "base64", media_type: "image/jpeg", data: opts.image } },
+    ],
+  });
+
+  const raw = input as Record<string, unknown>;
+  const codes = errorsFor(opts.sport);
+  const result: AnalysisResult = normalizeResult({ ...raw, phases: [], observations: raw.vu ? [raw.vu] : [] });
+  result.sport = opts.sport;
+  result.moment = typeof raw.moment === "string" ? raw.moment : null;
+  result.erreurs = result.erreurs.map((e) => ({ ...e, code: e.code in codes ? e.code : "autre" }));
+  if (result.figure_id && trickById(result.figure_id)?.sport !== opts.sport) result.figure_id = null;
+  return { result, cost };
+}
+
 /* ───────────────────────── Programme personnalisé (Elite) ───────────────────────── */
 
 const PROGRAM_TOOL: Anthropic.Tool = {

@@ -77,7 +77,7 @@ export default async function Dashboard({ searchParams }: { searchParams: Promis
           <ol className="mt-4 space-y-3">
             {[
               { done: true, title: "Ton profil rider est créé", text: `${S.name}${levelFor(profile, sport) ? `, niveau ${LEVEL_LABELS[levelFor(profile, sport)!].toLowerCase()}` : ""}.`, href: "/profil", cta: "Modifier" },
-              { done: false, title: plan === "free" ? "Analyse ta première figure, c'est offert" : "Analyse ta première figure", text: "Une vidéo filmée de côté, 10 secondes de ta figure, et tu sais quoi corriger.", href: "/analyse", cta: "Analyser" },
+              { done: false, title: plan === "free" ? "Analyse ta première figure, c'est offert" : "Analyse ta première figure", text: "Une photo de toi pendant ta figure, et tu sais quoi corriger dans ta position.", href: "/analyse", cta: "Analyser" },
               { done: false, title: "Pose une question au coach", text: "Sur ton matériel, une figure, ta prochaine session.", href: "/coach?vue=chat", cta: "Demander" },
             ].map((s, i) => (
               <li key={i} className="flex items-start gap-3">
