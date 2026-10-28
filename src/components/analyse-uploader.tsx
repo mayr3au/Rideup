@@ -273,9 +273,9 @@ export function AnalyseUploader({
           </fieldset>
         )}
         <div>
-          <label htmlFor="trick" className="label">Figure</label>
+          <label htmlFor="trick" className="label">Figure de ta roadmap (facultatif)</label>
           <select id="trick" name="trick" value={trick} onChange={(e) => setTrick(e.target.value)} className="field" disabled={busy}>
-            <option value="">Je ne sais pas, identifie-la</option>
+            <option value="">Pas dans la liste</option>
             {LEVEL_ORDER.map((l) => {
               const list = tricksFor(sport).filter((t) => t.level === l);
               return list.length ? (
@@ -289,8 +289,19 @@ export function AnalyseUploader({
           </select>
         </div>
         <div>
-          <label htmlFor="notes" className="label">Ce qui coince (facultatif)</label>
-          <textarea id="notes" name="notes" rows={2} maxLength={500} disabled={busy} placeholder="Ex. je ne finis pas la rotation" className="field" />
+          <label htmlFor="notes" className="label">Ce que tu as voulu faire</label>
+          <textarea
+            id="notes"
+            name="notes"
+            rows={2}
+            required
+            minLength={3}
+            maxLength={500}
+            disabled={busy}
+            placeholder="Ex. mon premier saut, je voulais aller plus haut · un backroll, je ne finis pas la rotation"
+            className="field"
+          />
+          <p className="mt-1 text-sm text-slate">Obligatoire : l&apos;analyse compare ce que tu voulais faire à ce que montre la vidéo.</p>
         </div>
       </section>
 

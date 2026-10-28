@@ -268,7 +268,7 @@ function analysisTool(sport: SportId, withEvolution: boolean): Anthropic.Tool {
         figure_id: {
           type: ["string", "null"],
           enum: [...tricksFor(sport).map((t) => t.id), null],
-          description: "Identifiant de la figure dans la roadmap, ou null si aucune ne correspond.",
+          description: `Figure de la liste qui correspond à ce que le rider a fait (${tricksFor(sport).map((t) => `${t.id} = ${t.name}`).join(", ")}), ou null si aucune.`,
         },
         note: { type: "integer", minimum: 1, maximum: 10, description: "Note d'exécution globale." },
         visibilite: {
@@ -332,13 +332,12 @@ function analysisTool(sport: SportId, withEvolution: boolean): Anthropic.Tool {
 export type PreviousAttempt = { date: string; note: number; codes: string[]; priorite: string };
 
 export async function analyseClip(opts: {
-  profile: Profile;
+  userId: string;
   sport: SportId;
-  history: RiderHistory;
   frames: string[]; // images JPEG base64 du passage, dans l'ordre, numérotées
   frameTimes: number[]; // horodatage (s) de chaque image dans le clip
+  intention: string; // ce que le rider a voulu faire, écrit par lui (obligatoire)
   trickId?: string | null;
-  notes?: string | null;
   deep: boolean;
   maxTokens: number;
   previous?: PreviousAttempt[];
@@ -348,27 +347,23 @@ export async function analyseClip(opts: {
   const n = opts.frames.length;
   const span = n > 1 ? opts.frameTimes[n - 1] - opts.frameTimes[0] : 0;
 
+  // Volontairement minimal : la vidéo, l'intention du rider et le sport. Ni niveau, ni matériel, ni historique
+  // dans le jugement : la note et les corrections ne reposent que sur ce que montrent les images.
   const intro = [
     `Tu reçois ${n} images d'un passage de ${span.toFixed(1)} s de ${sport.name.toLowerCase()}, dans l'ordre chronologique (numéro et temps en haut à gauche de chaque image).`,
-    trick
-      ? `Le rider dit tenter : ${trick.name}. Points clés : ${trick.keys.join(" ; ")}. Pars de cette figure, sauf si les images montrent clairement autre chose.`
-      : `Le rider n'a pas précisé la figure. Figures possibles :\n${tricksFor(opts.sport)
-          .map((t) => `- ${t.name} : ${t.summary}`)
-          .join("\n")}`,
-    opts.notes ? `Ce qui coince selon lui : « ${opts.notes} ».` : "",
+    `Ce que le rider a voulu faire, avec ses mots : « ${opts.intention} ».${trick ? ` Figure choisie : ${trick.name} (points clés : ${trick.keys.join(" ; ")}).` : ""}`,
     `Travaille en trois temps :
-1. Regarde chaque image et note dans « observations » ce que tu vois vraiment, en quelques mots : rider sur l'eau ou en l'air, position du kite ou de l'aile, gerbe d'eau, orientation du corps si elle est lisible. Rien d'autre.
-2. Déduis la figure de la suite des observations, comme un moniteur sur la plage. Rotation seulement si le corps tourne visiblement sur plusieurs images. En cas de doute, la figure la plus simple. Si aucune figure n'est tentée (navigation, transition), dis-le et analyse ce que fait le rider.
-3. Note et corrige uniquement ce qui est visible : les erreurs et les points forts viennent des images. Pour les points clés de la figure que tu ne vois pas (genoux, regard, mains, barre quand le rider est petit), donne quand même le bon geste dans « rappels », formulé comme un conseil (« Pense à… ») et jamais comme une erreur constatée.`,
-    `Repères techniques : ${sport.checklist}. Phases : ${sport.phases.approche}, ${sport.phases.appel}, ${sport.phases.vol}, ${sport.phases.reception}.`,
-    "Dans le rapport, ne cite jamais de numéro d'image : situe tout par phase (approche, appel, en l'air, réception). Ton affirmatif et direct, phrases courtes, consignes à l'impératif, sans « peut-être » ni « semble ».",
+1. Regarde chaque image et note dans « observations » ce que tu vois vraiment, en quelques mots : rider sur l'eau ou en l'air, position du kite ou de l'aile, gerbe d'eau, orientation du corps si elle est lisible.
+2. Compare avec ce qu'il a voulu faire : l'a-t-il fait, en partie, ou pas du tout ? Ne change de figure que si les images montrent clairement autre chose.
+3. Juge l'exécution sur ce qui est visible uniquement, sans tenir compte du niveau du rider. Les erreurs et les points forts viennent des images. Pour les points clés de la figure que tu ne vois pas (genoux, regard, mains, barre quand le rider est petit), donne le bon geste dans « rappels », en conseil (« Pense à… »), jamais comme une erreur constatée.`,
+    `Repères ${sport.name.toLowerCase()} : ${sport.checklist}.`,
+    "Dans le rapport, ne cite jamais de numéro d'image : situe tout par phase (approche, appel, en l'air, réception). Ton affirmatif et direct, phrases courtes, consignes à l'impératif.",
     opts.deep ? "Analyse approfondie : pour chaque erreur, donne aussi sa cause, en une phrase." : "",
     opts.previous?.length
-      ? `Tentatives précédentes de cette figure :\n${opts.previous
-          .map((p) => `- ${p.date} : ${p.note}/10, erreurs ${p.codes.map(errorLabel).join(", ") || "aucune"} ; priorité donnée : ${p.priorite}`)
-          .join("\n")}\nRemplis « evolution » : ce qui s'est amélioré, ce qui persiste.`
+      ? `Uniquement pour remplir « evolution », après avoir jugé cette vidéo seule — tentatives précédentes de cette figure :\n${opts.previous
+          .map((p) => `- ${p.date} : ${p.note}/10, erreurs ${p.codes.map(errorLabel).join(", ") || "aucune"}`)
+          .join("\n")}`
       : "",
-    "Réponds uniquement avec l'outil rapport_analyse, en français, en tutoyant.",
   ]
     .filter(Boolean)
     .join("\n\n");
@@ -377,8 +372,8 @@ export async function analyseClip(opts: {
   for (const data of opts.frames) content.push({ type: "image", source: { type: "base64", media_type: "image/jpeg", data } });
 
   const tool = analysisTool(opts.sport, Boolean(opts.previous?.length));
-  const { input, cost } = await callWithTool(opts.profile.id, "analyse", {
-    system: `${coachRules(opts.sport)}\n\nProfil du rider :\n${riderContext(opts.profile, opts.sport, opts.history)}`,
+  const { input, cost } = await callWithTool(opts.userId, "analyse", {
+    system: `Tu es moniteur de ${sport.name.toLowerCase()} et tu analyses une vidéo envoyée par un rider. Tu réponds en français, en le tutoyant, uniquement avec l'outil rapport_analyse.`,
     max_tokens: opts.maxTokens,
     tool,
     content,
