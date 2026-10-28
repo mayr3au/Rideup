@@ -15,6 +15,7 @@ const body = z.object({
   intention: z.string().trim().min(3, "Écris ce que tu fais sur la photo (ex. « premier saut, en l'air »).").max(300),
   image: z.string().startsWith("data:image/jpeg;base64,").max(2_500_000), // photo pour l'IA (≤ 1568 px)
   thumb: z.string().startsWith("data:image/jpeg;base64,").max(200_000), // miniature gardée avec le résultat
+  mini: z.string().startsWith("data:image/jpeg;base64,").max(30_000).optional(), // vignette pour les listes
 });
 
 /** Analyse photo : une image + ce que fait le rider → retour sur sa position, en une seule requête. */
@@ -82,6 +83,7 @@ export async function POST(request: NextRequest) {
       intention: b.intention,
     });
     result.image = b.thumb;
+    if (b.mini) result.mini = b.mini;
     const trickId = result.figure_id;
     await db.from("video_analyses").update({ status: "termine", counted: true, result, model: MODEL, cost_usd: cost, trick: trickId }).eq("id", id);
     if (result.erreurs.length) {

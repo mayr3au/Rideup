@@ -213,7 +213,7 @@ export default async function AnalysisDetail({
             {(r.rappels?.length ?? 0) > 0 && (
               <section>
                 <h2 className="text-2xl font-bold">À garder en tête</h2>
-                <p className="mt-1 text-sm text-slate">Pas visible sur ta vidéo, mais clé pour cette figure.</p>
+                <p className="mt-1 text-sm text-slate">Pas visible sur ta {r.image ? "photo" : "vidéo"}, mais clé pour cette figure.</p>
                 <ul className="mt-3 space-y-2">
                   {r.rappels!.map((d) => (
                     <li key={d} className="flex gap-2">

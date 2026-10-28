@@ -70,6 +70,7 @@ export type AnalysisResult = {
   rappels?: string[]; // bons gestes sur des points non visibles, en conseil
   moment?: string | null; // analyse photo : moment de la figure visible
   image?: string | null; // analyse photo : miniature JPEG (data URL)
+  mini?: string | null; // analyse photo : vignette 160 px pour les listes
 };
 
 export type VideoAnalysis = {

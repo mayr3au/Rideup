@@ -131,7 +131,7 @@ export async function getProgressData(db: SupabaseClient, userId: string, sport:
     analysesLite: analyses.map((a) => ({ id: a.id, trickId: a.trick ?? a.result.figure_id, note: a.result.note, date: a.created_at })),
     recentAttempts: analyses.slice(-8).map((a) => ({
       id: a.id,
-      image: a.result.image ?? null,
+      image: a.result.mini ?? a.result.image ?? null,
       date: new Date(a.created_at).toLocaleDateString("fr-FR"),
       figure: a.result.figure,
       note: a.result.note,

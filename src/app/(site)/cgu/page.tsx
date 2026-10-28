@@ -8,7 +8,7 @@ export default function Page() {
     <LegalPage title="Conditions générales d'utilisation">
       <h2>Le service</h2>
       <p>
-        RIDE&apos;UP propose un accompagnement en ligne pour progresser en sports de glisse (kitesurf, wingfoil, foil, surf, wakeboard) : analyse de vidéos par
+        RIDE&apos;UP propose un accompagnement en ligne pour progresser en sports de glisse (kitesurf, wingfoil, foil, surf, wakeboard) : analyse de photos par
         intelligence artificielle, roadmap de figures et coach conversationnel. Les conseils fournis sont
         indicatifs et ne remplacent pas un enseignement encadré par un moniteur diplômé.
       </p>
@@ -30,8 +30,8 @@ export default function Page() {
       </p>
       <h2>Contenus envoyés</h2>
       <p>
-        L&apos;utilisateur garantit disposer des droits sur les vidéos qu&apos;il envoie, y compris
-        l&apos;accord des personnes filmées. Les vidéos ne sont utilisées que pour produire son analyse.
+        L&apos;utilisateur garantit disposer des droits sur les photos et vidéos qu&apos;il envoie, y compris
+        l&apos;accord des personnes photographiées ou filmées. Ces contenus ne sont utilisés que pour produire son analyse.
       </p>
       <h2>Droit applicable</h2>
       <p>Les présentes conditions sont soumises au droit français.</p>

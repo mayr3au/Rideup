@@ -48,7 +48,7 @@ export default async function AdminOffers() {
                 <legend className="px-1 font-semibold">{LABEL[p]}</legend>
                 <div className="grid gap-4 sm:grid-cols-2">
                   <div>
-                    <label htmlFor={`${p}_analyses`} className="label">Analyses vidéo{p === "free" ? " (total)" : " par mois"}</label>
+                    <label htmlFor={`${p}_analyses`} className="label">Analyses{p === "free" ? " (total)" : " par mois"}</label>
                     <input id={`${p}_analyses`} name={`${p}_analyses`} type="number" min={0} defaultValue={s.monthly_analyses} className="field" />
                   </div>
                   <div>

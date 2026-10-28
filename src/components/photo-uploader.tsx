@@ -47,11 +47,11 @@ export function PhotoUploader({ remaining, sports, defaultSport }: { remaining: 
     setBusy(true);
     setError(null);
     try {
-      const [image, thumb] = await Promise.all([toJpeg(src, 1568, 0.85), toJpeg(src, 640, 0.7)]);
+      const [image, thumb, mini] = await Promise.all([toJpeg(src, 1568, 0.85), toJpeg(src, 640, 0.7), toJpeg(src, 160, 0.7)]);
       const res = await fetch("/api/analyses/photo", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ sport, intention, image, thumb }),
+        body: JSON.stringify({ sport, intention, image, thumb, mini }),
       });
       const data = await res.json();
       if (!res.ok) {

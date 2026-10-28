@@ -248,7 +248,7 @@ function CourseView({ c }: { c: Course }) {
                   </li>
                 ))}
               </ol>
-              <p className="mt-2 text-sm text-slate">Ce sont les quatre phases que l&apos;analyse vidéo note sur 10.</p>
+              <p className="mt-2 text-sm text-slate">Les quatre phases clés de la figure, dans l&apos;ordre.</p>
             </section>
           )}
 
@@ -311,8 +311,12 @@ function CourseView({ c }: { c: Course }) {
 
           {c.filmer && (
             <aside className="mt-8 rounded-2xl bg-brand-light p-4 sm:p-5">
-              <p className="text-sm font-bold uppercase tracking-wider text-lagoon">Pour l&apos;analyse vidéo</p>
+              <p className="text-sm font-bold uppercase tracking-wider text-lagoon">Pour ton analyse</p>
               <p className="mt-1">{c.filmer}</p>
+              <p className="mt-2 text-sm text-slate">
+                Ensuite, fais une capture d&apos;écran au moment clé et envoie-la dans{" "}
+                <Link href="/analyse" className="font-semibold text-lagoon">Analyser</Link> : tu reçois un retour sur ta position.
+              </p>
             </aside>
           )}
 
