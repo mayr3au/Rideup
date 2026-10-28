@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
-import { buildContactSheets, clipFingerprint, loadVideo } from "@/lib/frames";
+import { buildFrames, clipFingerprint, loadVideo } from "@/lib/frames";
 import { LEVEL_LABELS, LEVEL_ORDER, SPORTS, trickById, tricksFor, type SportId } from "@/lib/sports";
 import { ClipTrimmer } from "./clip-trimmer";
 import { CropPicker, FULL_FRAME, type Crop } from "./crop-picker";
@@ -17,14 +17,14 @@ export function AnalyseUploader({
   defaultTrick,
   remaining,
   deep,
-  sheetCount,
+  frameCount,
   sports,
   defaultSport,
 }: {
   defaultTrick?: string;
   remaining: number;
   deep: boolean;
-  sheetCount: number;
+  frameCount: number;
   sports: SportId[];
   defaultSport: SportId;
 }) {
@@ -77,11 +77,11 @@ export function AnalyseUploader({
       setStep("images");
       setProgress(0);
       const video = await loadVideo(src);
-      const { sheets, times, trace, mesures } = await buildContactSheets(
+      const { frames, times } = await buildFrames(
         video,
         seg.start,
         seg.end,
-        sheetCount,
+        frameCount,
         (d, t) => setProgress(Math.round((d / t) * 100)),
         crop,
       );
@@ -114,7 +114,7 @@ export function AnalyseUploader({
         return;
       }
       analysisId = created.id;
-      if (created.sheets !== sheetCount) {
+      if (created.frames !== frameCount) {
         throw new Error("Ta formule vient de changer : recharge la page puis relance l'analyse.");
       }
 
@@ -134,7 +134,7 @@ export function AnalyseUploader({
       const runRes = await fetch(`/api/analyses/${created.id}/run`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ sheets, frameTimes: times, trace, mesures }),
+        body: JSON.stringify({ frames, frameTimes: times }),
       });
       const done = await runRes.json();
       analysisId = null; // le serveur a pris en charge l'analyse (réussie ou marquée en échec)
@@ -212,7 +212,7 @@ export function AnalyseUploader({
 
   const STEPS: { id: Step; label: string }[] = [
     { id: "empreinte", label: "Préparation du clip" },
-    { id: "images", label: "Images et suivi du kite" },
+    { id: "images", label: "Extraction des images" },
     { id: "analyse", label: deep ? "Analyse approfondie par le coach" : "Analyse par le coach" },
   ];
   const stepIndex = STEPS.findIndex((x) => x.id === step);

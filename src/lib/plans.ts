@@ -51,12 +51,12 @@ export const DEFAULT_SETTINGS: Record<Plan, PlanSettings> = {
 
 /** Ce qui change concrètement dans l'analyse selon la formule. */
 export const ANALYSIS_DEPTH = {
-  free: { depth: "standard", sheets: 2, maxTokens: 1800, compare: false },
-  progress: { depth: "standard", sheets: 2, maxTokens: 1800, compare: false },
-  elite: { depth: "approfondie", sheets: 4, maxTokens: 3200, compare: true },
+  // frames : nombre d'images du passage envoyées à l'IA (grandes et nettes, dans l'ordre)
+  free: { depth: "standard", frames: 12, maxTokens: 2200, compare: false },
+  progress: { depth: "standard", frames: 12, maxTokens: 2200, compare: false },
+  elite: { depth: "approfondie", frames: 16, maxTokens: 3200, compare: true },
 } as const;
 
-export const FRAMES_PER_SHEET = 12; // grille 4 × 3
 export const MAX_SEGMENT_SECONDS = 20;
 
 export function isActive(status: string | null | undefined) {

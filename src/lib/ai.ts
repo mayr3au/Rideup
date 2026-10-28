@@ -5,7 +5,6 @@ import { errorLabel, errorsFor, LEVEL_LABELS, SPORTS, SPORT_IDS, tricksFor, tric
 import { detailsFor, disciplineFor, gearFor, levelFor, riderSports } from "@/lib/rider";
 import type { AnalysisResult, Profile, Program, TrickProgress } from "@/lib/types";
 import { normalizeResult } from "@/lib/analysis-result";
-import { mesuresLignes, type Mesures } from "@/lib/mesures";
 
 let client: Anthropic | null = null;
 function anthropic() {
@@ -260,6 +259,11 @@ function analysisTool(sport: SportId, withEvolution: boolean): Anthropic.Tool {
     input_schema: {
       type: "object",
       properties: {
+        observations: {
+          type: "array",
+          items: { type: "string" },
+          description: "Une ligne par image, dans l'ordre : ce qui est réellement visible (rider sur l'eau / en l'air, position du kite, gerbe, corps si lisible). À remplir en premier.",
+        },
         figure: { type: "string", description: "Nom d'une seule figure, affirmatif (jamais « peut-être » ni deux figures)." },
         figure_id: {
           type: ["string", "null"],
@@ -303,6 +307,12 @@ function analysisTool(sport: SportId, withEvolution: boolean): Anthropic.Tool {
           },
         },
         drills: { type: "array", items: { type: "string" }, maxItems: 3, description: "Exercices précis pour la prochaine session, une phrase chacun." },
+        rappels: {
+          type: "array",
+          items: { type: "string" },
+          maxItems: 3,
+          description: "Bons gestes de la figure sur des points non visibles dans la vidéo, en conseil (« Pense à… »), une phrase chacun. Vide si tout est visible.",
+        },
         priorite_session: { type: "string", description: "LA chose à travailler en priorité à la prochaine session, en une phrase." },
         securite: { type: ["string", "null"], description: "Alerte sécurité en une phrase si quelque chose de dangereux est visible, sinon null (pas de rappel générique)." },
         ...(withEvolution
@@ -314,7 +324,7 @@ function analysisTool(sport: SportId, withEvolution: boolean): Anthropic.Tool {
             }
           : {}),
       },
-      required: ["figure", "figure_id", "note", "visibilite", "resume", "phases", "points_forts", "erreurs", "drills", "priorite_session", "securite"],
+      required: ["observations", "figure", "figure_id", "note", "visibilite", "resume", "phases", "points_forts", "erreurs", "drills", "rappels", "priorite_session", "securite"],
     },
   };
 }
@@ -325,10 +335,8 @@ export async function analyseClip(opts: {
   profile: Profile;
   sport: SportId;
   history: RiderHistory;
-  sheets: string[]; // planches JPEG base64 (grilles 4×3 numérotées)
+  frames: string[]; // images JPEG base64 du passage, dans l'ordre, numérotées
   frameTimes: number[]; // horodatage (s) de chaque image dans le clip
-  trace?: string | null; // chronophotographie JPEG base64 : toutes les positions superposées
-  mesures?: Mesures | null; // suivi automatique du kite et du rider
   trickId?: string | null;
   notes?: string | null;
   deep: boolean;
@@ -337,41 +345,28 @@ export async function analyseClip(opts: {
 }): Promise<{ result: AnalysisResult; cost: number }> {
   const sport = SPORTS[opts.sport];
   const trick = opts.trickId ? trickById(opts.trickId) : undefined;
-  const n = opts.frameTimes.length;
+  const n = opts.frames.length;
   const span = n > 1 ? opts.frameTimes[n - 1] - opts.frameTimes[0] : 0;
 
   const intro = [
-    `Tu reçois ${opts.sheets.length} planche(s) contenant ${n} images numérotées (1 à ${n}), extraites à intervalle régulier d'un passage de ${span.toFixed(1)} s choisi par le rider. Ordre de lecture : de gauche à droite puis de haut en bas, planche après planche.`,
-    `Sport : ${sport.name}.`,
+    `Tu reçois ${n} images d'un passage de ${span.toFixed(1)} s de ${sport.name.toLowerCase()}, dans l'ordre chronologique (numéro et temps en haut à gauche de chaque image).`,
     trick
-      ? `Le rider dit tenter : ${trick.name}. Points clés attendus : ${trick.keys.join(" ; ")}. Pars de cette figure : ne la remplace par une autre que si les images montrent clairement autre chose.`
-      : `Le rider n'a pas précisé la figure : identifie-la à partir du mouvement. Figures possibles :\n${tricksFor(opts.sport)
+      ? `Le rider dit tenter : ${trick.name}. Points clés : ${trick.keys.join(" ; ")}. Pars de cette figure, sauf si les images montrent clairement autre chose.`
+      : `Le rider n'a pas précisé la figure. Figures possibles :\n${tricksFor(opts.sport)
           .map((t) => `- ${t.name} : ${t.summary}`)
           .join("\n")}`,
-    "Méthode : suis d'abord la trajectoire du kite ou de l'aile et celle du rider sur toute la séquence (décolle-t-il ? le kite fait-il un tour complet ?), puis seulement juge la technique.",
-    "Identification : ne parle de rotation (backroll, frontroll…) que si le corps du rider tourne visiblement sur plusieurs images d'affilée. Un rider loin ou flou n'est pas un rider qui tourne. Entre deux figures possibles, choisis toujours la plus simple. Le nom de la figure est affirmatif : jamais « peut-être », jamais deux figures à la fois.",
     opts.notes ? `Ce qui coince selon lui : « ${opts.notes} ».` : "",
-    `Analyse comme un moniteur de ${sport.name.toLowerCase()} : ${sport.checklist}.`,
-    `Phases à noter : ${sport.phases.approche}, ${sport.phases.appel}, ${sport.phases.vol}, ${sport.phases.reception}.`,
-    "Les numéros et horodatages des images servent seulement à ta lecture : ne les cite jamais dans le rapport, ni les planches. Situe tout par phase (approche, appel, en l'air, réception).",
-    "Ton : moniteur sûr de son diagnostic. Affirmatif et direct, phrases courtes, à l'impératif pour les consignes. Pas de conditionnel ni de « semble », « peut-être », « probablement », « lecture incertaine ».",
-    "Le rider est souvent loin et petit à l'image : c'est normal en glisse, et ça ne t'empêche pas d'analyser. Lis la figure avec tous les indices lisibles : trajectoire et position du kite ou de l'aile dans la fenêtre, silhouette et orientation du corps, hauteur au-dessus de l'eau, gerbes d'eau au décollage et à la réception, vitesse et direction de déplacement. Identifie la figure et note-la avec assurance à partir de ces indices ; la distance ne fait pas baisser la note, seule l'exécution compte.",
-    "Ce que tu ne peux vraiment pas lire (détail du corps trop petit, planche hors cadre) : dis-le une seule fois, en une courte phrase dans le résumé, puis n'en parle plus. « visibilite » = faible seulement si la figure elle-même est illisible. Ne relève aucune erreur que tu ne vois pas.",
-    "Chaque erreur est un point technique précis : pas de description générique de la vidéo.",
-    "Si le passage ne montre aucune figure (navigation, bord, transition), analyse ce que fait le rider : position du kite, carre, vitesse, posture. Ne lui reproche pas l'absence de saut.",
-    "Si la vidéo ne correspond pas au sport indiqué, dis-le dans le résumé et analyse ce que tu vois.",
-    opts.deep
-      ? "Analyse approfondie : pour chaque erreur, donne la cause (pas seulement le symptôme) et son effet sur la suite de la figure, toujours en une phrase."
-      : "",
+    `Travaille en trois temps :
+1. Regarde chaque image et note dans « observations » ce que tu vois vraiment, en quelques mots : rider sur l'eau ou en l'air, position du kite ou de l'aile, gerbe d'eau, orientation du corps si elle est lisible. Rien d'autre.
+2. Déduis la figure de la suite des observations, comme un moniteur sur la plage. Rotation seulement si le corps tourne visiblement sur plusieurs images. En cas de doute, la figure la plus simple. Si aucune figure n'est tentée (navigation, transition), dis-le et analyse ce que fait le rider.
+3. Note et corrige uniquement ce qui est visible : les erreurs et les points forts viennent des images. Pour les points clés de la figure que tu ne vois pas (genoux, regard, mains, barre quand le rider est petit), donne quand même le bon geste dans « rappels », formulé comme un conseil (« Pense à… ») et jamais comme une erreur constatée.`,
+    `Repères techniques : ${sport.checklist}. Phases : ${sport.phases.approche}, ${sport.phases.appel}, ${sport.phases.vol}, ${sport.phases.reception}.`,
+    "Dans le rapport, ne cite jamais de numéro d'image : situe tout par phase (approche, appel, en l'air, réception). Ton affirmatif et direct, phrases courtes, consignes à l'impératif, sans « peut-être » ni « semble ».",
+    opts.deep ? "Analyse approfondie : pour chaque erreur, donne aussi sa cause, en une phrase." : "",
     opts.previous?.length
       ? `Tentatives précédentes de cette figure :\n${opts.previous
           .map((p) => `- ${p.date} : ${p.note}/10, erreurs ${p.codes.map(errorLabel).join(", ") || "aucune"} ; priorité donnée : ${p.priorite}`)
-          .join("\n")}\nRemplis « evolution » : ce qui s'est amélioré, ce qui persiste, ce qui est nouveau.`
-      : "",
-    opts.mesures && mesuresLignes(opts.mesures).length
-      ? `Mesures automatiques (suivi du kite et du rider image par image, angles vus depuis la caméra, 90° = zénith) :\n${mesuresLignes(opts.mesures)
-          .map((l) => `- ${l.label} : ${l.valeur}`)
-          .join("\n")}\nCe sont des mesures automatiques : sers-t'en pour confirmer ce que tu vois et cites-en une quand elle éclaire une correction (ex. « 0,8 s en l'air »). Elles ne décrivent pas la figure à elles seules : une figure se déduit des images. Si une mesure contredit les images, ignore-la.`
+          .join("\n")}\nRemplis « evolution » : ce qui s'est amélioré, ce qui persiste.`
       : "",
     "Réponds uniquement avec l'outil rapport_analyse, en français, en tutoyant.",
   ]
@@ -379,17 +374,7 @@ export async function analyseClip(opts: {
     .join("\n\n");
 
   const content: Anthropic.ContentBlockParam[] = [{ type: "text", text: intro }];
-  opts.sheets.forEach((data, i) => {
-    content.push({ type: "text", text: `Planche ${i + 1}` });
-    content.push({ type: "image", source: { type: "base64", media_type: "image/jpeg", data } });
-  });
-  if (opts.trace) {
-    content.push({
-      type: "text",
-      text: "Image de synthèse (chronophotographie) : le décor est fixe et toutes les positions successives de ce qui bouge (kite ou aile, lignes, rider, gerbes d'eau) sont superposées. Elle montre directement les trajectoires : une boucle complète du kite y forme un cercle, un saut une courbe. Sers-t'en pour identifier la figure et juger les trajectoires.",
-    });
-    content.push({ type: "image", source: { type: "base64", media_type: "image/jpeg", data: opts.trace } });
-  }
+  for (const data of opts.frames) content.push({ type: "image", source: { type: "base64", media_type: "image/jpeg", data } });
 
   const tool = analysisTool(opts.sport, Boolean(opts.previous?.length));
   const { input, cost } = await callWithTool(opts.profile.id, "analyse", {
