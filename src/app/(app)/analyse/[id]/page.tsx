@@ -1,4 +1,5 @@
 import { normalizeResult } from "@/lib/analysis-result";
+import { mesuresLignes } from "@/lib/mesures";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -107,6 +108,19 @@ export default async function AnalysisDetail({
           <p className="mt-2 text-sm text-slate">
             Passage analysé : {start.toFixed(1)} s → {end.toFixed(1)} s
           </p>
+          {r?.mesures && mesuresLignes(r.mesures).length > 0 && (
+            <div className="mt-4">
+              <p className="text-xs font-bold uppercase tracking-wide text-slate">Mesuré sur ta vidéo</p>
+              <ul className="mt-2 grid grid-cols-2 gap-2">
+                {mesuresLignes(r.mesures).map((m) => (
+                  <li key={m.label} className="rounded-xl bg-brand-light px-3 py-2">
+                    <span className="block text-xs text-slate">{m.label}</span>
+                    <span className="font-bold text-deep">{m.valeur}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
           {r && r.visibilite !== "bonne" && (
             <p className="mt-3 rounded-md bg-kite/20 p-3 text-[0.95rem]">
               Visibilité {r.visibilite} : filme plus près et de côté, en gardant tout le rider dans le cadre, pour une analyse plus fine.

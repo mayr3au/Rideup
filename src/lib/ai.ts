@@ -5,6 +5,7 @@ import { errorLabel, errorsFor, LEVEL_LABELS, SPORTS, SPORT_IDS, tricksFor, tric
 import { detailsFor, disciplineFor, gearFor, levelFor, riderSports } from "@/lib/rider";
 import type { AnalysisResult, Profile, Program, TrickProgress } from "@/lib/types";
 import { normalizeResult } from "@/lib/analysis-result";
+import { mesuresLignes, type Mesures } from "@/lib/mesures";
 
 let client: Anthropic | null = null;
 function anthropic() {
@@ -327,6 +328,7 @@ export async function analyseClip(opts: {
   sheets: string[]; // planches JPEG base64 (grilles 4×3 numérotées)
   frameTimes: number[]; // horodatage (s) de chaque image dans le clip
   trace?: string | null; // chronophotographie JPEG base64 : toutes les positions superposées
+  mesures?: Mesures | null; // suivi automatique du kite et du rider
   trickId?: string | null;
   notes?: string | null;
   deep: boolean;
@@ -355,6 +357,7 @@ export async function analyseClip(opts: {
     "Le rider est souvent loin et petit à l'image : c'est normal en glisse, et ça ne t'empêche pas d'analyser. Lis la figure avec tous les indices lisibles : trajectoire et position du kite ou de l'aile dans la fenêtre, silhouette et orientation du corps, hauteur au-dessus de l'eau, gerbes d'eau au décollage et à la réception, vitesse et direction de déplacement. Identifie la figure et note-la avec assurance à partir de ces indices ; la distance ne fait pas baisser la note, seule l'exécution compte.",
     "Ce que tu ne peux vraiment pas lire (détail du corps trop petit, planche hors cadre) : dis-le une seule fois, en une courte phrase dans le résumé, puis n'en parle plus. « visibilite » = faible seulement si la figure elle-même est illisible. Ne relève aucune erreur que tu ne vois pas.",
     "Chaque erreur est un point technique précis : pas de description générique de la vidéo.",
+    "Si le passage ne montre aucune figure (navigation, bord, transition), analyse ce que fait le rider : position du kite, carre, vitesse, posture. Ne lui reproche pas l'absence de saut.",
     "Si la vidéo ne correspond pas au sport indiqué, dis-le dans le résumé et analyse ce que tu vois.",
     opts.deep
       ? "Analyse approfondie : pour chaque erreur, donne la cause (pas seulement le symptôme) et son effet sur la suite de la figure, toujours en une phrase."
@@ -363,6 +366,11 @@ export async function analyseClip(opts: {
       ? `Tentatives précédentes de cette figure :\n${opts.previous
           .map((p) => `- ${p.date} : ${p.note}/10, erreurs ${p.codes.map(errorLabel).join(", ") || "aucune"} ; priorité donnée : ${p.priorite}`)
           .join("\n")}\nRemplis « evolution » : ce qui s'est amélioré, ce qui persiste, ce qui est nouveau.`
+      : "",
+    opts.mesures && mesuresLignes(opts.mesures).length
+      ? `Mesures automatiques (suivi du kite et du rider image par image, angles vus depuis la caméra, 90° = zénith) :\n${mesuresLignes(opts.mesures)
+          .map((l) => `- ${l.label} : ${l.valeur}`)
+          .join("\n")}\nCes mesures sont fiables : appuie ton diagnostic dessus et cites-en une ou deux quand elles éclairent une correction (ex. « 0,8 s en l'air, c'est court pour un kiteloop »). Si une mesure contredit ce que tu vois, fie-toi aux images.`
       : "",
     "Réponds uniquement avec l'outil rapport_analyse, en français, en tutoyant.",
   ]

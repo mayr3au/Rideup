@@ -77,7 +77,7 @@ export function AnalyseUploader({
       setStep("images");
       setProgress(0);
       const video = await loadVideo(src);
-      const { sheets, times, trace } = await buildContactSheets(
+      const { sheets, times, trace, mesures } = await buildContactSheets(
         video,
         seg.start,
         seg.end,
@@ -134,7 +134,7 @@ export function AnalyseUploader({
       const runRes = await fetch(`/api/analyses/${created.id}/run`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ sheets, frameTimes: times, trace }),
+        body: JSON.stringify({ sheets, frameTimes: times, trace, mesures }),
       });
       const done = await runRes.json();
       analysisId = null; // le serveur a pris en charge l'analyse (réussie ou marquée en échec)
@@ -212,7 +212,7 @@ export function AnalyseUploader({
 
   const STEPS: { id: Step; label: string }[] = [
     { id: "empreinte", label: "Préparation du clip" },
-    { id: "images", label: "Extraction des images" },
+    { id: "images", label: "Images et suivi du kite" },
     { id: "analyse", label: deep ? "Analyse approfondie par le coach" : "Analyse par le coach" },
   ];
   const stepIndex = STEPS.findIndex((x) => x.id === step);

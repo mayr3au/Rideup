@@ -8,5 +8,8 @@ for %%p in (3000 3001) do (
   for /f "tokens=5" %%a in ('netstat -ano ^| findstr /r ":%%p .*LISTENING"') do taskkill /F /PID %%a >nul 2>&1
 )
 
+rem Installe les paquets ajoutes depuis la derniere fois (rapide si rien n'a change)
+call npm install --no-audit --no-fund
+
 npm run dev
 pause
