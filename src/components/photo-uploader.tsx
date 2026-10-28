@@ -21,11 +21,25 @@ async function toJpeg(src: string, max: number, quality: number) {
 }
 
 /** Analyse simple : une photo + ce que tu fais dessus → retour sur ta position. */
-export function PhotoUploader({ remaining, sports, defaultSport }: { remaining: number; sports: SportId[]; defaultSport: SportId }) {
+export function PhotoUploader({
+  remaining,
+  sports,
+  defaultSport,
+  shortcuts = [],
+  defaultIntention,
+}: {
+  remaining: number;
+  sports: SportId[];
+  defaultSport: SportId;
+  /** Figures en cours du rider, proposées en un clic */
+  shortcuts?: string[];
+  /** Figure choisie depuis « Nouvelle tentative » */
+  defaultIntention?: string;
+}) {
   const router = useRouter();
   const [sport, setSport] = useState<SportId>(defaultSport);
   const [src, setSrc] = useState<string | null>(null);
-  const [intention, setIntention] = useState("");
+  const [intention, setIntention] = useState(defaultIntention ?? "");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<{ text: string; upgrade?: boolean } | null>(null);
 
@@ -136,7 +150,31 @@ export function PhotoUploader({ remaining, sports, defaultSport }: { remaining: 
           placeholder="Ex. premier saut, en l'air · je navigue au près · réception de backroll"
           className="field"
         />
+        {sport === defaultSport && shortcuts.length > 0 && (
+          <div className="mt-2 flex flex-wrap gap-2" role="group" aria-label="Figures en cours">
+            {shortcuts.map((t) => (
+              <button
+                key={t}
+                type="button"
+                disabled={busy}
+                onClick={() => setIntention(t)}
+                className={`min-h-9 rounded-full border px-3 text-sm ${intention === t ? "border-brand bg-brand-light font-semibold text-brand" : "border-line"}`}
+              >
+                {t}
+              </button>
+            ))}
+          </div>
+        )}
       </div>
+
+      <details className="rounded-2xl bg-raised px-4 py-3 text-[0.95rem]">
+        <summary className="cursor-pointer font-semibold">Pour une analyse précise</summary>
+        <ul className="mt-2 space-y-1 text-slate">
+          <li>• Photo prise de côté, rider entier dans le cadre, planche visible.</li>
+          <li>• Au moment clé : appel, en l&apos;air ou réception plutôt qu&apos;avant ou après.</li>
+          <li>• Évite le contre-jour et le zoom numérique : une capture nette d&apos;une vidéo marche bien.</li>
+        </ul>
+      </details>
 
       {error && (
         <p role="alert" className="text-danger">

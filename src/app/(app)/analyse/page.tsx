@@ -5,15 +5,29 @@ import { getQuota, sweepStaleAnalyses } from "@/lib/usage";
 import { activeSport, riderSports } from "@/lib/rider";
 import { redirect } from "next/navigation";
 import { PhotoUploader } from "@/components/photo-uploader";
+import { trickById, tricksFor } from "@/lib/sports";
+import type { TrickProgress } from "@/lib/types";
 
 export const metadata: Metadata = { title: "Analyse de position" };
 
-export default async function AnalysePage() {
+export default async function AnalysePage({ searchParams }: { searchParams: Promise<{ figure?: string }> }) {
+  const { figure } = await searchParams;
   const { supabase, profile } = await requireSession();
   if (!profile.onboarded) redirect("/profil");
   const plan = effectivePlan(profile);
   await sweepStaleAnalyses(profile.id);
-  const quota = await getQuota(supabase, profile, plan, "analyses");
+  const sport = activeSport(profile);
+  const [quota, { data: progress }] = await Promise.all([
+    getQuota(supabase, profile, plan, "analyses"),
+    supabase.from("trick_progress").select("trick_id, status").eq("user_id", profile.id).returns<Pick<TrickProgress, "trick_id" | "status">[]>(),
+  ]);
+  // Raccourcis pour « ce que tu fais » : figures en cours, puis la prochaine à débloquer
+  const status = new Map((progress ?? []).map((p) => [p.trick_id, p.status]));
+  const tricks = tricksFor(sport);
+  const working = tricks.filter((t) => status.get(t.id) === "en-cours");
+  const nextTrick = tricks.find((t) => status.get(t.id) !== "valide" && status.get(t.id) !== "en-cours");
+  const shortcuts = [...working, ...(nextTrick ? [nextTrick] : [])].slice(0, 4).map((t) => t.name);
+  const wanted = figure ? trickById(figure)?.name : undefined;
 
   return (
     <div className="mx-auto max-w-2xl">
@@ -25,7 +39,13 @@ export default async function AnalysePage() {
 
       <div className="mt-8">
         {quota.allowed ? (
-          <PhotoUploader remaining={quota.remaining} sports={riderSports(profile)} defaultSport={activeSport(profile)} />
+          <PhotoUploader
+            remaining={quota.remaining}
+            sports={riderSports(profile)}
+            defaultSport={sport}
+            shortcuts={shortcuts}
+            defaultIntention={wanted}
+          />
         ) : (
           <div className="panel p-6">
             <h2 className="text-2xl font-bold">
