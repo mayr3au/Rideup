@@ -51,13 +51,24 @@ export const DEFAULT_SETTINGS: Record<Plan, PlanSettings> = {
 
 /** Ce qui change concrètement dans l'analyse selon la formule. */
 export const ANALYSIS_DEPTH = {
-  // frames : nombre d'images du passage envoyées à l'IA (grandes et nettes, dans l'ordre)
-  free: { depth: "standard", frames: 12, maxTokens: 2200, compare: false },
-  progress: { depth: "standard", frames: 12, maxTokens: 2200, compare: false },
-  elite: { depth: "approfondie", frames: 16, maxTokens: 3200, compare: true },
+  free: { depth: "standard", maxTokens: 2600, compare: false },
+  progress: { depth: "standard", maxTokens: 2600, compare: false },
+  elite: { depth: "approfondie", maxTokens: 3600, compare: true },
 } as const;
 
-export const MAX_SEGMENT_SECONDS = 20;
+/**
+ * Densité d'images envoyées à l'IA : 6 par seconde du passage, pour qu'elle suive le mouvement
+ * (appel, rotation, réception) sans trou. Passage court (10 s max) pour rester sous la limite
+ * de 100 images par demande et garder un coût raisonnable.
+ */
+export const FRAMES_PER_SECOND = 6;
+export const MIN_FRAMES = 12;
+export const MAX_FRAMES = 60;
+export function frameCountFor(seconds: number) {
+  return Math.max(MIN_FRAMES, Math.min(MAX_FRAMES, Math.round(seconds * FRAMES_PER_SECOND)));
+}
+
+export const MAX_SEGMENT_SECONDS = 10;
 
 export function isActive(status: string | null | undefined) {
   return status === "active" || status === "trialing";

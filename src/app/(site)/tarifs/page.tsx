@@ -76,7 +76,7 @@ export default async function PricingPage() {
       <div className="mt-12 grid gap-4 text-[0.95rem] sm:grid-cols-3">
         <div className="rounded-2xl bg-salt p-5">
           <h2 className="font-semibold">Une analyse, c&apos;est quoi ?</h2>
-          <p className="mt-1 text-slate">Un passage de 20 secondes maximum que tu choisis dans ta vidéo, analysé phase par phase.</p>
+          <p className="mt-1 text-slate">Un passage de 10 secondes maximum que tu choisis dans ta vidéo, analysé à 6 images par seconde, phase par phase.</p>
         </div>
         <div className="rounded-2xl bg-salt p-5">
           <h2 className="font-semibold">Et si je renvoie le même clip ?</h2>

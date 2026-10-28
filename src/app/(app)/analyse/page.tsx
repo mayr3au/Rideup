@@ -33,7 +33,6 @@ export default async function AnalysePage({ searchParams }: { searchParams: Prom
             defaultTrick={figure && trickById(figure) ? figure : undefined}
             remaining={quota.remaining}
             deep={deep}
-            frameCount={ANALYSIS_DEPTH[plan].frames}
             sports={riderSports(profile)}
             defaultSport={activeSport(profile)}
           />

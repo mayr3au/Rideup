@@ -262,7 +262,7 @@ function analysisTool(sport: SportId, withEvolution: boolean): Anthropic.Tool {
         observations: {
           type: "array",
           items: { type: "string" },
-          description: "Une ligne par image, dans l'ordre : ce qui est réellement visible (rider sur l'eau / en l'air, position du kite, gerbe, corps si lisible). À remplir en premier.",
+          description: "Une ligne par moment (environ une demi-seconde), dans l'ordre : ce qui est réellement visible (rider sur l'eau / en l'air, position du kite, gerbe, corps si lisible). À remplir en premier.",
         },
         figure: { type: "string", description: "Nom d'une seule figure, affirmatif (jamais « peut-être » ni deux figures)." },
         figure_id: {
@@ -350,10 +350,10 @@ export async function analyseClip(opts: {
   // Volontairement minimal : la vidéo, l'intention du rider et le sport. Ni niveau, ni matériel, ni historique
   // dans le jugement : la note et les corrections ne reposent que sur ce que montrent les images.
   const intro = [
-    `Tu reçois ${n} images d'un passage de ${span.toFixed(1)} s de ${sport.name.toLowerCase()}, dans l'ordre chronologique (numéro et temps en haut à gauche de chaque image).`,
+    `Tu reçois ${n} images d'un passage de ${span.toFixed(1)} s de ${sport.name.toLowerCase()}, environ 6 par seconde, dans l'ordre chronologique (numéro et temps en haut à gauche de chaque image). Elles forment une séquence continue : suis le mouvement d'une image à l'autre.`,
     `Ce que le rider a voulu faire, avec ses mots : « ${opts.intention} ».${trick ? ` Figure choisie : ${trick.name} (points clés : ${trick.keys.join(" ; ")}).` : ""}`,
     `Travaille en trois temps :
-1. Regarde chaque image et note dans « observations » ce que tu vois vraiment, en quelques mots : rider sur l'eau ou en l'air, position du kite ou de l'aile, gerbe d'eau, orientation du corps si elle est lisible.
+1. Regarde toute la séquence et note dans « observations », moment par moment (une ligne par demi-seconde environ), ce que tu vois vraiment : rider sur l'eau ou en l'air, position du kite ou de l'aile, gerbe d'eau, orientation du corps si elle est lisible.
 2. Compare avec ce qu'il a voulu faire : l'a-t-il fait, en partie, ou pas du tout ? Ne change de figure que si les images montrent clairement autre chose.
 3. Juge l'exécution sur ce qui est visible uniquement, sans tenir compte du niveau du rider. Les erreurs et les points forts viennent des images. Pour les points clés de la figure que tu ne vois pas (genoux, regard, mains, barre quand le rider est petit), donne le bon geste dans « rappels », en conseil (« Pense à… »), jamais comme une erreur constatée.`,
     `Repères ${sport.name.toLowerCase()} : ${sport.checklist}.`,

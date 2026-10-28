@@ -13,7 +13,7 @@ function fmt(t: number) {
 
 type Drag = { kind: "start" | "end" | "body"; offset: number } | null;
 
-/** Lecteur + sélection du passage à analyser (20 s max). Pensé pour le pouce sur mobile. */
+/** Lecteur + sélection du passage à analyser (10 s max). Pensé pour le pouce sur mobile. */
 export function ClipTrimmer({
   src,
   start,

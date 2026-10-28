@@ -62,7 +62,7 @@ function Hero() {
             </span>
           </h1>
           <p className="rise mt-6 max-w-xl text-lg text-slate sm:text-xl" style={{ "--d": "0.4s" } as React.CSSProperties}>
-            Kite, wing, foil, surf, wake. Envoie 20 secondes de ta figure : RIDE&apos;UP te dit exactement quoi corriger, et
+            Kite, wing, foil, surf, wake. Envoie 10 secondes de ta figure : RIDE&apos;UP te dit exactement quoi corriger, et
             quoi bosser à la prochaine session.
           </p>
           <div className="rise mt-8 flex flex-col gap-4 sm:flex-row sm:items-center" style={{ "--d": "0.5s" } as React.CSSProperties}>
@@ -78,7 +78,7 @@ function Hero() {
 
           <dl className="rise mt-10 grid max-w-md grid-cols-3 gap-4 border-t border-line pt-6" style={{ "--d": "0.68s" } as React.CSSProperties}>
             {[
-              ["20 s", "de vidéo suffisent"],
+              ["10 s", "de vidéo suffisent"],
               ["≈ 1 min", "pour ton retour"],
               ["5", "sports couverts"],
             ].map(([n, l]) => (
@@ -249,7 +249,7 @@ function Steps() {
           <div className="p-5">
             <p className="text-sm font-bold text-brand">Étape 2</p>
             <h3 className="mt-1 text-xl">Garde ta figure</h3>
-            <p className="mt-1 text-[0.95rem] text-slate">Fais glisser le curseur pour garder le moment de la figure, 20 secondes maximum.</p>
+            <p className="mt-1 text-[0.95rem] text-slate">Fais glisser le curseur pour garder le moment de la figure, 10 secondes maximum.</p>
           </div>
         </Reveal>
 
@@ -389,8 +389,8 @@ function Faq() {
       a: "Un téléphone suffit. Filme de côté, à une trentaine de mètres, en gardant le rider (et son aile ou son kite) dans le cadre.",
     },
     {
-      q: "Pourquoi 20 secondes maximum ?",
-      a: "Une figure dure quelques secondes. En gardant juste l'approche, la figure et la réception, l'analyse se concentre sur ce qui compte.",
+      q: "Pourquoi 10 secondes maximum ?",
+      a: "Une figure dure quelques secondes. En gardant juste l'approche, la figure et la réception, l'analyse regarde 6 images par seconde et ne rate aucun mouvement.",
     },
     {
       q: "Ça remplace un moniteur ?",
