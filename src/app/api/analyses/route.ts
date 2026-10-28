@@ -8,13 +8,13 @@ import { ANALYSIS_DEPTH, MAX_SEGMENT_SECONDS } from "@/lib/plans";
 import { isSport, trickById } from "@/lib/sports";
 
 /** À incrémenter quand la méthode d'analyse change : un même clip est alors réanalysé au lieu de ressortir l'ancien résultat. */
-const ANALYSIS_VERSION = "v3-images";
+const ANALYSIS_VERSION = "v4-intention";
 
 const body = z
   .object({
     sport: z.string().refine(isSport, "Sport inconnu."),
     trick: z.string(),
-    notes: z.string().trim().max(500),
+    notes: z.string().trim().min(3, "Écris ce que tu as voulu faire (ex. « mon premier saut », « un backroll »).").max(500),
     extension: z.enum(["mp4", "mov", "webm"]),
     clipHash: z.string().regex(/^[a-f0-9]{64}$/),
     segStart: z.number().min(0),
@@ -48,7 +48,7 @@ export async function POST(request: NextRequest) {
   const depth = ANALYSIS_DEPTH[plan];
 
   const cacheKey = createHash("sha256")
-    .update([ANALYSIS_VERSION, b.clipHash, b.segStart.toFixed(1), b.segEnd.toFixed(1), b.sport, b.trick || "-", depth.depth, b.crop?.join(",") ?? "full"].join("|"))
+    .update([ANALYSIS_VERSION, b.clipHash, b.segStart.toFixed(1), b.segEnd.toFixed(1), b.sport, b.trick || "-", b.notes.toLowerCase(), depth.depth, b.crop?.join(",") ?? "full"].join("|"))
     .digest("hex");
 
   // 1. Résultat déjà disponible ?

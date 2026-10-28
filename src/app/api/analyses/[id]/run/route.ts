@@ -2,8 +2,9 @@ import { NextResponse, type NextRequest } from "next/server";
 import { z } from "zod";
 import { getSession } from "@/lib/auth";
 import { analyseClip, MODEL, type PreviousAttempt } from "@/lib/ai";
-import { getRiderHistory, releaseAnalysis } from "@/lib/usage";
+import { releaseAnalysis } from "@/lib/usage";
 import { ANALYSIS_DEPTH } from "@/lib/plans";
+import { trickById } from "@/lib/sports";
 import { createAdminClient } from "@/lib/supabase/admin";
 import type { AnalysisResult, VideoAnalysis } from "@/lib/types";
 import { normalizeResult } from "@/lib/analysis-result";
@@ -51,7 +52,6 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
     return fail(400, "Les images du clip n'ont pas pu être lues. Réessaie : cette tentative n'est pas décomptée.");
   }
 
-  const history = await getRiderHistory(supabase, user.id);
 
   // Elite : comparaison avec les tentatives précédentes de la même figure
   let previous: PreviousAttempt[] | undefined;
@@ -81,13 +81,12 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
   let cost: number;
   try {
     ({ result, cost } = await analyseClip({
-      profile,
+      userId: profile.id,
       sport: analysis.sport,
-      history,
       frames: parsed.data.frames.map((s) => s.replace(/^data:image\/jpeg;base64,/, "")),
       frameTimes: parsed.data.frameTimes,
+      intention: analysis.notes ?? (analysis.trick ? trickById(analysis.trick)?.name ?? "" : "une figure"),
       trickId: analysis.trick,
-      notes: analysis.notes,
       deep: depth.depth === "approfondie",
       maxTokens: depth.maxTokens,
       previous,
