@@ -8,7 +8,7 @@ import { ANALYSIS_DEPTH, MAX_SEGMENT_SECONDS } from "@/lib/plans";
 import { isSport, trickById } from "@/lib/sports";
 
 /** À incrémenter quand la méthode d'analyse change : un même clip est alors réanalysé au lieu de ressortir l'ancien résultat. */
-const ANALYSIS_VERSION = "v4-intention";
+const ANALYSIS_VERSION = "v5-6ips";
 
 const body = z
   .object({
@@ -113,6 +113,5 @@ export async function POST(request: NextRequest) {
     id,
     videoPath,
     needsUpload: !sameClip,
-    frames: depth.frames,
   });
 }

@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { buildFrames, clipFingerprint, loadVideo } from "@/lib/frames";
+import { frameCountFor } from "@/lib/plans";
 import { LEVEL_LABELS, LEVEL_ORDER, SPORTS, trickById, tricksFor, type SportId } from "@/lib/sports";
 import { ClipTrimmer } from "./clip-trimmer";
 import { CropPicker, FULL_FRAME, type Crop } from "./crop-picker";
@@ -17,14 +18,12 @@ export function AnalyseUploader({
   defaultTrick,
   remaining,
   deep,
-  frameCount,
   sports,
   defaultSport,
 }: {
   defaultTrick?: string;
   remaining: number;
   deep: boolean;
-  frameCount: number;
   sports: SportId[];
   defaultSport: SportId;
 }) {
@@ -81,7 +80,7 @@ export function AnalyseUploader({
         video,
         seg.start,
         seg.end,
-        frameCount,
+        frameCountFor(seg.end - seg.start),
         (d, t) => setProgress(Math.round((d / t) * 100)),
         crop,
       );
@@ -114,9 +113,6 @@ export function AnalyseUploader({
         return;
       }
       analysisId = created.id;
-      if (created.frames !== frameCount) {
-        throw new Error("Ta formule vient de changer : recharge la page puis relance l'analyse.");
-      }
 
       // Le clip complet (souvent 30 à 100 Mo depuis un téléphone) ne sert qu'à le revoir à côté du rapport :
       // il part en parallèle et n'empêche pas d'afficher le résultat dès que l'IA a répondu.
@@ -178,7 +174,7 @@ export function AnalyseUploader({
           </span>
           <span className="mt-3 text-xl font-bold">{dragging ? "Lâche ta vidéo ici" : "Importer une vidéo"}</span>
           <span className="mt-2 max-w-xs text-slate">
-            Depuis ta galerie, ou glisse le fichier ici. Tu choisiras ensuite le passage de ta figure, 20 secondes maximum.
+            Depuis ta galerie, ou glisse le fichier ici. Tu choisiras ensuite le passage de ta figure, 10 secondes maximum.
           </span>
           <span className="mt-3 text-xs text-slate">MP4, MOV ou WebM · 200 Mo max</span>
         </label>
@@ -195,7 +191,7 @@ export function AnalyseUploader({
               ["De côté", "Filme perpendiculairement à ta trajectoire, pas de face."],
               ["Pas trop loin", "20 à 40 m : le rider doit rester bien visible, kite ou aile compris."],
               ["Stable", "Téléphone à l'horizontale, sans zoomer pendant la figure."],
-              ["Une figure", "Garde juste l'approche, la figure et la réception : 20 s max."],
+              ["Une figure", "Garde juste l'approche, la figure et la réception : 10 s max."],
             ].map(([t, d]) => (
               <li key={t} className="flex gap-2.5">
                 <span aria-hidden="true" className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-brand-light text-xs font-bold text-brand">✓</span>

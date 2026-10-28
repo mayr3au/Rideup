@@ -107,7 +107,9 @@ async function captureByPlayback(
   try {
     await seek(video, Math.max(0, times[0] - 0.05));
     video.muted = true;
-    video.playbackRate = span > 8 ? 4 : span > 3 ? 3 : 2;
+    // Images très rapprochées (6 par seconde) : lecture moins accélérée pour n'en sauter aucune
+    const density = times.length / Math.max(span, 0.1);
+    video.playbackRate = density > 3 ? 2 : span > 8 ? 4 : span > 3 ? 3 : 2;
   } catch {
     return done;
   }
@@ -148,7 +150,7 @@ async function captureByPlayback(
 }
 
 /** Taille des images envoyées à l'IA : grand côté en pixels. Assez grand pour bien voir le rider et le kite. */
-const FRAME_LONG_SIDE = 896;
+const FRAME_LONG_SIDE = 720;
 
 /**
  * Extrait `count` images réparties sur [start, end], dans l'ordre, chacune numérotée avec son horodatage.
@@ -199,13 +201,13 @@ export async function buildFrames(
     const ctx = c.getContext("2d")!;
     // Numéro et horodatage, pour que l'IA suive l'ordre des images
     const label = `${idx + 1} · ${times[idx].toFixed(1)} s`;
-    ctx.font = "bold 18px system-ui, sans-serif";
-    const lw = ctx.measureText(label).width + 12;
+    ctx.font = "bold 16px system-ui, sans-serif";
+    const lw = ctx.measureText(label).width + 10;
     ctx.fillStyle = "rgba(0,0,0,0.65)";
-    ctx.fillRect(6, 6, lw, 26);
+    ctx.fillRect(5, 5, lw, 22);
     ctx.fillStyle = "#ffd23f";
-    ctx.fillText(label, 12, 25);
-    return c.toDataURL("image/jpeg", 0.72);
+    ctx.fillText(label, 10, 21);
+    return c.toDataURL("image/jpeg", 0.7);
   });
   return { frames, times };
 }

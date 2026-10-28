@@ -3,7 +3,7 @@ import { z } from "zod";
 import { getSession } from "@/lib/auth";
 import { analyseClip, MODEL, type PreviousAttempt } from "@/lib/ai";
 import { releaseAnalysis } from "@/lib/usage";
-import { ANALYSIS_DEPTH } from "@/lib/plans";
+import { ANALYSIS_DEPTH, MAX_FRAMES, frameCountFor } from "@/lib/plans";
 import { trickById } from "@/lib/sports";
 import { createAdminClient } from "@/lib/supabase/admin";
 import type { AnalysisResult, VideoAnalysis } from "@/lib/types";
@@ -11,11 +11,11 @@ import { normalizeResult } from "@/lib/analysis-result";
 
 export const maxDuration = 300;
 
-const MAX_FRAME_B64 = 600_000; // ~450 Ko par image
+const MAX_FRAME_B64 = 300_000; // ~220 Ko par image
 
 const body = z.object({
-  frames: z.array(z.string().max(MAX_FRAME_B64)).min(1).max(16),
-  frameTimes: z.array(z.number()).max(16),
+  frames: z.array(z.string().max(MAX_FRAME_B64)).min(1).max(MAX_FRAMES),
+  frameTimes: z.array(z.number()).max(MAX_FRAMES),
 });
 
 /** Étape 2 : reçoit les images du passage choisi et lance l'analyse IA. */
@@ -48,7 +48,12 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
   // Profondeur figée à la réservation (un changement de formule entre-temps ne casse rien)
   const depth = analysis.depth === "approfondie" ? ANALYSIS_DEPTH.elite : ANALYSIS_DEPTH.progress;
   const parsed = body.safeParse(await request.json().catch(() => null));
-  if (!parsed.success || parsed.data.frames.length !== depth.frames || parsed.data.frameTimes.length !== depth.frames) {
+  const expected = frameCountFor(Number(analysis.seg_end) - Number(analysis.seg_start));
+  if (
+    !parsed.success ||
+    Math.abs(parsed.data.frames.length - expected) > 1 ||
+    parsed.data.frameTimes.length !== parsed.data.frames.length
+  ) {
     return fail(400, "Les images du clip n'ont pas pu être lues. Réessaie : cette tentative n'est pas décomptée.");
   }
 
