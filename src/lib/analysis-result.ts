@@ -43,6 +43,8 @@ export function normalizeResult(raw: unknown): AnalysisResult {
         gravite: e.gravite === "majeure" || e.gravite === "mineure" ? e.gravite : "moyenne",
       })),
     drills: asArray<unknown>(r.drills).map((d) => str(d)).filter(Boolean),
+    rappels: asArray<unknown>(r.rappels).map((d) => str(d)).filter(Boolean),
+    observations: asArray<unknown>(r.observations).map((d) => str(d)).filter(Boolean),
     priorite_session: str(r.priorite_session),
     securite: typeof r.securite === "string" && r.securite.trim() ? r.securite : null,
     evolution: typeof r.evolution === "string" && r.evolution.trim() ? r.evolution : null,

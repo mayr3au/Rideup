@@ -7,6 +7,9 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { ANALYSIS_DEPTH, MAX_SEGMENT_SECONDS } from "@/lib/plans";
 import { isSport, trickById } from "@/lib/sports";
 
+/** À incrémenter quand la méthode d'analyse change : un même clip est alors réanalysé au lieu de ressortir l'ancien résultat. */
+const ANALYSIS_VERSION = "v3-images";
+
 const body = z
   .object({
     sport: z.string().refine(isSport, "Sport inconnu."),
@@ -45,7 +48,7 @@ export async function POST(request: NextRequest) {
   const depth = ANALYSIS_DEPTH[plan];
 
   const cacheKey = createHash("sha256")
-    .update([b.clipHash, b.segStart.toFixed(1), b.segEnd.toFixed(1), b.sport, b.trick || "-", depth.depth, b.crop?.join(",") ?? "full"].join("|"))
+    .update([ANALYSIS_VERSION, b.clipHash, b.segStart.toFixed(1), b.segEnd.toFixed(1), b.sport, b.trick || "-", depth.depth, b.crop?.join(",") ?? "full"].join("|"))
     .digest("hex");
 
   // 1. Résultat déjà disponible ?
@@ -110,6 +113,6 @@ export async function POST(request: NextRequest) {
     id,
     videoPath,
     needsUpload: !sameClip,
-    sheets: depth.sheets,
+    frames: depth.frames,
   });
 }
