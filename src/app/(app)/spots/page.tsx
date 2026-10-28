@@ -61,8 +61,9 @@ export default async function SpotsPage({ searchParams }: { searchParams: Promis
   ]);
   const favorites = new Set((favs ?? []).map((f) => f.spot_id as string));
 
-  const nearby = (allSpots ?? [])
-    .map((s) => ({ ...s, distance: distanceKm(lat, lng, s.lat, s.lng) }))
+  const withDistance = (allSpots ?? []).map((s) => ({ ...s, distance: distanceKm(lat, lng, s.lat, s.lng) }));
+  const closest = withDistance.reduce<(typeof withDistance)[number] | null>((m, s) => (!m || s.distance < m.distance ? s : m), null);
+  const nearby = withDistance
     .filter((s) => s.distance <= radius || favorites.has(s.id))
     .sort((a, b) => a.distance - b.distance)
     .slice(0, MAX_SPOTS);
@@ -155,11 +156,19 @@ export default async function SpotsPage({ searchParams }: { searchParams: Promis
               ? "Aucun téléski nautique référencé autour de toi pour l'instant."
               : "Aucun spot référencé dans ce rayon."}
           </p>
-          {radius < 2000 && (
-            <Link href={`/spots?rayon=${Math.min(2000, radius * 2)}`} className="btn btn-primary mt-4">
-              Chercher à {Math.min(2000, radius * 2)} km
-            </Link>
+          {closest && S.spot !== "cable" && (
+            <p className="mt-1 text-slate">
+              Le plus proche : {closest.name}, à {Math.round(closest.distance)} km.
+            </p>
           )}
+          {radius < 2000 && (() => {
+            const next = closest ? Math.min(2000, [250, 500, 1000, 2000].find((r) => r > radius && r >= closest.distance) ?? 2000) : Math.min(2000, radius * 2);
+            return (
+              <Link href={`/spots?rayon=${next}${sp.lat && sp.lng ? `&lat=${sp.lat}&lng=${sp.lng}` : ""}`} className="btn btn-primary mt-4">
+                Chercher à {next} km
+              </Link>
+            );
+          })()}
         </div>
       ) : (
         <div className="mt-6">

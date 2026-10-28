@@ -2,14 +2,16 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import { Suspense } from "react";
 import { requireSession, effectivePlan } from "@/lib/auth";
 import { getQuota } from "@/lib/usage";
 import { getProgressData } from "@/lib/progress";
-import { PLANS } from "@/lib/plans";
+import { hasSpotFinder, PLANS } from "@/lib/plans";
 import { courseForTrick } from "@/lib/courses";
 import { activeSport, levelFor } from "@/lib/rider";
 import { LEVEL_LABELS, SPORTS } from "@/lib/sports";
 import { SPORT_PHOTOS } from "@/lib/photos";
+import { DashboardConditions, DashboardConditionsSkeleton } from "@/components/dashboard-conditions";
 
 export const metadata: Metadata = { title: "Accueil" };
 
@@ -29,6 +31,7 @@ export default async function Dashboard({ searchParams }: { searchParams: Promis
   const firstName = profile.full_name?.split(" ")[0];
   const next = data.working[0] ?? data.nextTrick;
   const course = next ? courseForTrick(next.id) : undefined;
+  const showConditions = hasSpotFinder(plan) && S.spot !== "cable";
 
   return (
     <div className="mx-auto max-w-3xl space-y-6">
@@ -49,15 +52,17 @@ export default async function Dashboard({ searchParams }: { searchParams: Promis
         <div className="photo-veil absolute inset-0" />
         <div className="relative flex items-end justify-between gap-4 p-5 text-white">
           <div>
-            <p className="text-2xl font-bold">Analyser une figure</p>
-            <p className="text-white/85">
+            <p className="text-2xl font-bold">Analyser ma position</p>
+            <p className="text-white/85">Une photo de toi en action, et tu sais quoi corriger.</p>
+            <p className="mt-1 text-sm text-white/75">
               {quota.remaining} analyse{quota.remaining > 1 ? "s" : ""} restante{quota.remaining > 1 ? "s" : ""}
               {plan === "free" ? " (essai)" : ` ce mois-ci · ${PLANS[plan].name}`}
             </p>
           </div>
           <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-white text-brand" aria-hidden="true">
             <svg viewBox="0 0 24 24" className="h-6 w-6" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M12 5v14M5 12h14" />
+              <path d="M4 8h3l2-3h6l2 3h3v11H4z" />
+              <circle cx="12" cy="13" r="3.5" />
             </svg>
           </span>
         </div>
@@ -67,6 +72,12 @@ export default async function Dashboard({ searchParams }: { searchParams: Promis
           Plus d&apos;analyses ?{" "}
           <Link href="/tarifs" className="font-semibold text-lagoon">Voir les formules</Link>
         </p>
+      )}
+
+      {showConditions && (
+        <Suspense fallback={<DashboardConditionsSkeleton />}>
+          <DashboardConditions profile={profile} sport={sport} />
+        </Suspense>
       )}
 
       {/* Premiers pas : tant qu'aucune analyse n'a été faite */}
@@ -119,7 +130,7 @@ export default async function Dashboard({ searchParams }: { searchParams: Promis
       </section>
       )}
 
-      <div className="grid gap-4 sm:grid-cols-2">
+      <div className={`grid gap-4 ${showConditions ? "" : "sm:grid-cols-2"}`}>
         {next && (
           <section className="panel p-5">
             <p className="text-sm font-semibold text-brand">{data.working.length ? "Figure en cours" : "Prochaine figure"}</p>
@@ -131,6 +142,7 @@ export default async function Dashboard({ searchParams }: { searchParams: Promis
             </div>
           </section>
         )}
+        {!showConditions && (
         <section className="panel p-5">
           <p className="text-sm font-semibold text-brand">{S.spot === "cable" ? "Où rider" : "Conditions"}</p>
           <h2 className="mt-1 text-xl font-bold">Spot Finder</h2>
@@ -145,6 +157,7 @@ export default async function Dashboard({ searchParams }: { searchParams: Promis
             {plan === "free" ? "Voir les spots du week-end" : "Trouver un spot"}
           </Link>
         </section>
+        )}
       </div>
 
       {data.recentAttempts.length > 0 && (
@@ -155,12 +168,20 @@ export default async function Dashboard({ searchParams }: { searchParams: Promis
           </div>
           <ul className="mt-3 space-y-2">
             {data.recentAttempts.slice(-3).reverse().map((a, i) => (
-              <li key={i} className="panel flex items-center justify-between gap-4 px-4 py-3">
-                <span>
-                  <span className="font-semibold">{a.figure}</span>
-                  <span className="block text-sm text-slate">{a.date}</span>
-                </span>
-                <span className="text-xl font-extrabold text-brand">{a.note}/10</span>
+              <li key={i}>
+                <Link href={`/analyse/${a.id}`} className="panel flex items-center gap-3 px-4 py-3 hover:ring-2 hover:ring-brand/30">
+                  {a.image ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img src={a.image} alt="" className="h-12 w-12 shrink-0 rounded-xl object-cover" />
+                  ) : (
+                    <span aria-hidden="true" className="h-12 w-12 shrink-0 rounded-xl bg-brand-light" />
+                  )}
+                  <span className="min-w-0 flex-1">
+                    <span className="block truncate font-semibold">{a.figure}</span>
+                    <span className="block truncate text-sm text-slate">{a.priorite || a.date}</span>
+                  </span>
+                  <span className="shrink-0 text-xl font-extrabold text-brand">{a.note}/10</span>
+                </Link>
               </li>
             ))}
           </ul>

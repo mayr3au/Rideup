@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 /** Recherche autour de la position actuelle du téléphone (utile en voyage). */
-export function NearMeButton({ radius }: { radius: number }) {
+export function NearMeButton({ radius, basePath = "/spots", query = "" }: { radius: number; basePath?: string; query?: string }) {
   const router = useRouter();
   const [state, setState] = useState<"idle" | "loading" | "denied">("idle");
 
@@ -15,7 +15,7 @@ export function NearMeButton({ radius }: { radius: number }) {
       (pos) => {
         const lat = pos.coords.latitude.toFixed(3);
         const lng = pos.coords.longitude.toFixed(3);
-        router.push(`/spots?lat=${lat}&lng=${lng}&rayon=${radius}`);
+        router.push(`${basePath}?lat=${lat}&lng=${lng}&rayon=${radius}${query ? `&${query}` : ""}`);
         setState("idle");
       },
       () => setState("denied"),

@@ -80,3 +80,15 @@ export async function toggleSpot(formData: FormData) {
   await db.from("spots").update({ active: formData.get("active") === "true" }).eq("id", String(formData.get("id")));
   revalidatePath("/admin/spots");
 }
+
+/** Ajoute les spots du catalogue livré avec le site qui manquent encore (les spots existants ne sont pas modifiés). */
+export async function importSpotCatalogue() {
+  const db = await requireAdmin();
+  const { SPOT_CATALOGUE } = await import("@/lib/spot-catalogue");
+  await db.from("spots").upsert(
+    SPOT_CATALOGUE.map((s) => ({ ...s, sports: ["kitesurf", "wingfoil", "foil"], active: true })),
+    { onConflict: "id", ignoreDuplicates: true },
+  );
+  revalidatePath("/admin/spots");
+  revalidatePath("/spots");
+}
