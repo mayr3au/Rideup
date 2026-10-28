@@ -326,6 +326,7 @@ export async function analyseClip(opts: {
   history: RiderHistory;
   sheets: string[]; // planches JPEG base64 (grilles 4×3 numérotées)
   frameTimes: number[]; // horodatage (s) de chaque image dans le clip
+  trace?: string | null; // chronophotographie JPEG base64 : toutes les positions superposées
   trickId?: string | null;
   notes?: string | null;
   deep: boolean;
@@ -342,13 +343,17 @@ export async function analyseClip(opts: {
     `Sport : ${sport.name}.`,
     trick
       ? `Le rider dit tenter : ${trick.name}. Points clés attendus : ${trick.keys.join(" ; ")}.`
-      : `Le rider n'a pas précisé la figure : identifie-la à partir du mouvement (figures de la roadmap ${sport.name} : ${tricksFor(opts.sport).map((t) => t.name).join(", ")}).`,
+      : `Le rider n'a pas précisé la figure : identifie-la à partir du mouvement. Figures possibles :\n${tricksFor(opts.sport)
+          .map((t) => `- ${t.name} : ${t.summary}`)
+          .join("\n")}`,
+    "Méthode : suis d'abord la trajectoire du kite ou de l'aile et celle du rider sur toute la séquence (le kite fait-il un tour complet ? le rider tourne-t-il sur lui-même ? décolle-t-il ?), puis seulement juge la technique.",
     opts.notes ? `Ce qui coince selon lui : « ${opts.notes} ».` : "",
     `Analyse comme un moniteur de ${sport.name.toLowerCase()} : ${sport.checklist}.`,
     `Phases à noter : ${sport.phases.approche}, ${sport.phases.appel}, ${sport.phases.vol}, ${sport.phases.reception}.`,
     "Les numéros et horodatages des images servent seulement à ta lecture : ne les cite jamais dans le rapport, ni les planches. Situe tout par phase (approche, appel, en l'air, réception).",
     "Ton : moniteur sûr de son diagnostic. Affirmatif et direct, phrases courtes, à l'impératif pour les consignes. Pas de conditionnel ni de « semble », « peut-être », « probablement », « lecture incertaine ».",
-    "Ce que tu ne vois pas (rider trop loin, planche ou aile hors cadre) : dis-le une seule fois, en une courte phrase dans le résumé, baisse « visibilite », puis n'en parle plus. Ne note pas une phase invisible et ne relève aucune erreur que tu ne vois pas : juge uniquement ce qui est visible.",
+    "Le rider est souvent loin et petit à l'image : c'est normal en glisse, et ça ne t'empêche pas d'analyser. Lis la figure avec tous les indices lisibles : trajectoire et position du kite ou de l'aile dans la fenêtre, silhouette et orientation du corps, hauteur au-dessus de l'eau, gerbes d'eau au décollage et à la réception, vitesse et direction de déplacement. Identifie la figure et note-la avec assurance à partir de ces indices ; la distance ne fait pas baisser la note, seule l'exécution compte.",
+    "Ce que tu ne peux vraiment pas lire (détail du corps trop petit, planche hors cadre) : dis-le une seule fois, en une courte phrase dans le résumé, puis n'en parle plus. « visibilite » = faible seulement si la figure elle-même est illisible. Ne relève aucune erreur que tu ne vois pas.",
     "Chaque erreur est un point technique précis : pas de description générique de la vidéo.",
     "Si la vidéo ne correspond pas au sport indiqué, dis-le dans le résumé et analyse ce que tu vois.",
     opts.deep
@@ -369,6 +374,13 @@ export async function analyseClip(opts: {
     content.push({ type: "text", text: `Planche ${i + 1}` });
     content.push({ type: "image", source: { type: "base64", media_type: "image/jpeg", data } });
   });
+  if (opts.trace) {
+    content.push({
+      type: "text",
+      text: "Image de synthèse (chronophotographie) : le décor est fixe et toutes les positions successives de ce qui bouge (kite ou aile, lignes, rider, gerbes d'eau) sont superposées. Elle montre directement les trajectoires : une boucle complète du kite y forme un cercle, un saut une courbe. Sers-t'en pour identifier la figure et juger les trajectoires.",
+    });
+    content.push({ type: "image", source: { type: "base64", media_type: "image/jpeg", data: opts.trace } });
+  }
 
   const tool = analysisTool(opts.sport, Boolean(opts.previous?.length));
   const { input, cost } = await callWithTool(opts.profile.id, "analyse", {
