@@ -7,16 +7,16 @@ import "./globals.css";
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000"),
   title: {
-    default: "RIDE'UP — Coach de glisse et analyse vidéo",
+    default: "RIDE'UP — Coach de glisse et analyse de position",
     template: "%s | RIDE'UP",
   },
   description:
-    "Envoie un clip de 10 secondes de ta figure et reçois une correction précise, des drills et une roadmap de progression en kitesurf, wingfoil, foil, surf et wakeboard.",
+    "Envoie une photo de ta figure et reçois une correction précise de ta position, des drills et une roadmap de progression en kitesurf, wingfoil, foil, surf et wakeboard.",
   applicationName: "RIDE'UP",
   appleWebApp: { capable: true, title: "RIDE'UP", statusBarStyle: "default" },
   openGraph: {
     title: "RIDE'UP — Ton coach de glisse dans ta poche",
-    description: "Envoie 10 secondes de ta figure : tu sais exactement quoi corriger. Kite, wing, foil, surf, wake.",
+    description: "Envoie une photo de ta figure : tu sais exactement quoi corriger. Kite, wing, foil, surf, wake.",
     type: "website",
     locale: "fr_FR",
     images: [{ url: "/hero-surf.jpg", width: 1199, height: 1495 }],

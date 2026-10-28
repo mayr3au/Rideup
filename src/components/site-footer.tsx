@@ -30,7 +30,7 @@ export function SiteFooter() {
         <div className="max-w-sm">
           <Logo full height={64} />
           <p className="mt-4 text-slate">
-            Coaching de glisse par IA (kitesurf, wingfoil, foil, surf, wakeboard) : analyse vidéo de tes figures, suivi de progression et Spot Finder selon le vent et la houle,
+            Coaching de glisse par IA (kitesurf, wingfoil, foil, surf, wakeboard) : analyse de ta position sur tes figures, suivi de progression et Spot Finder selon le vent et la houle,
             ton niveau et ton matériel.
           </p>
         </div>

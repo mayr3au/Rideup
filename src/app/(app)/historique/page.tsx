@@ -77,7 +77,7 @@ export default async function HistoryPage({ searchParams }: { searchParams: Prom
       ) : (
         <div className="panel mt-6 p-6 text-center">
           <p className="text-lg font-bold">Aucune analyse pour l&apos;instant</p>
-          <p className="mt-1 text-slate">Filme une figure, garde 10 secondes, et reçois ton premier retour de coach.</p>
+          <p className="mt-1 text-slate">Envoie une photo de ta figure et reçois ton premier retour de coach.</p>
           <Link href="/analyse" className="btn btn-primary mt-4">Analyser une figure</Link>
         </div>
       )}

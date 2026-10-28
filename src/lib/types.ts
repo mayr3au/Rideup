@@ -68,6 +68,8 @@ export type AnalysisResult = {
   evolution?: string | null; // Elite : comparaison avec les tentatives précédentes
   observations?: string[]; // ce que l'IA a vu, image par image (non affiché)
   rappels?: string[]; // bons gestes sur des points non visibles, en conseil
+  moment?: string | null; // analyse photo : moment de la figure visible
+  image?: string | null; // analyse photo : miniature JPEG (data URL)
 };
 
 export type VideoAnalysis = {
