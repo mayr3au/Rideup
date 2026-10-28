@@ -241,7 +241,14 @@ export default async function AnalysisDetail({
             Nouvelle tentative
           </Link>
         )}
-        <Link href="/coach" className="btn btn-ghost">
+        <Link
+          href={`/coach?q=${encodeURIComponent(
+            r?.priorite_session
+              ? `Sur ma dernière analyse (${r.figure}), on me dit : « ${r.priorite_session} » Comment je travaille ça à ma prochaine session ?`
+              : "Comment je travaille ce que mon analyse a relevé ?",
+          )}`}
+          className="btn btn-ghost"
+        >
           En parler au coach
         </Link>
         {r && (

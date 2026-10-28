@@ -248,6 +248,50 @@ export async function coachReply(
     .trim();
 }
 
+/**
+ * Même réponse que coachReply, mais envoyée au fil de l'écriture : le rider voit le texte apparaître
+ * tout de suite au lieu d'attendre la réponse complète. `onDone` reçoit le texte final (pour l'enregistrer),
+ * ou une chaîne vide si la réponse a échoué (pour ne pas décompter le message).
+ */
+export function streamCoachReply(
+  profile: Profile,
+  sport: SportId,
+  history: RiderHistory,
+  messages: { role: "user" | "assistant"; content: string }[],
+  onDone: (text: string) => Promise<void>,
+): ReadableStream<Uint8Array> {
+  const convo: Anthropic.MessageParam[] = messages.map((m, i) =>
+    i === messages.length - 2
+      ? { role: m.role, content: [{ type: "text", text: m.content, cache_control: { type: "ephemeral" } }] }
+      : { role: m.role, content: m.content },
+  );
+  const base = callParams("coach", `${coachRules(sport)}\n\nProfil du rider :\n${riderContext(profile, sport, history)}`, 1400);
+  const encoder = new TextEncoder();
+
+  return new ReadableStream<Uint8Array>({
+    async start(controller) {
+      let text = "";
+      try {
+        const stream = anthropic().messages.stream({ ...base, messages: convo });
+        stream.on("text", (delta) => {
+          text += delta;
+          controller.enqueue(encoder.encode(delta));
+        });
+        const final = await stream.finalMessage();
+        await recordUsage(profile.id, "coach", base.model, final.usage);
+        await onDone(text.trim());
+        controller.close();
+      } catch (e) {
+        console.error("coach (flux)", e);
+        await onDone("").catch(() => {}); // réponse non enregistrée, message non décompté
+        // Marqueur lu par le navigateur : la réponse a été interrompue
+        controller.enqueue(encoder.encode("\u0000ERREUR"));
+        controller.close();
+      }
+    },
+  });
+}
+
 /* ───────────────────────── Analyse vidéo ───────────────────────── */
 
 function analysisTool(sport: SportId, withEvolution: boolean): Anthropic.Tool {
