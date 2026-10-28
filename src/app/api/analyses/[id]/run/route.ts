@@ -16,6 +16,14 @@ const body = z.object({
   sheets: z.array(z.string().max(MAX_SHEET_B64)).min(1).max(4),
   frameTimes: z.array(z.number()).max(48),
   trace: z.string().max(MAX_SHEET_B64).nullish(), // chronophotographie (toutes les positions superposées)
+  mesures: z
+    .object({
+      couverture: z.object({ kite: z.number().min(0).max(1), rider: z.number().min(0).max(1) }),
+      saut: z.object({ tempsEnAir: z.number().min(0).max(20), hauteur: z.number().min(0).max(30), decollage: z.number(), reception: z.number() }).nullable(),
+      boucle: z.object({ tours: z.number().min(0).max(10), sens: z.enum(["horaire", "antihoraire"]) }).nullable(),
+      kite: z.object({ decollage: z.number().nullable(), reception: z.number().nullable(), max: z.number() }).nullable(),
+    })
+    .nullish(),
 });
 
 /** Étape 2 : reçoit les planches d'images du passage choisi et lance l'analyse IA. */
@@ -88,6 +96,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
       sheets: parsed.data.sheets.map((s) => s.replace(/^data:image\/jpeg;base64,/, "")),
       frameTimes: parsed.data.frameTimes,
       trace: parsed.data.trace?.replace(/^data:image\/jpeg;base64,/, "") ?? null,
+      mesures: parsed.data.mesures ?? null,
       trickId: analysis.trick,
       notes: analysis.notes,
       deep: depth.depth === "approfondie",
@@ -98,6 +107,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
     return fail(502, "L'analyse a échoué. Elle n'est pas décomptée : réessaie avec le même clip.", e);
   }
 
+  if (parsed.data.mesures) result.mesures = parsed.data.mesures;
   const trickId = analysis.trick ?? result.figure_id;
   await db
     .from("video_analyses")

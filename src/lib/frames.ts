@@ -6,6 +6,8 @@
  */
 
 import { FRAMES_PER_SHEET } from "./plans";
+import type { Mesures } from "./mesures";
+import type { FrameTrack } from "./tracking";
 
 export function loadVideo(src: string): Promise<HTMLVideoElement> {
   return new Promise((resolve, reject) => {
@@ -154,7 +156,7 @@ async function captureByPlayback(
  * par-dessus dans l'ordre du temps. Une boucle de kite devient un cercle, un saut devient une parabole.
  * Utile surtout quand le rider est loin. Renvoie null si la caméra bouge trop (image brouillée).
  */
-function buildTrace(cells: HTMLCanvasElement[], w: number, h: number): string | null {
+function buildTrace(cells: HTMLCanvasElement[], w: number, h: number, track: FrameTrack[] | null): string | null {
   const frames = cells.map((c) => c.getContext("2d")!.getImageData(0, 0, w, h).data);
   const n = frames.length;
   const size = w * h;
@@ -191,6 +193,20 @@ function buildTrace(cells: HTMLCanvasElement[], w: number, h: number): string | 
   c.height = h;
   const ctx = c.getContext("2d")!;
   ctx.putImageData(new ImageData(out, w, h), 0, 0);
+  // Trajectoires suivies : kite en orange, rider en jaune
+  if (track) {
+    const path = (pick: (f: FrameTrack) => { x: number; y: number; w: number; h: number } | null, color: string) => {
+      const pts = track.map(pick).filter(Boolean).map((b) => ({ x: (b!.x + b!.w / 2) * w, y: (b!.y + b!.h / 2) * h }));
+      if (pts.length < 3) return;
+      ctx.strokeStyle = color;
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      pts.forEach((p, i) => (i ? ctx.lineTo(p.x, p.y) : ctx.moveTo(p.x, p.y)));
+      ctx.stroke();
+    };
+    path((f) => f.kite, "#ff8a00");
+    path((f) => f.rider, "#ffd23f");
+  }
   // Agrandie ×2 pour que le modèle distingue bien les trajectoires
   const big = document.createElement("canvas");
   big.width = w * 2;
@@ -232,14 +248,25 @@ export async function buildContactSheets(
   const sy = crop.y * video.videoHeight;
   const sw = crop.w * video.videoWidth;
   const sh = crop.h * video.videoHeight;
+  // Copie plus grande de chaque image pour le détecteur de kite / rider (les petits objets y restent lisibles)
+  const detW = Math.round(Math.min(800, sw));
+  const detH = Math.round(detW * (sh / sw));
+  const det = times.map(() => {
+    const c = document.createElement("canvas");
+    c.width = detW;
+    c.height = detH;
+    return c;
+  });
   const drawCell = (idx: number) => {
     const ctx = cells[idx].getContext("2d");
     if (!ctx) return;
     ctx.imageSmoothingQuality = "high";
     ctx.drawImage(video, sx, sy, sw, sh, 0, 0, cellW, cellH);
+    det[idx].getContext("2d")?.drawImage(video, sx, sy, sw, sh, 0, 0, detW, detH);
   };
+  // Progression : capture = 0-60 %, suivi du kite et du rider = 60-100 %
   let captured = 0;
-  const tick = () => onProgress?.(++captured, total);
+  const tick = () => onProgress?.(Math.round(++captured * 0.6), total);
 
   const fast = await captureByPlayback(video as FrameCallbackVideo, times, drawCell, tick);
   for (let idx = 0; idx < total; idx++) {
@@ -278,11 +305,43 @@ export async function buildContactSheets(
     }
     out.push(canvas.toDataURL("image/jpeg", 0.8));
   }
+  // Suivi du kite, du rider et de la planche → mesures (temps en l'air, hauteur, boucle, angle du kite)
+  let track: FrameTrack[] | null = null;
+  let mesures: Mesures | null = null;
+  try {
+    const { trackFrames, computeMesures } = await import("./tracking");
+    track = await trackFrames(det, times, (d, t) => onProgress?.(Math.round(total * 0.6 + (d / t) * total * 0.4), total));
+    if (track) {
+      const m = computeMesures(track, sw / sh);
+      mesures = m.couverture.kite >= 0.3 || m.couverture.rider >= 0.3 ? m : null;
+      if (process.env.NODE_ENV !== "production") console.info("[suivi]", m);
+    }
+  } catch {
+    track = null;
+  }
+  onProgress?.(total, total);
+
   let trace: string | null = null;
   try {
-    trace = buildTrace(cells, cellW, cellH);
+    // Recalage vertical sur l'horizon : une caméra qui monte et descend ne brouille plus la synthèse
+    let traceCells = cells;
+    const hz = track?.map((f) => f.horizon?.y ?? null) ?? [];
+    if (track && hz.filter((y) => y != null).length >= track.length * 0.7) {
+      const known = hz.filter((y): y is number => y != null).sort((a, b) => a - b);
+      const ref = known[Math.floor(known.length / 2)];
+      traceCells = cells.map((c, i) => {
+        const dy = hz[i] != null ? Math.round((hz[i]! - ref) * cellH) : 0;
+        if (!dy) return c;
+        const a = document.createElement("canvas");
+        a.width = cellW;
+        a.height = cellH;
+        a.getContext("2d")!.drawImage(c, 0, -dy);
+        return a;
+      });
+    }
+    trace = buildTrace(traceCells, cellW, cellH, track);
   } catch {
     trace = null;
   }
-  return { sheets: out, times, trace };
+  return { sheets: out, times, trace, mesures };
 }

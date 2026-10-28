@@ -1,3 +1,4 @@
+import type { Mesures } from "./mesures";
 import type { Level, SportId } from "./sports";
 import type { Plan } from "./plans";
 import type { RiderDetails } from "./rider-details";
@@ -66,6 +67,7 @@ export type AnalysisResult = {
   priorite_session: string;
   securite: string | null;
   evolution?: string | null; // Elite : comparaison avec les tentatives précédentes
+  mesures?: Mesures | null; // suivi automatique du kite et du rider
 };
 
 export type VideoAnalysis = {
