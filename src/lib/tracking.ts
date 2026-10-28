@@ -277,16 +277,36 @@ export function computeMesures(track: FrameTrack[], aspect: number): Mesures {
       const r = center(f.rider!);
       return Math.atan2(-(k.y - r.y), (k.x - r.x) * aspect);
     };
+    // Une vraie boucle : le kite tourne régulièrement autour du rider, toujours dans le même sens.
+    // Les sauts d'angle brusques (kite confondu avec un autre, rider perdu) sont du bruit : on ne les compte pas,
+    // et s'il y en a trop, on ne conclut à aucune boucle.
+    const MAX_STEP = (70 * Math.PI) / 180;
     let total = 0;
+    let absTotal = 0;
+    let steps = 0;
+    let noisy = 0;
     for (let j = 1; j < both.length; j++) {
-      if (both[j].i - both[j - 1].i > 3) continue; // trou trop long : on ne devine pas
-      let d = angle(both[j].f) - angle(both[j - 1].f);
+      const a = both[j - 1];
+      const b = both[j];
+      if (b.i - a.i > 2) continue; // trou trop long : on ne devine pas
+      steps++;
+      const ka = center(a.f.kite!);
+      const kb = center(b.f.kite!);
+      const kiteJump = Math.hypot(kb.x - ka.x, kb.y - ka.y) > 0.25;
+      let d = angle(b.f) - angle(a.f);
       while (d > Math.PI) d -= 2 * Math.PI;
       while (d < -Math.PI) d += 2 * Math.PI;
+      if (kiteJump || Math.abs(d) > MAX_STEP) {
+        noisy++;
+        continue;
+      }
       total += d;
+      absTotal += Math.abs(d);
     }
     const tours = Math.abs(total) / (2 * Math.PI);
-    if (tours >= 0.85) boucle = { tours: Math.round(tours * 10) / 10, sens: total < 0 ? "horaire" : "antihoraire" };
+    const regular = absTotal > 0 && Math.abs(total) / absTotal >= 0.75; // même sens de rotation
+    const clean = steps >= 6 && noisy / steps <= 0.2;
+    if (tours >= 0.9 && regular && clean) boucle = { tours: Math.round(tours * 10) / 10, sens: total < 0 ? "horaire" : "antihoraire" };
 
     /* Angle apparent du kite au-dessus de l'horizon, vu depuis le rider */
     const elev = (f: FrameTrack) => {

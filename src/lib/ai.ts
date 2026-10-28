@@ -260,7 +260,7 @@ function analysisTool(sport: SportId, withEvolution: boolean): Anthropic.Tool {
     input_schema: {
       type: "object",
       properties: {
-        figure: { type: "string", description: "Nom de la figure tentée ou identifiée." },
+        figure: { type: "string", description: "Nom d'une seule figure, affirmatif (jamais « peut-être » ni deux figures)." },
         figure_id: {
           type: ["string", "null"],
           enum: [...tricksFor(sport).map((t) => t.id), null],
@@ -344,11 +344,12 @@ export async function analyseClip(opts: {
     `Tu reçois ${opts.sheets.length} planche(s) contenant ${n} images numérotées (1 à ${n}), extraites à intervalle régulier d'un passage de ${span.toFixed(1)} s choisi par le rider. Ordre de lecture : de gauche à droite puis de haut en bas, planche après planche.`,
     `Sport : ${sport.name}.`,
     trick
-      ? `Le rider dit tenter : ${trick.name}. Points clés attendus : ${trick.keys.join(" ; ")}.`
+      ? `Le rider dit tenter : ${trick.name}. Points clés attendus : ${trick.keys.join(" ; ")}. Pars de cette figure : ne la remplace par une autre que si les images montrent clairement autre chose.`
       : `Le rider n'a pas précisé la figure : identifie-la à partir du mouvement. Figures possibles :\n${tricksFor(opts.sport)
           .map((t) => `- ${t.name} : ${t.summary}`)
           .join("\n")}`,
-    "Méthode : suis d'abord la trajectoire du kite ou de l'aile et celle du rider sur toute la séquence (le kite fait-il un tour complet ? le rider tourne-t-il sur lui-même ? décolle-t-il ?), puis seulement juge la technique.",
+    "Méthode : suis d'abord la trajectoire du kite ou de l'aile et celle du rider sur toute la séquence (décolle-t-il ? le kite fait-il un tour complet ?), puis seulement juge la technique.",
+    "Identification : ne parle de rotation (backroll, frontroll…) que si le corps du rider tourne visiblement sur plusieurs images d'affilée. Un rider loin ou flou n'est pas un rider qui tourne. Entre deux figures possibles, choisis toujours la plus simple. Le nom de la figure est affirmatif : jamais « peut-être », jamais deux figures à la fois.",
     opts.notes ? `Ce qui coince selon lui : « ${opts.notes} ».` : "",
     `Analyse comme un moniteur de ${sport.name.toLowerCase()} : ${sport.checklist}.`,
     `Phases à noter : ${sport.phases.approche}, ${sport.phases.appel}, ${sport.phases.vol}, ${sport.phases.reception}.`,
@@ -370,7 +371,7 @@ export async function analyseClip(opts: {
     opts.mesures && mesuresLignes(opts.mesures).length
       ? `Mesures automatiques (suivi du kite et du rider image par image, angles vus depuis la caméra, 90° = zénith) :\n${mesuresLignes(opts.mesures)
           .map((l) => `- ${l.label} : ${l.valeur}`)
-          .join("\n")}\nCes mesures sont fiables : appuie ton diagnostic dessus et cites-en une ou deux quand elles éclairent une correction (ex. « 0,8 s en l'air, c'est court pour un kiteloop »). Si une mesure contredit ce que tu vois, fie-toi aux images.`
+          .join("\n")}\nCe sont des mesures automatiques : sers-t'en pour confirmer ce que tu vois et cites-en une quand elle éclaire une correction (ex. « 0,8 s en l'air »). Elles ne décrivent pas la figure à elles seules : une figure se déduit des images. Si une mesure contredit les images, ignore-la.`
       : "",
     "Réponds uniquement avec l'outil rapport_analyse, en français, en tutoyant.",
   ]
