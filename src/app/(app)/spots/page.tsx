@@ -4,11 +4,12 @@ import { redirect } from "next/navigation";
 import { requireSession, effectivePlan } from "@/lib/auth";
 import { hasSpotFinder } from "@/lib/plans";
 import { getConditions } from "@/lib/weather";
-import { distanceKm, summarizeDay, type Rider } from "@/lib/wind";
+import { distanceKm, rateHour, summarizeDay, type Rider } from "@/lib/wind";
 import { activeSport, gearSizes, levelFor } from "@/lib/rider";
 import { SPORTS } from "@/lib/sports";
 import type { Spot } from "@/lib/types";
 import { SpotFinder, type SpotData } from "@/components/spot-finder";
+import { NearMeButton } from "@/components/near-me-button";
 
 export const metadata: Metadata = { title: "Spot Finder" };
 export const dynamic = "force-dynamic";
@@ -82,10 +83,15 @@ export default async function SpotsPage({ searchParams }: { searchParams: Promis
           distance: Math.round(s.distance),
           favorite: favorites.has(s.id),
           days: dates.map((d) => summarizeDay(hours, d, s, rider)),
-          hours: hours.filter((h) => {
-            const hh = Number(h.time.slice(11, 13));
-            return hh >= 7 && hh <= 21;
-          }),
+          hours: hours
+            .filter((h) => {
+              const hh = Number(h.time.slice(11, 13));
+              return hh >= 7 && hh <= 21;
+            })
+            .map((h) => {
+              const v = rateHour(h, s, rider);
+              return { ...h, score: v.score, ok: v.ok };
+            }),
         };
       });
     } catch (e) {
@@ -111,7 +117,10 @@ export default async function SpotsPage({ searchParams }: { searchParams: Promis
             )}
           </p>
         </div>
-        <Link href="/profil" className="text-sm font-semibold text-lagoon">Modifier mes réglages</Link>
+        <div className="flex items-center gap-3">
+          <NearMeButton radius={radius} />
+          <Link href="/profil" className="text-sm font-semibold text-lagoon">Mes réglages</Link>
+        </div>
       </div>
 
       <nav className="-mx-5 mt-4 flex gap-2 overflow-x-auto px-5 pb-1" aria-label="Rayon de recherche">
