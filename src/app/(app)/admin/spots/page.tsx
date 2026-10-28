@@ -4,7 +4,8 @@ import { requireAdmin } from "@/lib/auth";
 import type { Spot } from "@/lib/types";
 import { SPORT_IDS, SPORTS } from "@/lib/sports";
 import { AdminForm } from "@/components/admin-form";
-import { saveSpot, toggleSpot } from "../actions";
+import { importSpotCatalogue, saveSpot, toggleSpot } from "../actions";
+import { SPOT_CATALOGUE } from "@/lib/spot-catalogue";
 
 export const metadata: Metadata = { title: "Admin · Spots" };
 
@@ -14,6 +15,8 @@ export default async function AdminSpots({ searchParams }: { searchParams: Promi
   const db = createAdminClient();
   const { data: spots } = await db.from("spots").select("*").order("country").order("name").returns<Spot[]>();
   const current = spots?.find((s) => s.id === edit);
+  const known = new Set((spots ?? []).map((s) => s.id));
+  const missing = SPOT_CATALOGUE.filter((s) => !known.has(s.id));
 
   return (
     <div className="grid gap-10 lg:grid-cols-[1fr_1.1fr]">
@@ -78,6 +81,13 @@ export default async function AdminSpots({ searchParams }: { searchParams: Promi
 
       <section>
         <h2 className="text-2xl font-bold">{spots?.length ?? 0} spots</h2>
+        {missing.length > 0 && (
+          <form action={importSpotCatalogue} className="mt-3 rounded-2xl bg-brand-light p-4">
+            <p className="font-semibold">{missing.length} spots du catalogue ne sont pas encore dans ta base</p>
+            <p className="mt-1 text-sm text-slate">{missing.map((m) => m.name).join(", ")}.</p>
+            <button className="btn btn-primary mt-3 !min-h-10 !px-4 !py-2 !text-sm">Importer ces {missing.length} spots</button>
+          </form>
+        )}
         <ul className="mt-4 divide-y divide-line border-y border-line">
           {(spots ?? []).map((s) => (
             <li key={s.id} className="flex items-center justify-between gap-3 py-3">

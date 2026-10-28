@@ -2,40 +2,30 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { requireSession, effectivePlan } from "@/lib/auth";
 import { getQuota, sweepStaleAnalyses } from "@/lib/usage";
-import { ANALYSIS_DEPTH } from "@/lib/plans";
-import { trickById } from "@/lib/sports";
 import { activeSport, riderSports } from "@/lib/rider";
 import { redirect } from "next/navigation";
-import { AnalyseUploader } from "@/components/analyse-uploader";
+import { PhotoUploader } from "@/components/photo-uploader";
 
-export const metadata: Metadata = { title: "Analyse vidéo" };
+export const metadata: Metadata = { title: "Analyse de position" };
 
-export default async function AnalysePage({ searchParams }: { searchParams: Promise<{ figure?: string }> }) {
-  const { figure } = await searchParams;
+export default async function AnalysePage() {
   const { supabase, profile } = await requireSession();
   if (!profile.onboarded) redirect("/profil");
   const plan = effectivePlan(profile);
   await sweepStaleAnalyses(profile.id);
   const quota = await getQuota(supabase, profile, plan, "analyses");
-  const deep = ANALYSIS_DEPTH[plan].depth === "approfondie";
 
   return (
     <div className="mx-auto max-w-2xl">
-      <h1 className="text-3xl font-bold sm:text-4xl">Analyser une figure</h1>
+      <h1 className="text-3xl font-bold sm:text-4xl">Analyse ta position</h1>
       <p className="mt-2 text-slate">
-        Importe ta vidéo, garde le moment de ta figure et reçois tes corrections en une minute environ.
-        {deep && " Ton analyse Elite est approfondie et comparée à tes tentatives précédentes."}
+        Une photo de toi (ou une capture d&apos;écran de ta vidéo), une phrase pour dire ce que tu fais, et tu reçois tes
+        corrections en quelques secondes.
       </p>
 
       <div className="mt-8">
         {quota.allowed ? (
-          <AnalyseUploader
-            defaultTrick={figure && trickById(figure) ? figure : undefined}
-            remaining={quota.remaining}
-            deep={deep}
-            sports={riderSports(profile)}
-            defaultSport={activeSport(profile)}
-          />
+          <PhotoUploader remaining={quota.remaining} sports={riderSports(profile)} defaultSport={activeSport(profile)} />
         ) : (
           <div className="panel p-6">
             <h2 className="text-2xl font-bold">

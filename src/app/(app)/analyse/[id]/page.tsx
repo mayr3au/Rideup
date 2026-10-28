@@ -92,7 +92,11 @@ export default async function AnalysisDetail({
 
       <div className="mt-6 grid gap-8 md:grid-cols-[1fr_1.25fr]">
         <div className="md:sticky md:top-6 md:self-start">
-          {signed?.signedUrl ? (
+          {r?.image ? (
+            // Analyse photo : la miniature est gardée avec le résultat
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={r.image} alt="Ta photo analysée" className="w-full rounded-lg bg-brand" />
+          ) : signed?.signedUrl ? (
             <video src={`${signed.signedUrl}#t=${start},${end}`} controls playsInline className="w-full rounded-lg bg-brand" />
           ) : a.video_path && Date.now() - new Date(a.created_at).getTime() < 15 * 60_000 ? (
             // Le clip part en arrière-plan après l'analyse : on rafraîchit jusqu'à ce qu'il soit arrivé.
@@ -102,14 +106,22 @@ export default async function AnalysisDetail({
               <AutoRefresh seconds={8} />
             </div>
           ) : (
-            <div className="rounded-lg bg-raised p-6 text-slate">Vidéo indisponible.</div>
+            <div className="rounded-lg bg-raised p-6 text-slate">Média indisponible.</div>
           )}
-          <p className="mt-2 text-sm text-slate">
-            Passage analysé : {start.toFixed(1)} s → {end.toFixed(1)} s
-          </p>
+          {r?.image ? (
+            r.moment && (
+              <p className="mt-2 text-sm text-slate">
+                Moment : <span className="font-semibold text-deep">{r.moment}</span>
+              </p>
+            )
+          ) : (
+            <p className="mt-2 text-sm text-slate">
+              Passage analysé : {start.toFixed(1)} s → {end.toFixed(1)} s
+            </p>
+          )}
           {r && r.visibilite !== "bonne" && (
             <p className="mt-3 rounded-md bg-kite/20 p-3 text-[0.95rem]">
-              Visibilité {r.visibilite} : filme plus près et de côté, en gardant tout le rider dans le cadre, pour une analyse plus fine.
+              Visibilité {r.visibilite} : {r.image ? "prends une photo plus proche et nette, rider entier dans le cadre" : "filme plus près et de côté, en gardant tout le rider dans le cadre"}, pour une analyse plus fine.
             </p>
           )}
         </div>
@@ -201,7 +213,7 @@ export default async function AnalysisDetail({
             {(r.rappels?.length ?? 0) > 0 && (
               <section>
                 <h2 className="text-2xl font-bold">À garder en tête</h2>
-                <p className="mt-1 text-sm text-slate">Pas visible sur ta vidéo, mais clé pour cette figure.</p>
+                <p className="mt-1 text-sm text-slate">Pas visible sur ta {r.image ? "photo" : "vidéo"}, mais clé pour cette figure.</p>
                 <ul className="mt-3 space-y-2">
                   {r.rappels!.map((d) => (
                     <li key={d} className="flex gap-2">
@@ -229,7 +241,14 @@ export default async function AnalysisDetail({
             Nouvelle tentative
           </Link>
         )}
-        <Link href="/coach" className="btn btn-ghost">
+        <Link
+          href={`/coach?q=${encodeURIComponent(
+            r?.priorite_session
+              ? `Sur ma dernière analyse (${r.figure}), on me dit : « ${r.priorite_session} » Comment je travaille ça à ma prochaine session ?`
+              : "Comment je travaille ce que mon analyse a relevé ?",
+          )}`}
+          className="btn btn-ghost"
+        >
           En parler au coach
         </Link>
         {r && (

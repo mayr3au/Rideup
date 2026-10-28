@@ -8,7 +8,7 @@ import { Reveal } from "@/components/reveal";
 
 export const metadata: Metadata = {
   title: "Tarifs",
-  description: "Progress à 14,99 € (20 analyses vidéo par mois) ou Elite à 29,99 € (60 analyses), sans engagement.",
+  description: "Progress à 14,99 € (20 analyses par mois) ou Elite à 29,99 € (60 analyses), sans engagement.",
 };
 
 export default async function PricingPage() {
@@ -42,7 +42,7 @@ export default async function PricingPage() {
                 <span className="text-slate"> par mois</span>
               </p>
               <p className="mt-4 text-lg font-semibold">
-                {n} analyses vidéo par mois
+                {n} analyses de position par mois
                 <span className="block text-base font-normal text-slate">Environ {Math.round(n / 4.3)} par semaine</span>
               </p>
               <ul className="mt-5 flex-1 space-y-2.5">
@@ -76,15 +76,15 @@ export default async function PricingPage() {
       <div className="mt-12 grid gap-4 text-[0.95rem] sm:grid-cols-3">
         <div className="rounded-2xl bg-salt p-5">
           <h2 className="font-semibold">Une analyse, c&apos;est quoi ?</h2>
-          <p className="mt-1 text-slate">Un passage de 10 secondes maximum que tu choisis dans ta vidéo, analysé à 6 images par seconde, phase par phase.</p>
+          <p className="mt-1 text-slate">Une photo de toi (ou une capture de ta vidéo) et une phrase pour dire ce que tu fais : tu reçois un retour précis sur ta position.</p>
         </div>
         <div className="rounded-2xl bg-salt p-5">
-          <h2 className="font-semibold">Et si je renvoie le même clip ?</h2>
-          <p className="mt-1 text-slate">Le même passage déjà analysé te redonne le résultat, sans décompter d&apos;analyse.</p>
+          <h2 className="font-semibold">Et si je renvoie la même photo ?</h2>
+          <p className="mt-1 text-slate">La même photo avec la même description te redonne le résultat, sans décompter d&apos;analyse.</p>
         </div>
         <div className="rounded-2xl bg-salt p-5">
           <h2 className="font-semibold">Si l&apos;analyse échoue ?</h2>
-          <p className="mt-1 text-slate">Elle n&apos;est pas décomptée. Tu peux relancer avec le même clip.</p>
+          <p className="mt-1 text-slate">Elle n&apos;est pas décomptée. Tu peux relancer avec la même photo.</p>
         </div>
       </div>
       <p className="mt-8 text-sm text-slate">Paiement sécurisé par Stripe. Prix TTC.</p>
