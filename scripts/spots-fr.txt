@@ -1,0 +1,391 @@
+# Spots France + outre-mer. Format : nom|lat|lng|orientation (plage → large, en degrés)|eau|niveau|sports|note
+# eau : f plat, c clapot, v vagues, l lac — niveau : d débutant, i intermédiaire, a avancé — sports : K kite, W wing, F foil, S surf
+# Coordonnées et orientations approximatives : à affiner depuis l'admin.
+
+## Pas-de-Calais
+Hardelot-Plage|50.635|1.575|270|c|d|KWF|
+Le Touquet|50.523|1.583|270|c|d|KWFS|
+Sangatte – Le Radar|50.946|1.748|330|c|i|KWF|
+Sangatte – La Boulangerie|50.938|1.730|320|c|i|KWF|
+Escalles|50.918|1.708|310|v|a|KWFS|Sous le cap Blanc-Nez, rochers et falaises.
+Ambleteuse|50.807|1.600|280|c|i|KWF|
+Audresselles|50.823|1.592|280|v|a|KWF|Platier rocheux à marée basse.
+Calais – Plage|50.966|1.845|340|c|d|KWF|
+Oye-Plage|51.000|2.020|340|c|d|KWF|
+Le Fort-Vert – Marck|50.985|1.950|340|c|d|KWF|
+## Nord
+Gravelines – Petit-Fort-Philippe|51.006|2.103|340|c|d|KWF|
+Bray-Dunes|51.083|2.515|340|c|d|KWF|
+## Somme
+Fort-Mahon-Plage|50.340|1.555|270|c|d|KWF|
+Quend-Plage|50.320|1.548|270|c|d|KWF|
+Cayeux-sur-Mer|50.180|1.488|280|c|i|KWF|Plage de galets à marée haute.
+Le Crotoy|50.218|1.618|230|f|d|KWF|Baie de Somme : à pratiquer autour de la marée haute, courants.
+## Calvados
+Cabourg|49.293|-0.120|0|c|d|KWF|
+Houlgate|49.303|-0.073|0|c|d|KWF|
+Saint-Aubin-sur-Mer|49.333|-0.390|0|c|d|KWF|
+Ouistreham – Riva-Bella|49.290|-0.255|0|c|d|KWF|
+Saint-Laurent-sur-Mer – Omaha|49.365|-0.880|0|c|d|KWF|
+Luc-sur-Mer|49.318|-0.355|0|c|d|KWF|
+Trouville-sur-Mer|49.367|0.078|330|c|d|KWF|
+## Manche
+Portbail|49.330|-1.712|250|c|d|KWF|
+Hatainville|49.405|-1.810|270|v|i|KWFS|
+Le Rozel|49.483|-1.845|270|v|i|KWFS|
+Sciotot – Les Pieux|49.515|-1.855|260|v|i|KWFS|
+Barneville-Carteret|49.370|-1.790|250|c|d|KWF|
+Agon-Coutainville|49.045|-1.605|270|c|d|KWF|
+Utah Beach|49.415|-1.175|80|c|d|KWF|
+Ravenoville|49.465|-1.235|80|c|d|KWF|
+Créances|49.200|-1.585|270|c|d|KWF|
+Gouville-sur-Mer|49.100|-1.605|270|c|d|KWF|
+Montmartin-sur-Mer|48.990|-1.565|270|c|d|KWF|
+Fermanville|49.690|-1.460|10|c|i|KWF|
+Surtainville|49.460|-1.830|270|v|i|KWFS|
+Tourlaville – Collignon|49.648|-1.565|10|c|d|KWF|
+Beaumont-Hague – Vauville|49.635|-1.860|270|v|i|KWFS|
+## Seine-Maritime
+Veules-les-Roses|49.877|0.800|0|c|i|KWF|Plage de galets.
+Veulettes-sur-Mer|49.853|0.598|340|c|i|KWF|Plage de galets.
+Sainte-Adresse|49.508|0.075|270|c|i|KWF|Plage de galets.
+Étretat|49.708|0.200|320|v|a|KWF|Galets et falaises.
+Yport|49.738|0.312|330|v|a|KWF|Galets et falaises.
+Pourville-sur-Mer|49.920|1.030|350|c|i|KWF|
+Les Petites-Dalles|49.830|0.530|340|c|i|KWF|
+## Finistère
+Beg-Meil – Fouesnant|47.855|-3.980|150|c|d|KWF|
+Mousterlin – Fouesnant|47.850|-4.040|190|c|d|KWF|
+Brignogan-Plages|48.672|-4.330|0|c|d|KWF|
+Penmarc'h – Saint-Guénolé|47.815|-4.375|270|v|a|KWFS|
+Plouescat – Pors Meur|48.668|-4.195|0|c|i|KWF|
+Baie du Kernic|48.662|-4.240|10|f|d|KWF|Baie à marée : à pratiquer à marée haute.
+Le Dossen – Santec|48.705|-4.015|340|c|d|KWF|
+Tréompan – Ploudalmézeau|48.565|-4.690|290|v|i|KWFS|
+Les Trois Moutons – Lampaul-Ploudalmézeau|48.575|-4.660|330|c|i|KWF|Position approximative, à vérifier.
+Keremma|48.680|-4.115|0|c|d|KWF|
+Sainte-Marguerite – Landéda|48.600|-4.590|280|c|i|KWF|
+Aber Wrac'h – Landéda|48.600|-4.565|320|f|d|KWF|
+Le Vougot – Guissény|48.640|-4.455|340|c|i|KWF|
+Plage du Ris – Douarnenez|48.095|-4.295|330|c|d|KWF|
+Kervel – Plonévez-Porzay|48.115|-4.285|270|c|d|KWF|
+Pentrez|48.180|-4.300|270|c|d|KWF|
+Penhors|47.935|-4.405|250|v|i|KWFS|
+Plage de l'Aber – Crozon|48.215|-4.425|200|c|i|KWF|
+Île-Tudy|47.840|-4.160|170|c|d|KWF|
+Les Glénan – Saint-Nicolas|47.722|-3.995|90|f|d|KWF|Lagon de la Chambre. Accès en bateau, zone protégée : à vérifier.
+Les Glénan – Penfret|47.720|-3.955|90|f|d|KWF|Accès en bateau, zone protégée : à vérifier.
+Les Glénan – Guiriden|47.712|-3.985|0|f|d|KWF|Accès en bateau, zone protégée : à vérifier.
+Pointe Saint-Gilles – Bénodet|47.865|-4.090|180|c|i|KWF|
+Kersidan – Névez|47.800|-3.810|180|c|i|KWF|Position approximative, à vérifier.
+## Côtes-d'Armor
+Saint-Michel-en-Grève|48.690|-3.565|0|c|d|KWF|Grande plage à marée, courants à marée descendante.
+Lancieux – Les Briantais|48.610|-2.150|330|c|d|KWF|
+## Ille-et-Vilaine
+Saint-Briac-sur-Mer|48.625|-2.140|300|c|i|KWF|
+## Morbihan
+Kerhillio – Erdeven|47.620|-3.180|230|v|i|KWFS|
+Larmor-Plage|47.705|-3.385|180|c|d|KWF|
+Penthièvre – Quiberon|47.545|-3.130|270|v|i|KWFS|Côté baie : eau plate par vent d'ouest.
+Saint-Pierre-Quiberon – Portivy|47.540|-3.153|270|v|a|KWFS|
+Quiberon – Port Maria|47.475|-3.120|200|c|i|KWF|
+Étel – Ria d'Étel|47.655|-3.205|200|f|i|KWF|Barre d'Étel dangereuse : reste dans la ria.
+Île de Houat – Treac'h Goured|47.390|-2.955|90|c|i|KWF|Accès en bateau.
+Île de Hoëdic|47.338|-2.875|180|c|i|KWF|Accès en bateau.
+Penvins – Sarzeau|47.495|-2.680|180|c|d|KWF|
+Le Roaliguen – Sarzeau|47.495|-2.745|200|c|d|KWF|
+Suscinio – Sarzeau|47.508|-2.723|180|c|d|KWF|
+Landrezac – Sarzeau|47.502|-2.702|180|c|d|KWF|
+Plage des Govelins – Saint-Gildas-de-Rhuys|47.505|-2.825|230|v|i|KWF|
+Île d'Arz|47.590|-2.800|180|f|d|KWF|Golfe du Morbihan : courants forts, trafic.
+Damgan|47.515|-2.580|180|c|d|KWF|
+Carnac – Saint-Colomban|47.575|-3.110|180|c|d|KWF|
+Carnac – La Grande Plage|47.576|-3.076|180|c|d|KWF|
+Carnac – Légenèse|47.573|-3.052|180|c|d|KWF|
+La Trinité-sur-Mer – Men Du|47.578|-3.026|180|c|d|KWF|
+Locmariaquer – Saint-Pierre|47.565|-2.955|180|c|d|KWF|
+Plouhinec – Le Linès|47.675|-3.240|220|c|i|KWF|
+Guidel-Plage|47.765|-3.525|220|v|i|KWFS|
+Le Pouldu|47.770|-3.545|200|c|i|KWF|
+Le Fort-Bloqué|47.735|-3.500|230|v|i|KWFS|
+Gâvres – La Caserne|47.690|-3.345|240|v|i|KWFS|
+Riantec – Kerner|47.700|-3.330|300|f|d|KWF|Petite mer de Gâvres : eau plate à marée haute.
+## Loire-Atlantique
+La Govelle – Batz-sur-Mer|47.270|-2.465|220|v|a|KWFS|
+Le Pouliguen|47.272|-2.430|170|c|d|KWF|
+Pornichet|47.255|-2.345|180|c|d|KWF|
+Saint-Marc-sur-Mer|47.240|-2.300|180|c|i|KWF|
+Kerlédé – Saint-Nazaire|47.250|-2.265|180|c|i|KWF|
+La Turballe|47.350|-2.515|270|c|d|KWF|
+Pen Bron – La Turballe|47.320|-2.505|270|c|d|KWF|
+Piriac-sur-Mer|47.385|-2.545|290|c|i|KWF|
+Assérac – Pont-Mahé|47.445|-2.455|270|f|d|KWF|Très plat à marée haute.
+Sorlock – Mesquer|47.418|-2.470|340|c|d|KWF|
+Saint-Brevin – Le Pointeau|47.240|-2.170|300|c|d|KWF|
+Saint-Brevin – Les Rochelets|47.228|-2.175|270|c|d|KWF|
+Saint-Brevin – Les Dunes|47.215|-2.180|270|c|d|KWF|
+Tharon-Plage|47.165|-2.160|260|c|d|KWF|
+Le Cormier – La Plaine-sur-Mer|47.150|-2.215|300|c|i|KWF|
+Pointe Saint-Gildas – Préfailles|47.135|-2.240|230|v|a|KWF|Rochers.
+Pornic – La Noëveillard|47.110|-2.110|230|c|i|KWF|
+La Bernerie-en-Retz|47.080|-2.040|270|c|d|KWF|
+Les Moutiers-en-Retz|47.060|-2.010|250|f|d|KWF|
+## Vendée
+Noirmoutier – Pointe de l'Herbaudière|47.030|-2.305|330|c|i|KWF|
+Noirmoutier – Les Sableaux|46.995|-2.215|80|c|d|KWF|
+Noirmoutier – Luzéronde|46.975|-2.290|250|v|i|KWFS|
+La Guérinière – Noirmoutier|46.965|-2.230|250|c|d|KWF|
+Barbâtre – La Linière|46.925|-2.180|250|c|d|KWF|
+Barbâtre – Pointe de la Fosse|46.893|-2.155|180|c|i|KWF|Courants forts au goulet de Fromentine.
+Bouin – Le Polder|46.980|-2.040|270|f|d|KWF|Baie de Bourgneuf : à marée haute.
+Fromentine – La Barre-de-Monts|46.890|-2.140|260|c|d|KWF|
+La Barre-de-Monts – Le Pey de la Blet|46.865|-2.150|260|c|d|KWF|
+Notre-Dame-de-Monts|46.835|-2.140|260|c|d|KWF|
+Saint-Jean-de-Monts|46.785|-2.075|250|c|d|KWF|
+Saint-Hilaire-de-Riez – Les Demoiselles|46.745|-1.990|260|c|d|KWF|
+Saint-Gilles-Croix-de-Vie – La Grande Plage|46.690|-1.945|240|c|d|KWF|
+Brétignolles-sur-Mer|46.630|-1.875|250|v|i|KWFS|
+Île d'Yeu – La Conche|46.698|-2.330|200|c|i|KWF|Accès en bateau.
+Olonne-sur-Mer – Sauveterre|46.540|-1.825|250|v|i|KWFS|
+Port Bourgenay – Talmont|46.440|-1.680|210|c|i|KWF|
+Le Veillon – Talmont|46.430|-1.630|200|c|i|KWF|
+Saint-Vincent-sur-Jard – Clemenceau|46.410|-1.555|200|c|i|KWF|
+Longeville-sur-Mer – Les Conches|46.395|-1.525|220|v|i|KWFS|
+La Tranche-sur-Mer – La Terrière|46.355|-1.475|220|c|d|KWF|
+La Tranche-sur-Mer – Les Générales|46.346|-1.452|200|c|d|KWF|
+La Tranche-sur-Mer|46.343|-1.425|200|c|d|KWF|
+La Faute-sur-Mer|46.315|-1.335|200|c|d|KWF|
+La Faute-sur-Mer – Pointe de l'Aiguillon|46.270|-1.270|200|c|i|KWF|Réserve naturelle à proximité : respecte les zones.
+## Charente-Maritime
+Île de Ré – Rivedoux-Plage|46.160|-1.270|180|c|d|KWF|
+Île de Ré – La Flotte|46.190|-1.325|30|c|d|KWF|
+Île de Ré – Le Gros Jonc|46.172|-1.355|200|c|d|KWF|
+Île de Ré – Les Gouillauds|46.180|-1.385|200|c|d|KWF|
+Île de Ré – La Couarde-sur-Mer|46.190|-1.420|200|c|d|KWF|
+Île de Ré – Le Martray|46.205|-1.465|210|c|i|KWF|
+Île de Ré – Le Boutillon|46.200|-1.510|220|c|i|KWF|Position approximative, à vérifier.
+Île de Ré – Plage des Prises|46.215|-1.440|0|f|d|KWF|Position approximative, à vérifier.
+Île de Ré – Pointe de Grignon|46.230|-1.470|0|f|d|KWF|Fier d'Ars. Position approximative, à vérifier.
+Île de Ré – Pointe du Lizay|46.255|-1.480|0|c|i|KWF|
+Île de Ré – Saint-Clément-des-Baleines|46.240|-1.540|330|c|i|KWF|
+Île de Ré – Phare des Baleines|46.245|-1.560|320|v|a|KWFS|
+Aytré|46.125|-1.125|250|c|d|KWF|
+Châtelaillon-Plage|46.070|-1.090|270|c|d|KWF|
+Île d'Aix|46.010|-1.170|270|c|i|KWF|Accès en bateau.
+Fouras – Plage de l'Espérance|45.985|-1.095|200|c|d|KWF|
+Port-des-Barques|45.950|-1.090|270|f|d|KWF|
+Oléron – Saint-Denis-d'Oléron|46.030|-1.375|30|c|d|KWF|
+Oléron – La Boirie|46.035|-1.400|330|c|i|KWF|
+Oléron – Pointe de Chassiron|46.045|-1.410|330|v|a|KWF|
+Oléron – Les Huttes|46.020|-1.390|290|v|i|KWFS|
+Oléron – La Brée-les-Bains|46.020|-1.350|30|c|d|KWF|
+Oléron – Les Trois Pierres|46.010|-1.333|30|c|d|KWF|Position approximative, à vérifier.
+Oléron – Le Douhet|45.990|-1.315|30|c|d|KWF|
+Oléron – Boyardville|45.965|-1.240|90|c|d|KWF|
+Oléron – Les Sables Vignier|45.950|-1.335|270|v|i|KWFS|
+Oléron – Vert-Bois|45.910|-1.275|260|v|i|KWFS|
+Oléron – La Perroche|45.880|-1.260|260|v|i|KWFS|
+Oléron – Grand-Village-Plage|45.860|-1.250|260|v|i|KWFS|
+Oléron – Saint-Trojan-les-Bains|45.833|-1.207|160|c|d|KWF|
+Oléron – Baie de Gatseau|45.805|-1.215|180|c|d|KWF|
+Ronce-les-Bains|45.795|-1.170|270|c|i|KWF|Courants du pertuis de Maumusson.
+Ronce-les-Bains – Le Galon d'Or|45.778|-1.175|270|c|i|KWF|
+La Coubre – Pointe Espagnole|45.735|-1.240|260|v|a|KWFS|Courants et baïnes.
+La Palmyre – Les Mathes|45.690|-1.185|220|c|d|KWF|
+Bonne-Anse – La Palmyre|45.700|-1.165|180|f|d|KWF|Baie peu profonde, à marée haute.
+Saint-Palais-sur-Mer – La Grande Côte|45.660|-1.110|230|v|a|KWFS|Courants.
+Royan – La Grande Conche|45.630|-1.020|200|c|d|KWF|
+Saint-Georges-de-Didonne|45.600|-0.990|230|c|d|KWF|
+Meschers-sur-Gironde|45.555|-0.950|220|c|i|KWF|
+## Gironde
+Le Verdon – Pointe de Grave|45.570|-1.060|30|c|i|KWF|
+Le Verdon-sur-Mer – Plage océane|45.540|-1.090|300|v|i|KWFS|
+Soulac-sur-Mer|45.515|-1.130|280|v|i|KWFS|
+Le Gurp – Grayan-et-l'Hôpital|45.435|-1.155|270|v|i|KWFS|
+Montalivet|45.375|-1.160|270|v|i|KWFS|
+Hourtin-Plage|45.220|-1.170|270|v|i|KWFS|
+Carcans-Plage|45.080|-1.190|270|v|i|KWFS|
+Lac de Carcans-Hourtin – Maubuisson|45.110|-1.150|90|l|d|KWF|
+Lac de Lacanau – Le Moutchic|44.995|-1.140|90|l|d|KWF|
+Cap Ferret – Le Grand Crohot|44.795|-1.230|270|v|i|KWFS|
+Cap Ferret – Le Truc Vert|44.720|-1.245|270|v|i|KWFS|
+Cap Ferret – L'Horizon|44.640|-1.260|270|v|a|KWFS|Courants des passes.
+Bassin d'Arcachon – Claouey|44.750|-1.180|90|f|d|KWF|À marée haute.
+Bassin d'Arcachon – Andernos-les-Bains|44.740|-1.110|220|f|d|KWF|À marée haute.
+Bassin d'Arcachon – Les Arbousiers|44.765|-1.140|180|f|d|KWF|Position approximative, à vérifier.
+Bassin d'Arcachon – Île aux Oiseaux|44.705|-1.180|0|f|d|KWF|Accès en bateau, zone protégée : à vérifier.
+Dune du Pilat|44.590|-1.215|270|v|i|KWFS|
+La Salie|44.540|-1.255|270|v|i|KWFS|
+Lac de Cazaux|44.520|-1.150|180|l|d|KWF|
+## Landes
+Lac de Cazaux – Navarrosse|44.432|-1.168|0|l|d|KWF|
+Lac de Sanguinet|44.488|-1.095|270|l|d|KWF|
+Lac de Biscarrosse – Port Maguide|44.385|-1.190|90|l|d|KWF|
+Contis-Plage|44.090|-1.320|270|v|i|KWFS|
+Moliets-et-Maa|43.855|-1.390|270|v|i|KWFS|
+Messanges|43.815|-1.400|270|v|i|KWFS|
+Vieux-Boucau – Port d'Albret|43.788|-1.395|90|f|d|KWF|Lac marin, eau plate.
+Seignosse – Les Estagnots|43.690|-1.437|270|v|a|KWFS|
+Ondres|43.575|-1.495|280|v|i|KWFS|
+Tarnos|43.540|-1.515|280|v|i|KWFS|
+## Pyrénées-Atlantiques
+Anglet – Chambre d'Amour|43.500|-1.545|290|v|a|KWFS|
+Anglet – La Barre|43.528|-1.522|300|v|a|KWFS|
+Bidart – Uhabia|43.440|-1.595|290|v|a|KWFS|Spot à vérifier.
+Hendaye-Plage|43.375|-1.770|330|c|d|KWFS|
+## Hérault
+Frontignan-Plage|43.430|3.770|160|c|d|KWF|
+Sète – La Corniche|43.390|3.680|160|c|i|KWF|
+Marseillan-Plage|43.315|3.555|150|c|d|KWF|
+Mèze – Étang de Thau|43.420|3.610|180|f|d|KWF|
+Bouzigues – Étang de Thau|43.448|3.660|200|f|d|KWF|
+Agde – Cap d'Agde|43.275|3.505|150|c|i|KWF|
+Vias-Plage|43.290|3.420|160|c|d|KWF|
+Carnon – Le Grand Travers|43.565|4.040|160|c|d|KWF|
+## Gard
+Le Grau-du-Roi|43.530|4.135|200|c|d|KWF|
+## Aude
+Gruissan – Les Chalets|43.090|3.110|130|c|d|KWF|
+Gruissan – Mateille|43.100|3.130|130|c|d|KWF|
+Gruissan – La Vieille Nouvelle|43.040|3.080|120|c|i|KWF|
+Gruissan – Étang de l'Ayrolle|43.070|3.050|90|f|d|KWF|
+Étang de Bages-Sigean|43.075|2.995|90|f|i|KWF|Position approximative, à vérifier.
+Port-la-Nouvelle|43.010|3.065|120|c|i|KWF|
+Étang de La Palme|42.968|3.010|90|f|d|KWF|
+Leucate – Les Dosses|42.885|3.020|270|f|d|KWF|Étang de Salses-Leucate.
+Leucate – La Mine|42.890|3.055|100|c|i|KWF|Tramontane offshore : réservé aux confirmés.
+Leucate – Le Goulet|42.845|3.035|270|f|d|KWF|Étang de Salses-Leucate.
+## Pyrénées-Orientales
+Saint-Laurent-de-la-Salanque – Plage|42.765|3.035|90|c|i|KWF|
+Sainte-Marie-la-Mer|42.735|3.040|90|c|i|KWF|
+Saint-Cyprien|42.620|3.035|90|c|i|KWF|
+Port-Vendres|42.520|3.110|60|c|a|KWF|Côte rocheuse.
+Cerbère|42.443|3.170|90|c|a|KWF|Côte rocheuse, spot à vérifier.
+## Bouches-du-Rhône
+Port-Saint-Louis – Carteau|43.380|4.860|200|f|d|KWF|
+Salin-de-Giraud – Piémanson|43.355|4.780|180|c|d|KWF|
+Marignane – Le Jaï|43.430|5.200|340|f|d|KWF|Étang de Berre.
+Étang de Berre – Saint-Chamas|43.540|5.040|180|f|d|KWF|
+Étang de Berre – Martigues Ferrières|43.415|5.060|0|f|d|KWF|
+Sausset-les-Pins|43.330|5.105|180|c|i|KWF|
+Carry-le-Rouet|43.330|5.150|180|c|i|KWF|
+Ensuès-la-Redonne – Méjean|43.333|5.215|200|c|a|KWF|Calanque rocheuse.
+Marseille – Plage du Prado|43.260|5.375|260|c|i|KWF|Spot à vérifier.
+Cassis|43.212|5.538|180|c|a|KWF|Spot à vérifier.
+La Ciotat|43.180|5.620|150|c|i|KWF|
+## Var
+L'Almanarre – Secteur nord|43.078|6.130|270|c|i|KWF|
+Giens – La Madrague|43.040|6.100|300|c|i|KWF|
+Hyères – La Badine|43.050|6.160|100|c|d|KWF|
+Hyères – Les Salins|43.115|6.200|140|c|d|KWF|
+Saint-Cyr-sur-Mer – Les Lecques|43.180|5.685|200|c|d|KWF|
+Bandol|43.135|5.755|180|c|i|KWF|
+Sanary-sur-Mer|43.115|5.790|200|c|i|KWF|
+Six-Fours – Bonnegrâce|43.090|5.815|270|c|i|KWF|
+La Seyne-sur-Mer – Mar Vivo|43.068|5.870|180|c|i|KWF|
+La Seyne-sur-Mer – Les Sablettes|43.077|5.890|180|c|d|KWF|
+Saint-Mandrier – Marégau|43.075|5.925|180|c|i|KWF|
+Saint-Tropez – Les Salins|43.255|6.690|80|c|i|KWF|
+Sainte-Maxime – La Nartelle|43.315|6.665|150|c|d|KWF|
+Saint-Raphaël – Boulouris|43.415|6.810|160|c|i|KWF|Spot à vérifier.
+Agay|43.430|6.865|160|c|i|KWF|Spot à vérifier.
+## Alpes-Maritimes
+Théoule-sur-Mer|43.505|6.940|160|c|i|KWF|Spot à vérifier.
+Cannes – La Bocca|43.545|6.970|180|c|i|KWF|
+Cannes – La Croisette|43.548|7.025|160|c|i|KWF|Spot à vérifier.
+Cannes – Palm Beach|43.535|7.040|150|c|i|KWF|
+Nice – Baie des Anges|43.690|7.250|180|c|a|KWF|Galets, baignade surveillée l'été. Spot à vérifier.
+## Corse
+Bonifacio – Tonnara|41.425|9.080|250|c|i|KWF|
+Bonifacio – Santa Manza|41.415|9.240|90|f|d|KWF|
+Bonifacio – Balistra|41.445|9.230|100|c|i|KWF|
+Bonifacio – Rondinara|41.470|9.270|90|f|d|KWF|Spot à vérifier.
+Porto-Vecchio – Santa Giulia|41.525|9.270|90|f|d|KWF|
+Porto-Vecchio – Palombaggia|41.560|9.330|90|c|i|KWF|
+Porto-Vecchio – Golfo di Sogno|41.620|9.310|120|f|d|KWF|
+Lecci – Saint-Cyprien|41.640|9.355|90|c|d|KWF|
+Sainte-Lucie-de-Porto-Vecchio – Pinarellu|41.675|9.380|90|c|i|KWF|
+Figari – Baie de Figari|41.470|9.050|200|c|i|KWF|
+Sartène – Campomoro|41.630|8.810|30|c|i|KWF|Spot à vérifier.
+Propriano|41.680|8.900|250|c|i|KWF|Spot à vérifier.
+Calvi – La Pinède|42.560|8.760|30|c|d|KWF|
+Algajola|42.610|8.860|0|c|i|KWF|Spot à vérifier.
+Étang de Biguglia|42.620|9.450|0|f|d|KWF|Réserve naturelle : pratique à vérifier.
+## Hautes-Alpes
+Lac de Serre-Ponçon|44.525|6.315|180|l|i|KWF|Zones de pratique balisées.
+## Isère
+Lac de Monteynard|44.950|5.700|180|l|i|KWF|Vent thermique régulier l'après-midi.
+## Savoie
+Lac du Bourget|45.700|5.885|270|l|i|WF|Kitesurf non confirmé : wing et foil.
+## Haute-Savoie
+Lac d'Annecy – Saint-Jorioz|45.830|6.165|90|l|i|WF|Kitesurf interdit : wing et foil.
+## Meuse
+Lac de Madine|48.930|5.740|180|l|d|KWF|
+## Lozère
+Lac de Naussac|44.740|3.840|180|l|i|KWF|
+## Guadeloupe
+Marie-Galante – Plage de la Feuillère|15.895|-61.210|120|c|i|KWF|
+Anse-Bertrand – Anse Laborde|16.480|-61.505|300|v|a|KWF|
+Saint-François – Anse à la Gourde|16.245|-61.205|10|c|i|KWF|
+Saint-François – Lagon|16.250|-61.270|180|f|d|KWF|
+Le Moule|16.335|-61.345|30|v|a|KWFS|
+Le Gosier – La Saline|16.200|-61.470|180|c|d|KWF|
+Le Gosier – Pointe de la Verdure|16.207|-61.500|180|c|d|KWF|
+Sainte-Anne|16.225|-61.385|180|f|d|KWF|
+## Martinique
+Sainte-Marie – Anse Charpentier|14.810|-60.985|60|v|a|KWF|
+Anse Trabaud|14.420|-60.840|90|c|i|KWF|
+Le Vauclin – Pointe Faula|14.540|-60.825|90|f|d|KWF|
+Le Vauclin – Petit et Grand Macabou|14.490|-60.840|120|v|i|KWF|
+Le François – Cap Est|14.600|-60.840|90|f|d|KWF|
+Le Robert|14.680|-60.920|90|f|d|KWF|
+Tartane – Anse l'Étang|14.770|-60.890|60|v|a|KWFS|
+Trois-Îlets – Pointe du Bout|14.555|-61.050|0|c|i|KWF|
+Le Diamant|14.470|-61.020|180|v|a|KWF|
+## Guyane
+Kourou – Front de mer|5.160|-52.630|45|c|i|KWF|Spot à vérifier.
+Cayenne – Montjoly|4.945|-52.290|30|c|i|KWF|Spot à vérifier.
+## La Réunion
+L'Étang-Salé|-21.270|55.330|250|v|a|KWFS|
+La Saline-les-Bains|-21.090|55.230|270|f|d|KWF|Lagon peu profond, coraux.
+Saint-Gilles-les-Bains|-21.050|55.220|270|c|i|KWF|Spot à vérifier.
+Saint-Pierre – La Ravine Blanche|-21.345|55.460|180|c|i|KWF|
+Le Port|-20.930|55.290|300|c|i|KWF|
+## Nouvelle-Calédonie
+Nouméa – Anse Vata|-22.300|166.445|180|c|d|KWF|
+Nouméa – Îlot Maître|-22.335|166.410|90|f|d|KWF|Accès en bateau.
+Nouméa – Îlot Goéland|-22.380|166.355|90|f|d|KWF|Accès en bateau. Position approximative.
+Dumbéa – La Passe|-22.360|166.230|240|v|a|KWF|Au large, accès en bateau.
+La Foa – Ouano|-21.850|165.820|240|f|d|KWF|
+Boulouparis – Îlot Ténia|-21.920|165.920|240|f|i|KWF|Accès en bateau. Position approximative.
+Bourail – Poé Beach|-21.610|165.400|220|f|d|KWF|
+Pouembout – Pindaï|-21.330|164.950|240|f|i|KWF|Position approximative.
+Koumac|-20.565|164.270|270|c|i|KWF|
+Île des Pins – Baie de Kuto|-22.665|167.440|220|f|d|KWF|
+Lifou – Baie de Châteaubriand|-20.920|167.270|90|c|d|KWF|
+Lifou – Easo|-20.780|167.120|300|f|d|KWF|
+Lifou – Mou|-21.080|167.330|120|c|i|KWF|Position approximative.
+Lifou – Peng|-20.840|167.250|60|c|i|KWF|Position approximative, à vérifier.
+Lifou – Xodre|-20.900|167.060|270|c|i|KWF|Position approximative, à vérifier.
+## Polynésie française
+Bora Bora – Pointe Matira|-16.545|-151.735|180|f|d|KWF|
+Bora Bora – Motu Mute (aéroport)|-16.444|-151.751|90|f|d|KWF|Accès en bateau.
+Moorea – Temae|-17.495|-149.760|60|f|d|KWF|
+Moorea – Maharepa|-17.485|-149.810|0|f|d|KWF|
+Moorea – Afareaitu|-17.555|-149.795|90|f|i|KWF|
+Moorea – Atiha|-17.590|-149.900|180|f|i|KWF|
+Moorea – Haapiti|-17.570|-149.880|270|v|a|KWFS|
+Huahine – Parea|-16.810|-150.960|180|f|d|KWF|
+Fakarava – Rotoava|-16.060|-145.620|90|f|d|KWF|Lagon.
+Rangiroa – Passe d'Avatoru|-14.940|-147.700|0|f|i|KWF|Courants dans la passe.
+Tahiti – Mahana Beach|-17.625|-149.610|270|f|d|KWF|
+Tahiti – Papenoo|-17.500|-149.420|0|v|a|KWFS|
+Tahiti – Pirae Sapinus|-17.535|-149.540|0|c|i|KWF|Position approximative.
+Tahiti – Baie de Phaéton|-17.730|-149.320|220|f|d|KWF|
+Tahiti – Maraa|-17.745|-149.570|250|f|i|KWF|
+Tahiti – Vairao|-17.800|-149.290|250|f|i|KWF|
+Tahiti – Teahupo'o|-17.855|-149.260|200|v|a|KWFS|Vague de récif réservée aux experts. Spot à vérifier.
+## Saint-Barthélemy et Saint-Martin
+Saint-Barthélemy – Grand Cul-de-Sac|17.915|-62.800|60|f|d|KWF|
+Saint-Martin – Baie Orientale|18.095|-63.015|90|c|i|KWF|Spot à vérifier.
+Saint-Martin – Anse Marcel|18.110|-63.030|0|f|i|KWF|Spot à vérifier.

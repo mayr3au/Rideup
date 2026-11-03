@@ -105,7 +105,7 @@ export async function importSpotCatalogue() {
   const db = await requireAdmin();
   const { SPOT_CATALOGUE } = await import("@/lib/spot-catalogue");
   await db.from("spots").upsert(
-    SPOT_CATALOGUE.map((s) => ({ ...s, sports: ["kitesurf", "wingfoil", "foil"], active: true })),
+    SPOT_CATALOGUE.map((s) => ({ ...s, sports: s.sports ?? ["kitesurf", "wingfoil", "foil"], active: true })),
     { onConflict: "id", ignoreDuplicates: true },
   );
   revalidatePath("/admin/spots");

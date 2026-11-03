@@ -86,7 +86,10 @@ export default async function AdminSpots({ searchParams }: { searchParams: Promi
         {missing.length > 0 && (
           <form action={importSpotCatalogue} className="mt-3 rounded-2xl bg-brand-light p-4">
             <p className="font-semibold">{missing.length} spots du catalogue ne sont pas encore dans ta base</p>
-            <p className="mt-1 text-sm text-slate">{missing.map((m) => m.name).join(", ")}.</p>
+            <p className="mt-1 text-sm text-slate">
+              {missing.slice(0, 12).map((m) => m.name).join(", ")}
+              {missing.length > 12 ? ` et ${missing.length - 12} autres.` : "."}
+            </p>
             <button className="btn btn-primary mt-3 !min-h-10 !px-4 !py-2 !text-sm">Importer ces {missing.length} spots</button>
           </form>
         )}
