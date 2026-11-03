@@ -352,7 +352,7 @@ export function SpotFinder({
                     const good = d && d.goodHours > 0;
                     return (
                       <li key={s.spot.id}>
-                        <div className={`panel p-4 ${rank === 0 && good && filter !== "favoris" ? "ring-2 ring-emerald-500" : ""}`}>
+                        <div className={`panel p-4 ${rank === 0 && verdict(d, kind, dayIdx).status === "go" && filter !== "favoris" ? "ring-2 ring-emerald-500" : ""}`}>
                           <button onClick={() => open(s.spot.id)} className="w-full text-left">
                             <div className="flex items-start gap-3">
                               <div className="min-w-0 flex-1">
