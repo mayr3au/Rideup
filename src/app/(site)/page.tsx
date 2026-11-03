@@ -123,7 +123,7 @@ function Hero() {
         <div className="rise relative" style={d(0.3)}>
           <PhoneMock />
           {/* notifications qui flottent autour du téléphone */}
-          <div className="pop-in absolute -left-2 top-[44%] hidden sm:block lg:-left-14" style={d(1.1)}>
+          <div className="pop-in absolute left-0 top-[44%] hidden sm:block xl:-left-14" style={d(1.1)}>
             <div className="float flex items-center gap-2.5 rounded-2xl bg-white px-3.5 py-2.5 text-deep shadow-[0_20px_40px_-18px_rgba(0,0,0,0.6)]" style={d(0.5)}>
               <span aria-hidden="true" className="flex h-8 w-8 items-center justify-center rounded-full bg-emerald-100 text-emerald-600">
                 <Icon name="check" className="h-4 w-4" />
@@ -134,7 +134,7 @@ function Hero() {
               </span>
             </div>
           </div>
-          <div className="pop-in absolute -right-2 bottom-20 hidden sm:block lg:-right-10" style={d(1.5)}>
+          <div className="pop-in absolute right-0 bottom-20 hidden sm:block xl:-right-10" style={d(1.5)}>
             <div className="float flex items-center gap-2.5 rounded-2xl bg-sun px-3.5 py-2.5 text-deep shadow-[0_20px_40px_-18px_rgba(0,0,0,0.6)]" style={d(1.8)}>
               <span aria-hidden="true" className="text-xl">🔥</span>
               <span className="leading-tight">
