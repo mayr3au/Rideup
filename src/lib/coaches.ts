@@ -13,6 +13,8 @@ export type TeamCoach = {
   bio: string;
   instagram: string;
   photo: string;
+  /** Petite photo ronde (visage) */
+  avatar: string;
   /** Cadrage de la photo (object-position) */
   pos?: string;
 };
@@ -25,6 +27,7 @@ export const TEAM: TeamCoach[] = [
     bio: "Top 11 Young World Kite Foil, spécialiste du big air. Kite, foil, wing ou surf : il t'aide à voler plus haut et plus propre.",
     instagram: "anil_garnier",
     photo: "/coachs/coach-kite.jpg",
+    avatar: "/coachs/avatar-anil.jpg",
     pos: "50% 30%",
   },
   {
@@ -34,6 +37,7 @@ export const TEAM: TeamCoach[] = [
     bio: "Kickers, modules et premiers inverts : il te fait progresser à chaque tour de câble.",
     instagram: "endy_beltrame",
     photo: "/coachs/coach-endy.jpg",
+    avatar: "/coachs/avatar-endy.jpg",
     pos: "50% 40%",
   },
   {
@@ -43,6 +47,7 @@ export const TEAM: TeamCoach[] = [
     bio: "Il a inventé le Sassa roll, la figure qui porte son nom. Rider pro français, il t'emmène au niveau supérieur sur les kickers et les modules.",
     instagram: "yann.sassa",
     photo: "/coachs/coach-yann.jpg",
+    avatar: "/coachs/avatar-yann.jpg",
     pos: "50% 30%",
   },
 ];
