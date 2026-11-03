@@ -6,6 +6,7 @@ import { SPORT_IDS, SPORTS } from "@/lib/sports";
 import { COURSES } from "@/lib/courses";
 import { LESSONS } from "@/lib/lessons";
 import { Reveal } from "@/components/reveal";
+import { instagramUrl, TEAM } from "@/lib/coaches";
 import { Tilt } from "@/components/tilt";
 import { PhoneScreens } from "@/components/phone-screens";
 import { SampleReport } from "@/components/sample-report";
@@ -18,6 +19,7 @@ export default function Home() {
       <Sports />
       <Steps />
       <Coachs />
+      <Team />
       <AiCoach />
       <Features />
       <PricingTeaser />
@@ -447,6 +449,66 @@ function Coachs() {
           <p className="mt-3 text-center text-sm text-slate">Exemple de retour, tel que tu le reçois dans l&apos;appli.</p>
         </Reveal>
       </div>
+    </section>
+  );
+}
+
+/* ───────────── 3 bis bis. L'équipe : visages, sports, coachings privés ───────────── */
+function Team() {
+  const team = TEAM.filter((c) => c.name);
+  if (!team.length) return null;
+  return (
+    <section id="equipe" className="mx-auto max-w-6xl scroll-mt-20 px-5 pt-14 sm:px-6 sm:pt-20">
+      <Reveal className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+        <div>
+          <p className="eyebrow">L&apos;équipe</p>
+          <h2 className="mt-2 text-3xl sm:text-4xl">
+            Rencontre <span className="text-brand">tes coachs</span>
+          </h2>
+        </div>
+        <p className="max-w-sm text-[0.95rem] text-slate sm:text-right">
+          Ce sont eux qui analysent tes vidéos. Et si tu veux aller plus loin, ils proposent aussi des coachings privés sur l&apos;eau.
+        </p>
+      </Reveal>
+      <ul className={`mt-8 grid gap-5 sm:grid-cols-2 ${team.length >= 3 ? "lg:grid-cols-3" : "lg:max-w-3xl"}`}>
+        {team.map((c, i) => (
+          <Reveal as="li" key={c.photo} delay={i * 0.1} className="panel lift flex flex-col overflow-hidden">
+            <div className="relative aspect-[4/5] overflow-hidden">
+              <Image src={c.photo} alt={`${c.name}, coach de ${c.sports.map((s) => SPORTS[s].name.toLowerCase()).join(" et ")}`} fill sizes="(min-width: 1024px) 380px, (min-width: 640px) 50vw, 100vw" quality={90} className="object-cover" style={{ objectPosition: c.pos ?? "50% 30%" }} />
+              <div className="absolute inset-0 bg-gradient-to-t from-deep/85 via-deep/10 to-transparent" />
+              <div className="absolute left-3 top-3 flex flex-wrap gap-1.5">
+                {c.sports.map((s) => (
+                  <span key={s} className="tag-glass rounded-full px-3 py-1 text-xs font-bold">{SPORTS[s].name}</span>
+                ))}
+              </div>
+              <div className="absolute inset-x-0 bottom-0 p-4 text-white">
+                <p className="text-2xl font-extrabold leading-tight">{c.name}</p>
+                <p className="mt-0.5 flex items-center gap-1.5 text-sm font-semibold text-white/90">
+                  {c.title}
+                </p>
+              </div>
+            </div>
+            <div className="flex flex-1 flex-col p-4">
+              {c.bio && <p className="text-[0.95rem] text-slate">{c.bio}</p>}
+              {c.instagram ? (
+                <a
+                  href={instagramUrl(c.instagram)}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={`btn w-full bg-gradient-to-r from-[#f58529] via-[#dd2a7b] to-[#8134af] text-white hover:opacity-90 ${c.bio ? "mt-4" : "mt-auto"}`}
+                >
+                  <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+                    <rect x="3" y="3" width="18" height="18" rx="5" />
+                    <circle cx="12" cy="12" r="4" />
+                    <circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none" />
+                  </svg>
+                  Coaching privé · @{c.instagram.replace(/^@/, "")}
+                </a>
+              ) : null}
+            </div>
+          </Reveal>
+        ))}
+      </ul>
     </section>
   );
 }
