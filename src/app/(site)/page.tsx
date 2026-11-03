@@ -3,6 +3,8 @@ import Link from "next/link";
 import { DEFAULT_SETTINGS, PLANS } from "@/lib/plans";
 import { SITE_PHOTOS, SPORT_PHOTOS, SPORT_PHOTO_POS } from "@/lib/photos";
 import { SPORT_IDS, SPORTS } from "@/lib/sports";
+import { COURSES } from "@/lib/courses";
+import { LESSONS } from "@/lib/lessons";
 import { Reveal } from "@/components/reveal";
 import { Tilt } from "@/components/tilt";
 import { PhoneScreens } from "@/components/phone-screens";
@@ -12,7 +14,7 @@ export default function Home() {
   return (
     <>
       <Hero />
-      <Ribbon />
+      <TrustBar />
       <Sports />
       <Steps />
       <Coachs />
@@ -161,22 +163,29 @@ function PhoneMock() {
   );
 }
 
-/* Ruban qui défile : bande bleu nuit légèrement inclinée, mots en capitales italiques */
-function Ribbon() {
-  const items = ["Kitesurf", "Wingfoil", "Foil", "Surf", "Wakeboard", "Analyse vidéo", "Coachs diplômés d'État", "Spot Finder", "Progresse"];
-  const row = [...items, ...items];
+/* Barre de garanties sous l'accroche : ce qui rassure avant de s'inscrire */
+function TrustBar() {
+  const items = [
+    { icon: "check" as const, title: "Coachs diplômés d'État", text: "BPJEPS ou DEJEPS" },
+    { icon: "video" as const, title: "Retour sous 24 à 72 h", text: "par e-mail, dans l'appli" },
+    { icon: "book" as const, title: `5 sports, ${COURSES.length + LESSONS.length} cours`, text: "kite, wing, foil, surf, wake" },
+    { icon: "arrow" as const, title: "Sans engagement", text: "1 analyse offerte" },
+  ];
   return (
-    <div className="border-y border-line bg-white py-5" aria-hidden="true">
-      <div className="overflow-hidden [mask-image:linear-gradient(90deg,transparent,black_10%,black_90%,transparent)]">
-        <div className="marquee flex w-max items-center gap-10 whitespace-nowrap">
-          {row.map((t, i) => (
-            <span key={i} className="flex items-center gap-10">
-              <span className="text-lg font-semibold text-deep/70 sm:text-xl">{t}</span>
-              <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-brand" />
+    <div className="border-y border-line bg-white">
+      <ul className="mx-auto grid max-w-6xl grid-cols-2 gap-x-4 gap-y-5 px-5 py-6 sm:px-6 lg:grid-cols-4">
+        {items.map((it) => (
+          <li key={it.title} className="flex items-center gap-3">
+            <span aria-hidden="true" className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-brand-light text-brand">
+              <Icon name={it.icon} className="h-5 w-5" />
             </span>
-          ))}
-        </div>
-      </div>
+            <span className="min-w-0 leading-tight">
+              <span className="block text-[0.95rem] font-bold text-deep">{it.title}</span>
+              <span className="block text-sm text-slate">{it.text}</span>
+            </span>
+          </li>
+        ))}
+      </ul>
     </div>
   );
 }
