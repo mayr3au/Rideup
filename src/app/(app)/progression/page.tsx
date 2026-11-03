@@ -26,8 +26,36 @@ const TREND = {
 
 const fmtXp = (n: number) => n.toLocaleString("fr-FR");
 
+const strList = (v: unknown) => (Array.isArray(v) ? v.filter((x): x is string => typeof x === "string" && x.trim() !== "") : []);
+
+/** Programme stocké en JSON : on ne garde que ce qui a la bonne forme, pour ne jamais casser la page. */
+function normalizeProgram(raw: unknown): Program | undefined {
+  if (!raw || typeof raw !== "object") return undefined;
+  const r = raw as Record<string, unknown>;
+  const sessions = (Array.isArray(r.sessions) ? r.sessions : [])
+    .filter((x): x is Record<string, unknown> => !!x && typeof x === "object")
+    .map((x) => ({ titre: String(x.titre ?? ""), objectif: String(x.objectif ?? ""), exercices: strList(x.exercices) }));
+  if (!sessions.length && typeof r.focus !== "string") return undefined;
+  return { focus: String(r.focus ?? ""), diagnostic: String(r.diagnostic ?? ""), sessions, criteres_reussite: strList(r.criteres_reussite) };
+}
+
 export default async function ProgressionPage() {
-  const { supabase, user, profile } = await requireSession();
+  const session = await requireSession();
+  try {
+    return await renderProgression(session);
+  } catch (e) {
+    if (!session.profile.is_admin || (e as { digest?: string })?.digest?.startsWith("NEXT_")) throw e;
+    console.error("progression", e);
+    return (
+      <div className="panel p-5">
+        <p className="font-semibold text-danger">Erreur sur la page Progression (visible par les admins)</p>
+        <pre className="mt-3 whitespace-pre-wrap break-words text-xs text-slate">{e instanceof Error ? `${e.message}\n\n${e.stack ?? ""}` : String(e)}</pre>
+      </div>
+    );
+  }
+}
+
+async function renderProgression({ supabase, user, profile }: Awaited<ReturnType<typeof requireSession>>) {
   const plan = effectivePlan(profile);
   const elite = plan === "elite";
   const sport = activeSport(profile);
@@ -48,7 +76,7 @@ export default async function ProgressionPage() {
         .limit(1)
         .maybeSingle()
     : { data: null };
-  const program = programRow?.content as Program | undefined;
+  const program = normalizeProgram(programRow?.content);
 
   const declared = levelFor(profile, sport);
   const focusTricks = g.actuel.tricks.filter((t) => t.status === "en-cours").map((t) => t.trick);
