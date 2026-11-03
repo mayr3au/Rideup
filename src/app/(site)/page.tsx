@@ -201,7 +201,7 @@ function Sports() {
         {SPORT_IDS.map((sp, i) => (
           <Reveal as="li" key={sp} delay={i * 0.08} className="w-[42vw] max-w-[200px] shrink-0 snap-start sm:w-auto sm:max-w-none">
             <div className="photo-card lift relative aspect-[3/4] overflow-hidden">
-              <Image src={SPORT_PHOTOS[sp]} alt="" fill sizes="(min-width: 640px) 220px, 42vw" className="object-cover" style={{ objectPosition: SPORT_PHOTO_POS[sp] }} />
+              <Image src={SPORT_PHOTOS[sp]} alt="" fill sizes="(min-width: 640px) 480px, 80vw" quality={85} className="object-cover" style={{ objectPosition: SPORT_PHOTO_POS[sp] }} />
               <div className="photo-veil absolute inset-0" />
               <div className="absolute inset-x-0 bottom-0 p-3 text-white">
                 <p className="text-lg font-bold leading-tight">{SPORTS[sp].name}</p>
@@ -386,7 +386,7 @@ function Features() {
         {items.map((it, i) => (
           <Reveal as="li" key={it.title} delay={i * 0.1} className="panel lift flex gap-4 p-3 lg:flex-col lg:p-0">
             <div className="relative h-24 w-24 shrink-0 overflow-hidden rounded-2xl lg:h-44 lg:w-full lg:rounded-b-none lg:rounded-t-[22px]">
-              <Image src={it.photo} alt="" fill sizes="(min-width: 1024px) 360px, 96px" className="object-cover" />
+              <Image src={it.photo} alt="" fill sizes="(min-width: 1024px) 400px, 200px" quality={85} className="object-cover" />
             </div>
             <div className="min-w-0 py-1 pr-1 lg:px-5 lg:pb-5">
               <p className="flex items-center gap-2 font-bold">

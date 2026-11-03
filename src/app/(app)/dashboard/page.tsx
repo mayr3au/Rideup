@@ -48,7 +48,7 @@ export default async function Dashboard({ searchParams }: { searchParams: Promis
 
       {/* Action principale */}
       <Link href="/analyse" className="photo-card relative flex min-h-56 flex-col justify-end overflow-hidden">
-        <Image src={SPORT_PHOTOS[sport]} alt="" fill sizes="(min-width: 768px) 768px, 100vw" className="object-cover" priority />
+        <Image src={SPORT_PHOTOS[sport]} alt="" fill sizes="(min-width: 768px) 768px, 100vw" quality={85} className="object-cover" priority />
         <div className="photo-veil absolute inset-0" />
         <div className="relative flex items-end justify-between gap-4 p-5 text-white">
           <div>
