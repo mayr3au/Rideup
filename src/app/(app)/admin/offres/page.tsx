@@ -17,17 +17,12 @@ export default async function AdminOffers() {
   const db = createAdminClient();
   const settings = await getPlanSettings(db);
 
-  // Coût moyen réel par analyse et par message sur 30 jours, séparé standard / approfondie
+  // Coût IA moyen d'un message au coach conversationnel sur 30 jours (les analyses vidéo sont faites par des coachs)
   const since = new Date(Date.now() - 30 * 86400000).toISOString();
-  const [{ data: analyses }, { data: coach }] = await Promise.all([
-    db.from("video_analyses").select("depth, cost_usd").eq("status", "termine").not("cost_usd", "is", null).gte("created_at", since).limit(20000),
-    db.from("ai_usage").select("cost_usd").eq("kind", "coach").gte("created_at", since).limit(20000),
-  ]);
+  const { data: coach } = await db.from("ai_usage").select("cost_usd").eq("kind", "coach").gte("created_at", since).limit(20000);
   const avg = (xs: number[], fallback: number) => (xs.length ? xs.reduce((a, b) => a + b, 0) / xs.length : fallback);
-  const costStd = avg((analyses ?? []).filter((a) => a.depth === "standard").map((a) => Number(a.cost_usd)), 0.03);
-  const costDeep = avg((analyses ?? []).filter((a) => a.depth === "approfondie").map((a) => Number(a.cost_usd)), 0.055);
   const costMsg = avg((coach ?? []).map((c) => Number(c.cost_usd)), 0.01);
-  const measured = (analyses ?? []).length > 0;
+  const measured = (coach ?? []).length > 0;
 
   return (
     <div className="max-w-3xl">
@@ -41,14 +36,13 @@ export default async function AdminOffers() {
         <div className="space-y-4">
           {(["free", "progress", "elite"] as const).map((p) => {
             const s = settings[p];
-            const unit = p === "elite" ? costDeep : costStd;
-            const worst = (s.monthly_analyses * unit + s.monthly_coach_messages * costMsg) * EUR_PER_USD;
+            const worst = s.monthly_coach_messages * costMsg * EUR_PER_USD;
             return (
               <fieldset key={p} className="panel p-5">
                 <legend className="px-1 font-semibold">{LABEL[p]}</legend>
                 <div className="grid gap-4 sm:grid-cols-2">
                   <div>
-                    <label htmlFor={`${p}_analyses`} className="label">Analyses{p === "free" ? " (total)" : " par mois"}</label>
+                    <label htmlFor={`${p}_analyses`} className="label">Vidéos analysées par un coach{p === "free" ? " (total)" : " par mois"}</label>
                     <input id={`${p}_analyses`} name={`${p}_analyses`} type="number" min={0} defaultValue={s.monthly_analyses} className="field" />
                   </div>
                   <div>
@@ -57,8 +51,9 @@ export default async function AdminOffers() {
                   </div>
                 </div>
                 <p className="mt-3 text-sm text-slate">
-                  Coût IA maximal si tout est consommé : <span className="font-semibold text-deep">{worst.toFixed(2).replace(".", ",")} €</span>
+                  Coût IA maximal du chat si tout est consommé : <span className="font-semibold text-deep">{worst.toFixed(2).replace(".", ",")} €</span>
                   {p !== "free" && ` pour ${PRICE[p].toFixed(2).replace(".", ",")} € encaissés (${Math.round((worst / (PRICE[p] / 1.2)) * 100)} % du prix HT)`}
+                  {s.monthly_analyses > 0 && `, plus le temps coach de ${s.monthly_analyses} vidéo${s.monthly_analyses > 1 ? "s" : ""}.`}
                 </p>
               </fieldset>
             );
@@ -69,10 +64,9 @@ export default async function AdminOffers() {
       <section className="mt-10 text-[0.95rem]">
         <h2 className="text-xl font-bold">Base de calcul</h2>
         <ul className="mt-2 space-y-1 text-slate">
-          <li>Analyse standard (Progress, essai) : {costStd.toFixed(3).replace(".", ",")} $ en moyenne</li>
-          <li>Analyse approfondie (Elite) : {costDeep.toFixed(3).replace(".", ",")} $ en moyenne</li>
-          <li>Message au coach : {costMsg.toFixed(4).replace(".", ",")} $ en moyenne</li>
-          <li>{measured ? "Moyennes mesurées sur les 30 derniers jours." : "Estimations par défaut : aucune analyse mesurée pour l'instant."}</li>
+          <li>Message au coach IA (chat) : {costMsg.toFixed(4).replace(".", ",")} $ en moyenne</li>
+          <li>{measured ? "Moyenne mesurée sur les 30 derniers jours." : "Estimation par défaut : aucun message mesuré pour l'instant."}</li>
+          <li>Les vidéos sont analysées par les coachs RIDE&apos;UP : leur coût est le temps passé, à rémunérer hors de l&apos;appli.</li>
         </ul>
         <p className="mt-3 text-slate">
           Les textes des formules (avantages affichés sur la page Tarifs) sont dans <code>src/lib/plans.ts</code>.{" "}

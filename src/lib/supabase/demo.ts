@@ -192,14 +192,34 @@ function seed(): Store {
 
   const valid = ["fenetre-vent", "body-drag", "water-start", "navigation", "remonter-vent", "transition", "premier-saut", "toeside", "backroll", "wing-maniement", "wing-debout", "wing-bords"];
 
+  // File des coachs : deux vidéos d'autres riders en attente (l'admin démo voit l'espace coach)
+  const rider = (id: string, full_name: string, sport: string, level: string): Row => ({
+    ...profile,
+    id,
+    email: null,
+    full_name,
+    sport,
+    sports: [sport],
+    levels: { [sport]: level },
+    gear: {},
+    goals: null,
+    is_admin: false,
+    plan_override: null,
+  });
+  const riders = [rider("d0000002-0000-4000-8000-000000000002", "Lina", "kitesurf", "intermediaire"), rider("d0000003-0000-4000-8000-000000000003", "Tom", "wingfoil", "debutant")];
+  const queued: Row[] = [
+    { ...analysis("a0000009-0000-4000-8000-000000000009", "kitesurf", "premier-saut", 0, { figure: "", note: 0, resume: "", phases: [], points_forts: [], erreurs: [], drills: [], priorite_session: "" }), user_id: riders[0].id, notes: "Mon premier saut, je retombe toujours en arrière. Qu'est-ce que je fais mal à l'envoi ?", status: "en-attente", result: null, priority: true, submitted_at: daysAgo(0, 7), coach_id: null },
+    { ...analysis("a0000010-0000-4000-8000-000000000010", "wingfoil", "wing-decollage", 1, { figure: "", note: 0, resume: "", phases: [], points_forts: [], erreurs: [], drills: [], priorite_session: "" }), user_id: riders[1].id, notes: "Je n'arrive pas à décoller, la planche reste collée à l'eau.", status: "en-attente", result: null, priority: false, submitted_at: daysAgo(1, 15), coach_id: null },
+  ];
+
   return {
-    profiles: [profile],
+    profiles: [profile, ...riders],
     plan_settings: [
       { plan: "free", monthly_analyses: 1, monthly_coach_messages: 10 },
-      { plan: "progress", monthly_analyses: 20, monthly_coach_messages: 300 },
-      { plan: "elite", monthly_analyses: 60, monthly_coach_messages: 600 },
+      { plan: "progress", monthly_analyses: 2, monthly_coach_messages: 300 },
+      { plan: "elite", monthly_analyses: 6, monthly_coach_messages: 600 },
     ],
-    video_analyses: analyses,
+    video_analyses: [...analyses, ...queued],
     analysis_errors: errors,
     trick_progress: [
       ...valid.map((t) => ({ user_id: DEMO_ID, trick_id: t, status: "valide", updated_at: daysAgo(9) })),
@@ -560,6 +580,8 @@ export function demoClient() {
         createSignedUrl: async () => ({ data: null, error: { message: "Pas de vidéo en mode démo" } }),
         createSignedUploadUrl: async () => ({ data: null, error: { message: "Pas d'envoi de vidéo en mode démo" } }),
         remove: async () => ({ data: null, error: null }),
+        list: async () => ({ data: [], error: null }),
+        upload: async () => ({ data: null, error: { message: "Pas d'envoi de vidéo en mode démo" } }),
       }),
     },
   };

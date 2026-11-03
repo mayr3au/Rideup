@@ -140,7 +140,7 @@ function AnalyseScreen() {
         <span aria-hidden="true" className="absolute right-3 top-3 h-4 w-4 rounded-tr-md border-r-2 border-t-2 border-white/80" />
         <span className="tag-glass absolute left-1/2 top-3 -translate-x-1/2 rounded-full px-2 py-0.5 text-[0.58rem] font-bold">
           <span aria-hidden="true" className="mr-1 inline-block h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-300" />
-          IA en analyse
+          Analysé par ton coach
         </span>
         <div className="absolute inset-x-0 bottom-0 flex items-end justify-between p-3 text-white">
           <div>

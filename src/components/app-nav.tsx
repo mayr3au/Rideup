@@ -49,11 +49,15 @@ const SECONDARY = [
   { href: "/compte", label: "Abonnement et compte" },
 ];
 
-export function AppNav({ isAdmin, planLabel }: { isAdmin: boolean; planLabel: string }) {
+export function AppNav({ isAdmin, isCoach, planLabel }: { isAdmin: boolean; isCoach?: boolean; planLabel: string }) {
   const path = usePathname();
   const [open, setOpen] = useState(false);
   const close = useCallback(() => setOpen(false), []);
-  const secondary = isAdmin ? [...SECONDARY, { href: "/admin", label: "Administration" }] : SECONDARY;
+  const secondary = [
+    ...(isCoach || isAdmin ? [{ href: "/espace-coach", label: "Espace coach" }] : []),
+    ...SECONDARY,
+    ...(isAdmin ? [{ href: "/admin", label: "Administration" }] : []),
+  ];
   const active = (href: string) => path === href || path.startsWith(href + "/");
 
   useEffect(() => setOpen(false), [path]);

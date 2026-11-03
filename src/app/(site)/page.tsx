@@ -53,7 +53,7 @@ function Hero() {
         <div>
           <span className="tag rise" style={{ "--d": "0s" } as React.CSSProperties}>
             <span aria-hidden="true" className="h-1.5 w-1.5 rounded-full bg-brand" />
-            Coach IA · 5 sports
+            Vrais coachs · 5 sports
           </span>
           <h1 className="mt-6 text-[3rem] leading-[0.98] sm:text-6xl lg:text-[5rem]">
             <span className="rise block" style={{ "--d": "0.08s" } as React.CSSProperties}>Chaque session</span>
@@ -63,8 +63,8 @@ function Hero() {
             </span>
           </h1>
           <p className="rise mt-6 max-w-xl text-lg text-slate sm:text-xl" style={{ "--d": "0.4s" } as React.CSSProperties}>
-            Kite, wing, foil, surf, wake. Envoie une photo de ta figure : RIDE&apos;UP te dit exactement quoi corriger, et
-            quoi bosser à la prochaine session.
+            Kite, wing, foil, surf, wake. Envoie la vidéo de ta figure : un vrai coach la décortique et te dit exactement
+            quoi corriger, et quoi bosser à la prochaine session.
           </p>
           <div className="rise mt-8 flex flex-col gap-4 sm:flex-row sm:items-center" style={{ "--d": "0.5s" } as React.CSSProperties}>
             <Link href="/inscription" className="btn btn-primary">
@@ -79,8 +79,8 @@ function Hero() {
 
           <dl className="rise mt-10 grid max-w-md grid-cols-3 gap-4 border-t border-line pt-6" style={{ "--d": "0.68s" } as React.CSSProperties}>
             {[
-              ["1 photo", "suffit"],
-              ["≈ 1 min", "pour ton retour"],
+              ["1 vidéo", "suffit"],
+              ["24 à 72 h", "pour ton retour"],
               ["5", "sports couverts"],
             ].map(([n, l]) => (
               <div key={n}>
@@ -161,7 +161,7 @@ function PhoneMock() {
 
 /* Ruban qui défile : bande bleu nuit légèrement inclinée, mots en capitales italiques */
 function Ribbon() {
-  const items = ["Kitesurf", "Wingfoil", "Foil", "Surf", "Wakeboard", "Analyse de position", "Coach IA", "Spot Finder", "Progresse"];
+  const items = ["Kitesurf", "Wingfoil", "Foil", "Surf", "Wakeboard", "Analyse vidéo", "Vrais coachs", "Spot Finder", "Progresse"];
   const row = [...items, ...items];
   return (
     <div className="border-y border-line bg-white py-5" aria-hidden="true">
@@ -232,8 +232,8 @@ function Steps() {
           </div>
           <div className="p-5">
             <p className="text-sm font-bold text-brand">Étape 1</p>
-            <h3 className="mt-1 text-xl">Importe ta photo</h3>
-            <p className="mt-1 text-[0.95rem] text-slate">Prise par un pote depuis la plage, ou une capture d&apos;écran de ta vidéo.</p>
+            <h3 className="mt-1 text-xl">Importe ta vidéo</h3>
+            <p className="mt-1 text-[0.95rem] text-slate">Filmée par un pote depuis la plage. Tu gardes juste le passage de ta figure.</p>
           </div>
         </Reveal>
 
@@ -249,8 +249,8 @@ function Steps() {
           </div>
           <div className="p-5">
             <p className="text-sm font-bold text-brand">Étape 2</p>
-            <h3 className="mt-1 text-xl">Dis ce que tu fais</h3>
-            <p className="mt-1 text-[0.95rem] text-slate">Une phrase suffit : la figure et le moment de la photo.</p>
+            <h3 className="mt-1 text-xl">Pose ta question</h3>
+            <p className="mt-1 text-[0.95rem] text-slate">Ce que tu as voulu faire, et ce qui te bloque.</p>
           </div>
         </Reveal>
 
@@ -272,8 +272,8 @@ function Steps() {
           </div>
           <div className="p-5">
             <p className="text-sm font-bold text-brand">Étape 3</p>
-            <h3 className="mt-1 text-xl">Reçois ta correction</h3>
-            <p className="mt-1 text-[0.95rem] text-slate">Une note, tes erreurs et quoi faire différemment à ta prochaine session.</p>
+            <h3 className="mt-1 text-xl">Reçois le retour du coach</h3>
+            <p className="mt-1 text-[0.95rem] text-slate">Une note, tes erreurs et tes exercices, rédigés par un coach qui a vraiment regardé ta vidéo.</p>
           </div>
         </Reveal>
       </ol>
@@ -363,13 +363,13 @@ function PricingTeaser() {
                 <span className="text-slate"> / mois</span>
               </p>
               <p className="mt-2 rounded-xl bg-raised px-3 py-2 text-[0.95rem]">
-                <span className="font-bold">{n} analyses par mois</span>
-                <span className="text-slate"> · environ {Math.round(n / 4.3)} par semaine</span>
+                <span className="font-bold">{n} vidéo{n > 1 ? "s" : ""} analysée{n > 1 ? "s" : ""} par un coach</span>
+                <span className="text-slate"> · chaque mois</span>
               </p>
               <p className="mt-3 text-[0.95rem] text-slate">
                 {elite
-                  ? "Analyse plus poussée, comparaison de tes tentatives, programme personnalisé et alertes conditions sur tes spots."
-                  : "Analyse de position, suivi de progression, coach et Spot Finder."}
+                  ? "Retour du coach sous 24 h, comparaison de tes tentatives, programme personnalisé et alertes conditions sur tes spots."
+                  : "Retour du coach sous 72 h, suivi de progression, coach IA et Spot Finder."}
               </p>
             </Reveal>
           );
@@ -386,12 +386,12 @@ function PricingTeaser() {
 function Faq() {
   const items = [
     {
-      q: "Il faut quel genre de photo ?",
-      a: "Un téléphone suffit. Prends-toi de côté, assez près pour bien voir ton corps et ta planche, avec ton aile ou ton kite si possible. Une capture d'écran de vidéo marche aussi.",
+      q: "Il faut quel genre de vidéo ?",
+      a: "Un téléphone suffit. Fais-toi filmer de côté, à 20 ou 40 m, sans zoomer pendant la figure, avec ton aile ou ton kite dans le cadre. Tu choisis ensuite le passage à montrer (30 s max).",
     },
     {
-      q: "Pourquoi une photo et pas une vidéo ?",
-      a: "Sur une image nette, l'analyse juge précisément ta position : jambes, buste, bras, barre, planche, kite. Choisis le moment qui t'intéresse : l'appel, en l'air ou la réception.",
+      q: "Qui analyse ma vidéo ?",
+      a: "Un coach RIDE'UP spécialiste de ton sport. Il regarde ta figure image par image, de l'approche à la réception, et te répond sous 72 h (24 h en Elite). Tu reçois un e-mail dès que son retour est prêt.",
     },
     {
       q: "Ça remplace un moniteur ?",

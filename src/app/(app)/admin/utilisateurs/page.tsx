@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { requireAdmin } from "@/lib/auth";
-import { setPlanOverride } from "../actions";
+import { SPORTS, SPORT_IDS } from "@/lib/sports";
+import { setCoach, setPlanOverride } from "../actions";
 
 export const metadata: Metadata = { title: "Admin · Utilisateurs" };
 
@@ -14,6 +15,8 @@ type Row = {
   subscription_status: string | null;
   created_at: string;
   is_admin: boolean;
+  is_coach: boolean;
+  coach_sports: string[];
 };
 
 export default async function AdminUsers({ searchParams }: { searchParams: Promise<{ q?: string }> }) {
@@ -24,7 +27,7 @@ export default async function AdminUsers({ searchParams }: { searchParams: Promi
   monthStart.setUTCDate(1);
   monthStart.setUTCHours(0, 0, 0, 0);
 
-  const cols = "id, email, full_name, plan, plan_override, subscription_status, created_at, is_admin";
+  const cols = "id, email, full_name, plan, plan_override, subscription_status, created_at, is_admin, is_coach, coach_sports";
   const term = (q ?? "").replace(/[%_\\]/g, "").trim().slice(0, 80);
   let users: Row[] = [];
   if (term) {
@@ -64,7 +67,7 @@ export default async function AdminUsers({ searchParams }: { searchParams: Promi
       </form>
 
       <div className="mt-6 overflow-x-auto">
-        <table className="w-full min-w-[760px] text-left text-[0.95rem]">
+        <table className="w-full min-w-[1100px] text-left text-[0.95rem]">
           <thead className="border-b border-line text-sm text-slate">
             <tr>
               <th className="py-2 pr-3 font-medium">Utilisateur</th>
@@ -72,13 +75,14 @@ export default async function AdminUsers({ searchParams }: { searchParams: Promi
               <th className="py-2 pr-3 font-medium">Analyses (mois)</th>
               <th className="py-2 pr-3 font-medium">Coût IA (mois)</th>
               <th className="py-2 pr-3 font-medium">Accès offert</th>
+              <th className="py-2 pr-3 font-medium">Coach</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-line">
             {users.map((u) => (
               <tr key={u.id}>
                 <td className="py-3 pr-3">
-                  <p className="font-semibold">{u.full_name || "—"}{u.is_admin && <span className="ml-2 text-sm text-lagoon">admin</span>}</p>
+                  <p className="font-semibold">{u.full_name || "—"}{u.is_admin && <span className="ml-2 text-sm text-lagoon">admin</span>}{u.is_coach && <span className="ml-2 text-sm text-lagoon">coach</span>}</p>
                   <p className="text-sm text-slate">{u.email} · inscrit le {new Date(u.created_at).toLocaleDateString("fr-FR")}</p>
                 </td>
                 <td className="py-3 pr-3">
@@ -98,6 +102,22 @@ export default async function AdminUsers({ searchParams }: { searchParams: Promi
                     <button className="btn btn-ghost !px-3 !py-1.5 text-sm">Appliquer</button>
                   </form>
                 </td>
+                <td className="py-3 pr-3">
+                  <form action={setCoach} className="space-y-1.5">
+                    <input type="hidden" name="id" value={u.id} />
+                    <label className="flex items-center gap-2 font-semibold">
+                      <input type="checkbox" name="is_coach" defaultChecked={u.is_coach} /> Coach
+                    </label>
+                    <div className="flex flex-wrap gap-x-3 gap-y-1 text-sm">
+                      {SPORT_IDS.map((s) => (
+                        <label key={s} className="flex items-center gap-1">
+                          <input type="checkbox" name="coach_sports" value={s} defaultChecked={u.coach_sports?.includes(s)} /> {SPORTS[s].name}
+                        </label>
+                      ))}
+                    </div>
+                    <button className="btn btn-ghost !px-3 !py-1.5 text-sm">Enregistrer</button>
+                  </form>
+                </td>
               </tr>
             ))}
           </tbody>
@@ -105,7 +125,8 @@ export default async function AdminUsers({ searchParams }: { searchParams: Promi
       </div>
       <p className="mt-4 text-sm text-slate">
         « Accès offert » donne la formule sans paiement (testeurs, partenaires). Les abonnements payants se gèrent dans
-        Stripe.
+        Stripe. « Coach » donne accès à l&apos;espace coach pour analyser les vidéos des sports cochés (aucun coché = tous
+        les sports).
       </p>
     </div>
   );

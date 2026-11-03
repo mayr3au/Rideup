@@ -9,9 +9,9 @@ export const PLANS = {
     priceEnv: "STRIPE_PRICE_PROGRESS",
     tagline: "Pour progresser chaque semaine.",
     features: [
-      "Analyse des sauts et des figures",
-      "Identification des erreurs techniques",
-      "Conseils personnalisés pour progresser",
+      "2 vidéos analysées par un vrai coach chaque mois",
+      "Erreurs techniques et corrections, phase par phase",
+      "Exercices et priorité pour ta prochaine session",
       "Historique et suivi des analyses",
       "Coach et roadmap de figures",
       "Accès au Spot Finder",
@@ -25,12 +25,12 @@ export const PLANS = {
     tagline: "Pour les riders qui s'entraînent sérieusement.",
     features: [
       "Tout ce qui est inclus dans Progress",
-      "Analyse technique plus approfondie",
-      "Comparaison des figures et des sessions",
+      "6 vidéos analysées par un vrai coach chaque mois",
+      "Retour du coach sous 24 h, tes vidéos passent en priorité",
+      "Ton coach compare avec tes tentatives précédentes",
       "Détection de l'évolution de tes erreurs",
       "Programme de progression personnalisé",
       "Suivi des figures maîtrisées et à travailler",
-      "Analyses traitées en priorité",
       "Alerte quand les conditions (vent ou houle) sont bonnes sur tes spots favoris",
     ],
   },
@@ -45,30 +45,15 @@ export type PlanSettings = {
 /** Valeurs par défaut si la table plan_settings est vide. */
 export const DEFAULT_SETTINGS: Record<Plan, PlanSettings> = {
   free: { plan: "free", monthly_analyses: 1, monthly_coach_messages: 10 },
-  progress: { plan: "progress", monthly_analyses: 20, monthly_coach_messages: 300 },
-  elite: { plan: "elite", monthly_analyses: 60, monthly_coach_messages: 600 },
+  progress: { plan: "progress", monthly_analyses: 2, monthly_coach_messages: 300 },
+  elite: { plan: "elite", monthly_analyses: 6, monthly_coach_messages: 600 },
 };
 
-/** Ce qui change concrètement dans l'analyse selon la formule. */
-export const ANALYSIS_DEPTH = {
-  free: { depth: "standard", maxTokens: 2600, compare: false },
-  progress: { depth: "standard", maxTokens: 2600, compare: false },
-  elite: { depth: "approfondie", maxTokens: 3600, compare: true },
-} as const;
+/** Passage envoyé au coach : assez long pour l'approche, la figure et la réception. */
+export const MAX_SEGMENT_SECONDS = 30;
 
-/**
- * Densité d'images envoyées à l'IA : 6 par seconde du passage, pour qu'elle suive le mouvement
- * (appel, rotation, réception) sans trou. Passage court (10 s max) pour rester sous la limite
- * de 100 images par demande et garder un coût raisonnable.
- */
-export const FRAMES_PER_SECOND = 6;
-export const MIN_FRAMES = 12;
-export const MAX_FRAMES = 60;
-export function frameCountFor(seconds: number) {
-  return Math.max(MIN_FRAMES, Math.min(MAX_FRAMES, Math.round(seconds * FRAMES_PER_SECOND)));
-}
-
-export const MAX_SEGMENT_SECONDS = 10;
+/** Délai de retour annoncé au rider (heures) : Elite passe devant dans la file. */
+export const REVIEW_DELAY_HOURS = { free: 72, progress: 72, elite: 24 } as const;
 
 export function isActive(status: string | null | undefined) {
   return status === "active" || status === "trialing";

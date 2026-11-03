@@ -1,28 +1,22 @@
 # RIDE'UP
 
-Plateforme de coaching de glisse par IA (kitesurf, wingfoil, foil, surf, wakeboard au téléski) : analyse vidéo des figures, suivi de progression, coach, cours et Spot Finder.
+Plateforme de coaching de glisse (kitesurf, wingfoil, foil, surf, wakeboard au téléski) : vidéos des figures analysées par de vrais coachs, suivi de progression, coach conversationnel IA, cours et Spot Finder.
 
 ### Multi-sport
 Toute la logique propre à chaque sport (phases d'une figure, erreurs, roadmap de figures, matériel, niveaux, type de spot) est dans `src/lib/sports.ts`. Un rider peut pratiquer plusieurs sports, avec un niveau et un matériel par sport (`profiles.sports`, `levels`, `gear`) ; le sélecteur en haut de l'appli change le sport actif. Les analyses, la progression, le programme et le coach sont filtrés par sport. Le « foil » désigne le kitefoil.
 
-**Stack :** Next.js 15 (App Router) · Supabase (auth, Postgres, stockage) · Stripe (abonnements) · Claude Sonnet 5.5 d'Anthropic (analyses, coach, programmes) · Open-Meteo (vent) · Leaflet + OpenStreetMap (carte) · Resend (alertes e-mail) · Vercel.
+**Stack :** Next.js 15 (App Router) · Supabase (auth, Postgres, stockage) · Stripe (abonnements) · Claude d'Anthropic (coach conversationnel, programmes) · Open-Meteo (vent) · Leaflet + OpenStreetMap (carte) · Resend (alertes e-mail) · Vercel.
 
 ## Fonctionnement
 
-### Analyse vidéo
-1. Le rider importe sa vidéo et **sélectionne au doigt un passage de 20 s maximum** (`clip-trimmer.tsx`).
-2. Le navigateur calcule une **empreinte du clip**. Si ce passage (même clip, mêmes bornes, même figure, même profondeur) a déjà été analysé, le résultat existant est réaffiché : **aucun appel IA, aucun quota décompté**. Un clip déjà envoyé n'est pas renvoyé.
-3. Le navigateur extrait des images du passage et les assemble en **planches numérotées 4 × 3** : 2 planches (24 images) en Progress, 4 planches (48 images) en Elite. Seules ces planches partent vers l'IA, la vidéo reste dans le stockage privé.
-4. Claude renvoie un rapport structuré : note globale et par phase (approche, appel, vol, réception), erreurs classées dans une **taxonomie fixe** (`ERROR_CODES` dans `src/lib/tricks.ts`), corrections, exercices, priorité de la prochaine session, alerte sécurité. En Elite, l'analyse est approfondie et **comparée aux tentatives précédentes** de la même figure.
-5. Une analyse en échec n'est jamais décomptée.
+### Analyse vidéo par un coach
+1. Le rider importe sa vidéo, **sélectionne le passage de sa figure (30 s max)**, choisit la figure et écrit ce qu'il a voulu faire et sa question (`analyse-uploader.tsx`).
+2. Le quota est réservé, la vidéo part dans le stockage privé `clips`, puis l'analyse entre dans la **file des coachs** (statut `en-attente`). Les coachs du sport sont prévenus par e-mail. Un envoi raté n'est pas décompté ; tant qu'aucun coach ne l'a prise, le rider peut retirer sa vidéo et récupérer son analyse.
+3. Dans l'**Espace coach** (`/espace-coach`), un coach prend la vidéo (`en-cours`), la regarde avec le profil du rider et ses derniers retours, puis remplit le rapport : note, résumé, phases, erreurs classées dans la **taxonomie fixe** (`errorsFor` dans `src/lib/sports.ts`), points forts, exercices, priorité de la prochaine session, alerte sécurité. Il peut aussi la rendre à la file.
+4. À la publication (`termine`), le rider reçoit un e-mail ; erreurs et figure alimentent sa progression comme avant.
+5. Les riders **Elite passent en priorité** (retour annoncé sous 24 h, contre 72 h). Délais dans `REVIEW_DELAY_HOURS` (`src/lib/plans.ts`).
 
-### Coût IA (Claude Sonnet 5.5 : 2 $ / M tokens en entrée, 10 $ / M en sortie)
-| | Coût d'une analyse | Quota | Coût max / mois | Prix |
-|---|---|---|---|---|
-| Progress | ≈ 0,03 $ | 20 analyses | ≈ 0,60 $ | 14,99 € |
-| Elite | ≈ 0,055 $ | 60 analyses | ≈ 3,30 $ | 29,99 € |
-
-Les coûts réels sont enregistrés à chaque appel (table `ai_usage`) et visibles dans **Admin → Vue d'ensemble**. Les quotas se règlent dans **Admin → Offres**, avec le coût maximal recalculé sur les moyennes réelles.
+**Coachs :** dans **Admin → Utilisateurs**, coche « Coach » et les sports qu'il analyse (aucun coché = tous). L'admin a toujours accès à l'espace coach.
 
 ### Progression
 Erreurs récurrentes (et leur tendance en Elite), priorités pour la prochaine session, suivi figure par figure (tentatives, meilleure note, courbe en Elite), roadmap de 15 figures, programme personnalisé de 3 à 5 sessions (Elite, 1 par 24 h), coach conversationnel qui connaît l'historique.
@@ -39,14 +33,14 @@ La page publique **/week-end** classe les spots par sport : vent prévu pour kit
 
 ### Formules
 - **Essai** : 1 analyse et 10 messages au coach (réglable).
-- **Progress, 14,99 €** : 20 analyses par mois, coach, historique, progression, Spot Finder.
-- **Elite, 29,99 €** : 60 analyses par mois, analyse approfondie et comparée, évolution des erreurs, programme personnalisé, alertes vent.
+- **Progress, 14,99 €** : 2 vidéos analysées par un coach par mois (retour sous 72 h), coach IA, historique, progression, Spot Finder.
+- **Elite, 29,99 €** : 6 vidéos analysées par un coach par mois, en priorité (retour sous 24 h), évolution des erreurs, programme personnalisé, alertes vent.
 
 ## Mise en route
 
 ### 1. Supabase
 1. Crée un projet (région Europe).
-2. **SQL Editor** : exécute `supabase/migrations/0001_init.sql`, puis `supabase/seed_spots.sql` (61 spots de vent et 19 spots de surf ; pas de téléski).
+2. **SQL Editor** : exécute les migrations de `supabase/migrations/` dans l'ordre (0001 à 0004), puis `supabase/seed_spots.sql` (61 spots de vent et 19 spots de surf ; pas de téléski).
 3. **Authentication → URL Configuration** : *Site URL* = l'URL du site, et ajoute `https://TON-DOMAINE/auth/callback` (et `http://localhost:3000/auth/callback`) dans *Redirect URLs*.
 4. **Project Settings → API** : URL, clé `anon`, clé `service_role`.
 5. Inscris-toi sur le site, puis **Table Editor → profiles** : passe `is_admin` à `true` sur ton compte.

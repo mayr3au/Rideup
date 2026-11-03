@@ -4,11 +4,11 @@ import { requireSession, effectivePlan } from "@/lib/auth";
 import { getQuota, sweepStaleAnalyses } from "@/lib/usage";
 import { activeSport, riderSports } from "@/lib/rider";
 import { redirect } from "next/navigation";
-import { PhotoUploader } from "@/components/photo-uploader";
-import { trickById, tricksFor } from "@/lib/sports";
-import type { TrickProgress } from "@/lib/types";
+import { AnalyseUploader } from "@/components/analyse-uploader";
+import { REVIEW_DELAY_HOURS } from "@/lib/plans";
+import { trickById } from "@/lib/sports";
 
-export const metadata: Metadata = { title: "Analyse de position" };
+export const metadata: Metadata = { title: "Analyse vidéo par un coach" };
 
 export default async function AnalysePage({ searchParams }: { searchParams: Promise<{ figure?: string }> }) {
   const { figure } = await searchParams;
@@ -17,34 +17,25 @@ export default async function AnalysePage({ searchParams }: { searchParams: Prom
   const plan = effectivePlan(profile);
   await sweepStaleAnalyses(profile.id);
   const sport = activeSport(profile);
-  const [quota, { data: progress }] = await Promise.all([
-    getQuota(supabase, profile, plan, "analyses"),
-    supabase.from("trick_progress").select("trick_id, status").eq("user_id", profile.id).returns<Pick<TrickProgress, "trick_id" | "status">[]>(),
-  ]);
-  // Raccourcis pour « ce que tu fais » : figures en cours, puis la prochaine à débloquer
-  const status = new Map((progress ?? []).map((p) => [p.trick_id, p.status]));
-  const tricks = tricksFor(sport);
-  const working = tricks.filter((t) => status.get(t.id) === "en-cours");
-  const nextTrick = tricks.find((t) => status.get(t.id) !== "valide" && status.get(t.id) !== "en-cours");
-  const shortcuts = [...working, ...(nextTrick ? [nextTrick] : [])].slice(0, 4).map((t) => t.name);
-  const wanted = figure ? trickById(figure)?.name : undefined;
+  const quota = await getQuota(supabase, profile, plan, "analyses");
+  const wanted = figure && trickById(figure) ? figure : undefined;
 
   return (
     <div className="mx-auto max-w-2xl">
-      <h1 className="text-3xl font-bold sm:text-4xl">Analyse ta position</h1>
+      <h1 className="text-3xl font-bold sm:text-4xl">Fais analyser ta vidéo</h1>
       <p className="mt-2 text-slate">
-        Une photo de toi (ou une capture d&apos;écran de ta vidéo), une phrase pour dire ce que tu fais, et tu reçois tes
-        corrections en quelques secondes.
+        Envoie le passage de ta figure : un vrai coach RIDE&apos;UP la regarde image par image et te renvoie ses corrections,
+        tes exercices et ta priorité pour la prochaine session, sous {REVIEW_DELAY_HOURS[plan]} h.
       </p>
 
       <div className="mt-8">
         {quota.allowed ? (
-          <PhotoUploader
+          <AnalyseUploader
             remaining={quota.remaining}
             sports={riderSports(profile)}
             defaultSport={sport}
-            shortcuts={shortcuts}
-            defaultIntention={wanted}
+            defaultTrick={wanted}
+            delayHours={REVIEW_DELAY_HOURS[plan]}
           />
         ) : (
           <div className="panel p-6">
@@ -54,7 +45,7 @@ export default async function AnalysePage({ searchParams }: { searchParams: Prom
             <p className="mt-2 text-slate">
               {plan === "free"
                 ? "Choisis une formule pour continuer à analyser tes sessions."
-                : `Tu as utilisé tes ${quota.limit} analyses.${plan === "progress" ? " Elite en propose 60 par mois." : " Le compteur repart au renouvellement de ton abonnement."}`}
+                : `Tu as utilisé tes ${quota.limit} analyses.${plan === "progress" ? " Elite en propose davantage, avec un retour sous 24 h." : " Le compteur repart au renouvellement de ton abonnement."}`}
             </p>
             {plan !== "elite" && (
               <Link href="/tarifs" className="btn btn-primary mt-5">

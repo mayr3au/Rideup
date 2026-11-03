@@ -24,6 +24,16 @@ export async function setPlanOverride(formData: FormData) {
   revalidatePath("/admin/utilisateurs");
 }
 
+/** Nomme (ou retire) un coach, et choisit les sports qu'il analyse (aucun coché = tous). */
+export async function setCoach(formData: FormData) {
+  const db = await requireAdmin();
+  const id = String(formData.get("id"));
+  const isCoach = formData.get("is_coach") === "on";
+  const sports = formData.getAll("coach_sports").map(String).filter((s) => (SPORT_IDS as string[]).includes(s));
+  await db.from("profiles").update({ is_coach: isCoach, coach_sports: isCoach ? sports : [] }).eq("id", id);
+  revalidatePath("/admin/utilisateurs");
+}
+
 const planSchema = z.object({
   plan: z.enum(["free", "progress", "elite"]),
   monthly_analyses: z.coerce.number().int().min(0).max(10000),

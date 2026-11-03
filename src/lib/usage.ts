@@ -65,15 +65,18 @@ export async function releaseAnalysis(analysisId: string) {
   await createAdminClient().from("usage_events").delete().eq("kind", "analyse").eq("ref", analysisId);
 }
 
-/** Analyses bloquées (onglet fermé, réseau coupé) depuis plus de 10 min : échec, quota rendu. */
+/**
+ * Vidéos dont l'envoi n'a jamais abouti (onglet fermé, réseau coupé) depuis plus de 2 h : échec, quota rendu.
+ * Les vidéos déjà dans la file des coachs ne sont jamais annulées automatiquement.
+ */
 export async function sweepStaleAnalyses(userId: string) {
   const db = createAdminClient();
   const { data } = await db
     .from("video_analyses")
-    .update({ status: "erreur", counted: false, error: "Interrompue" })
+    .update({ status: "erreur", counted: false, error: "Envoi de la vidéo interrompu" })
     .eq("user_id", userId)
-    .in("status", ["en-attente", "en-cours"])
-    .lt("created_at", new Date(Date.now() - 10 * 60 * 1000).toISOString())
+    .eq("status", "envoi")
+    .lt("created_at", new Date(Date.now() - 2 * 3600 * 1000).toISOString())
     .select("id");
   for (const row of data ?? []) await releaseAnalysis(row.id);
 }

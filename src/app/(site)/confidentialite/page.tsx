@@ -19,9 +19,9 @@ export default function Page() {
       </p>
       <h2>Sous-traitants</h2>
       <p>
-        Supabase (base de données et stockage), Vercel (hébergement), Stripe (paiement), Anthropic (analyse des photos
-        que tu envoies et réponses du coach), Resend (e-mails d&apos;alerte vent). Seule la photo envoyée, réduite, est
-        transmise à Anthropic. Ta ville de départ sert
+        Supabase (base de données et stockage), Vercel (hébergement), Stripe (paiement), Anthropic (réponses du coach
+        conversationnel et programmes), Resend (e-mails d&apos;alerte vent et de retour d&apos;analyse). Tes vidéos ne sont pas
+        transmises à Anthropic : elles sont stockées de façon privée et seuls les coachs RIDE&apos;UP qui les analysent y ont accès. Ta ville de départ sert
         uniquement à calculer la distance des spots. Ces prestataires n&apos;utilisent pas tes données à leurs
         propres fins.
       </p>

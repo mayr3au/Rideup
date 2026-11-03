@@ -9,7 +9,7 @@ export const metadata: Metadata = { title: "Historique" };
 type Row = {
   id: string;
   trick: string | null;
-  status: "termine" | "erreur";
+  status: "en-attente" | "en-cours" | "termine" | "erreur";
   created_at: string;
   seg_start: number | string;
   seg_end: number | string;
@@ -33,7 +33,7 @@ export default async function HistoryPage({ searchParams }: { searchParams: Prom
       "id, trick, status, created_at, seg_start, seg_end, figure:result->>figure, note:result->>note, priorite:result->>priorite_session, moment:result->>moment, mini:result->>mini, image:result->>image",
     )
     .eq("sport", sport)
-    .in("status", ["termine", "erreur"])
+    .in("status", ["en-attente", "en-cours", "termine", "erreur"])
     .order("created_at", { ascending: false })
     .limit(100);
   if (figure) q = q.eq("trick", figure);
@@ -137,7 +137,7 @@ export default async function HistoryPage({ searchParams }: { searchParams: Prom
                           {a.priorite && <span className="mt-0.5 line-clamp-1 text-sm text-slate">{a.priorite}</span>}
                         </span>
                         <span className={`shrink-0 ${ok ? "text-xl font-extrabold text-brand" : "text-sm font-semibold text-slate"}`}>
-                          {ok ? `${Number(a.note)}/10` : a.status === "erreur" ? "Échec" : "En cours…"}
+                          {ok ? `${Number(a.note)}/10` : a.status === "erreur" ? "Annulée" : a.status === "en-cours" ? "Chez le coach" : "En attente"}
                         </span>
                       </Link>
                     </li>
@@ -150,8 +150,8 @@ export default async function HistoryPage({ searchParams }: { searchParams: Prom
       ) : (
         <div className="panel mt-6 p-6 text-center">
           <p className="text-lg font-bold">Aucune analyse pour l&apos;instant</p>
-          <p className="mt-1 text-slate">Envoie une photo de ta figure et reçois ton premier retour de coach.</p>
-          <Link href="/analyse" className="btn btn-primary mt-4">Analyser ma position</Link>
+          <p className="mt-1 text-slate">Envoie la vidéo de ta figure et reçois le retour d&apos;un vrai coach.</p>
+          <Link href="/analyse" className="btn btn-primary mt-4">Envoyer une vidéo</Link>
         </div>
       )}
     </div>
