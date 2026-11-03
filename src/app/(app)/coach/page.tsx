@@ -14,6 +14,8 @@ import { clearChat, setTrickStatus } from "./actions";
 
 export const metadata: Metadata = { title: "Coach" };
 
+const VISIBLE = 3;
+
 export default async function CoachPage({ searchParams }: { searchParams: Promise<{ vue?: string; q?: string; go?: string }> }) {
   const { vue, q, go } = await searchParams;
   const { supabase, profile } = await requireSession();
@@ -106,11 +108,13 @@ export default async function CoachPage({ searchParams }: { searchParams: Promis
                   )}
 
                   <ol className="mt-3 space-y-2">
-                    {open.map((t) => {
+                    {open.map((t, idx) => {
                       const s = status.get(t.id);
                       const isNext = t.id === firstOpen;
                       const course = courseForTrick(t.id);
                       const focus = isNext || s === "en-cours";
+                      // Liste longue : on montre les 3 premières figures et celles en cours, le reste est replié.
+                      if (idx >= VISIBLE && !focus) return null;
                       return (
                         <li key={t.id} className={`panel ${focus ? "p-4 ring-2 ring-brand" : "px-4 py-3"}`}>
                           <div className="flex items-start gap-3">
@@ -156,6 +160,31 @@ export default async function CoachPage({ searchParams }: { searchParams: Promis
                       );
                     })}
                   </ol>
+                  {(() => {
+                    const rest = open.filter((t, idx) => idx >= VISIBLE && t.id !== firstOpen && status.get(t.id) !== "en-cours");
+                    if (!rest.length) return null;
+                    return (
+                      <details className="group mt-2 rounded-2xl border border-line bg-white px-4 py-2">
+                        <summary className="flex min-h-9 cursor-pointer list-none items-center gap-2 text-sm font-semibold text-lagoon">
+                          <span aria-hidden="true" className="transition group-open:rotate-90">›</span>
+                          {rest.length} autre{rest.length > 1 ? "s" : ""} figure{rest.length > 1 ? "s" : ""} à débloquer
+                        </summary>
+                        <ul className="mt-1 divide-y divide-line/60 pb-1">
+                          {rest.map((t) => (
+                            <li key={t.id} className="flex flex-wrap items-center justify-between gap-2 py-2.5">
+                              <div className="min-w-0">
+                                <p className="font-semibold">{t.name}</p>
+                                <p className="text-sm text-slate">{t.summary}</p>
+                              </div>
+                              <div className="flex shrink-0 items-center gap-2">
+                                <TrickControls trickId={t.id} status={undefined} />
+                              </div>
+                            </li>
+                          ))}
+                        </ul>
+                      </details>
+                    );
+                  })()}
                 </div>
               );
             })}

@@ -3,6 +3,8 @@
  * figures (roadmap), erreurs typiques, libellés des phases, matériel, type de spot.
  */
 
+import { ROADMAPS } from "./roadmaps";
+
 export type SportId = "kitesurf" | "wingfoil" | "foil" | "surf" | "wakeboard";
 export type Level = "debutant" | "intermediaire" | "avance" | "expert";
 export type SpotKind = "wind" | "waves" | "cable";
@@ -91,23 +93,7 @@ export const SPORTS: Record<SportId, Sport> = {
       "bras-tendus": "Bras tendus, barre qui pivote",
       "planche-mal-orientee": "Planche mal orientée",
     },
-    tricks: [
-      { id: "fenetre-vent", name: "Lire la fenêtre de vent", level: "debutant", summary: "Savoir où le kite tire fort et où il se pose.", keys: ["Zone neutre au zénith", "Puissance en bas de fenêtre", "Toujours regarder sous le vent"] },
-      { id: "body-drag", name: "Body drag", level: "debutant", summary: "Se déplacer dans l'eau sans planche, et aller la récupérer.", keys: ["Kite à 11 h ou 1 h", "Bras tendu dans la direction", "Body drag au près pour remonter"] },
-      { id: "water-start", name: "Water start", level: "debutant", summary: "Sortir de l'eau et tenir les premiers mètres.", keys: ["Planche en travers, genoux pliés", "Une seule passe de kite, pas trop haute", "Poids sur le talon arrière dès le départ"] },
-      { id: "navigation", name: "Naviguer dans les deux sens", level: "debutant", summary: "Tenir une trajectoire stable bâbord comme tribord.", keys: ["Regarder où tu vas", "Kite stable à 45°", "Carre constante"] },
-      { id: "remonter-vent", name: "Remonter au vent", level: "intermediaire", summary: "Revenir à son point de départ sans marcher.", keys: ["Hanches vers l'avant", "Mettre de la carre sur le talon", "Kite plus haut, moins de puissance"] },
-      { id: "transition", name: "Transition", level: "intermediaire", summary: "Changer de bord sans s'arrêter.", keys: ["Ralentir en remontant", "Passer le kite au zénith", "Transférer le poids sur l'autre carre"] },
-      { id: "premier-saut", name: "Premier saut", level: "intermediaire", summary: "Décoller proprement et se poser en douceur.", keys: ["Vitesse + carre avant l'envoi", "Envoi du kite franc, pas brutal", "Renvoyer le kite vers l'avant pour la réception"] },
-      { id: "toeside", name: "Toeside", level: "intermediaire", summary: "Naviguer sur la carre avant.", keys: ["Épaules dans l'axe de déplacement", "Pression sur les orteils", "Regarder par-dessus l'épaule"] },
-      { id: "backroll", name: "Backroll", level: "avance", summary: "Rotation arrière, la première vraie figure.", keys: ["Carre plus forte qu'un saut", "Regarder par-dessus l'épaule arrière", "Kite qui ne bouge pas pendant la rotation"] },
-      { id: "frontroll", name: "Frontroll", level: "avance", summary: "Rotation avant, plus engagée visuellement.", keys: ["Envoi plus doux que pour un saut", "Tête et épaules lancent la rotation", "Barre près des hanches"] },
-      { id: "board-off", name: "Board off", level: "avance", summary: "Sortir les pieds de la planche en l'air.", keys: ["Saut haut et stable d'abord", "Ramener la planche vers toi", "Remettre les pieds avant le pic"] },
-      { id: "kiteloop", name: "Kiteloop", level: "avance", summary: "Boucler le kite pendant le saut.", keys: ["Commencer petit, vent modéré", "Tirer franc d'un côté de la barre", "Garder la barre près du corps"] },
-      { id: "raley", name: "Raley", level: "expert", summary: "Le classique du freestyle unhooked.", keys: ["Kite bas à 45°", "Carre très forte, pop sur la carre", "Corps en extension, puis genoux ramenés"] },
-      { id: "s-bend", name: "S-Bend", level: "expert", summary: "Raley avec rotation inversée.", keys: ["Raley maîtrisé avant", "Épaule avant qui ouvre la rotation", "Tenir la barre jusqu'au bout"] },
-      { id: "handle-pass", name: "Handle pass", level: "expert", summary: "Passer la barre dans le dos en l'air.", keys: ["Ramener la barre au nombril", "Une main lâche, l'autre suit", "Rester compact"] },
-    ],
+    tricks: ROADMAPS.kitesurf,
   },
 
   /* ───────────────────────── Wingfoil ───────────────────────── */
@@ -139,20 +125,7 @@ export const SPORTS: Record<SportId, Sport> = {
       "regard-bas": "Regard sur la planche au lieu de l'horizon",
       "changement-mains-tardif": "Changement de mains trop tardif",
     },
-    tricks: [
-      { id: "wing-maniement", name: "Manier l'aile", level: "debutant", summary: "Tenir, gonfler et orienter l'aile sans se faire embarquer.", keys: ["Bras fléchis, aile au-dessus de la tête", "Border avec la main arrière", "Lâcher la main arrière pour choquer"] },
-      { id: "wing-debout", name: "Se mettre debout", level: "debutant", summary: "Passer de genoux à debout avec l'aile qui tire.", keys: ["Pieds au centre de la planche", "Aile haute pendant la montée", "Se relever en un mouvement fluide"] },
-      { id: "wing-bords", name: "Premiers bords sans voler", level: "debutant", summary: "Naviguer à plat et revenir à son point de départ.", keys: ["Regarder l'horizon", "Planche bien à plat", "Petits virages par l'avant de l'aile"] },
-      { id: "wing-decollage", name: "Décoller sur le foil", level: "intermediaire", summary: "Prendre de la vitesse et monter sur le foil.", keys: ["Vitesse d'abord, pression ensuite", "Légère pression sur le pied arrière", "Revenir neutre dès que tu voles"] },
-      { id: "wing-vol", name: "Tenir le vol", level: "intermediaire", summary: "Garder une hauteur de vol constante.", keys: ["Genoux souples", "Petites corrections de pieds", "Aile stable, pas de grands gestes"] },
-      { id: "wing-remonter", name: "Remonter au vent", level: "intermediaire", summary: "Revenir au vent en volant.", keys: ["Aile bordée, épaules ouvertes", "Planche orientée au près", "Ne pas trop charger le pied arrière"] },
-      { id: "wing-jibe", name: "Jibe en vol", level: "avance", summary: "Empanner sans retoucher l'eau.", keys: ["Abattre en gardant la vitesse", "Aile neutre au-dessus de la tête", "Changer de mains en sortie de virage"] },
-      { id: "wing-tack", name: "Tack en vol", level: "avance", summary: "Virer de bord par le vent en volant.", keys: ["Lofer franchement", "Pas de pieds rapide", "Aile passée devant toi"] },
-      { id: "wing-pumping", name: "Pumping", level: "avance", summary: "Décoller et rester en vol dans peu de vent.", keys: ["Pomper avec les jambes, pas les bras", "Synchroniser aile et planche", "Rythme régulier"] },
-      { id: "wing-downwind", name: "Downwind", level: "avance", summary: "Surfer la houle sous le vent.", keys: ["Aile neutre sur les bosses", "Lire la houle devant toi", "Relancer au pumping entre deux bosses"] },
-      { id: "wing-saut", name: "Premier saut", level: "expert", summary: "Décoller du plan d'eau et se reposer en vol.", keys: ["Vitesse et appel sur le pied arrière", "Aile qui accompagne la montée", "Réception sur les deux pieds, foil à plat"] },
-      { id: "wing-backroll", name: "Backroll", level: "expert", summary: "Rotation arrière en wingfoil.", keys: ["Saut maîtrisé avant", "Regard qui lance la rotation", "Aile au-dessus de la tête pendant la rotation"] },
-    ],
+    tricks: ROADMAPS.wingfoil,
   },
 
   /* ───────────────────────── Foil (kitefoil) ───────────────────────── */
@@ -182,18 +155,7 @@ export const SPORTS: Record<SportId, Sport> = {
       "carre-trop-forte": "Trop de carre, la planche se couche",
       "regard-bas": "Regard sur la planche au lieu de l'horizon",
     },
-    tricks: [
-      { id: "foil-displacement", name: "Naviguer sans voler", level: "debutant", summary: "Tenir la planche de foil à plat, en contrôle.", keys: ["Pied avant au-dessus du mât", "Kite à 45°, sans trop de traction", "Regarder loin devant"] },
-      { id: "foil-decollage", name: "Premier décollage", level: "debutant", summary: "Monter sur le foil et redescendre en douceur.", keys: ["Petite pression sur le pied arrière", "Revenir neutre dès que tu décolles", "Redescendre en chargeant le pied avant"] },
-      { id: "foil-vol", name: "Vol stable", level: "intermediaire", summary: "Garder la même hauteur sur tout un bord.", keys: ["Genoux souples", "Corrections minimes", "Kite stable, barre près du corps"] },
-      { id: "foil-remonter", name: "Remonter au vent", level: "intermediaire", summary: "Remonter fort au vent en volant.", keys: ["Hanches vers l'avant", "Kite plus haut", "Planche orientée au près, peu de carre"] },
-      { id: "foil-transition", name: "Transition en touchant l'eau", level: "intermediaire", summary: "Changer de bord en redescendant.", keys: ["Ralentir et poser la planche", "Kite au zénith", "Redécoller sur l'autre bord"] },
-      { id: "foil-jibe", name: "Jibe en vol", level: "avance", summary: "Empanner sans retoucher l'eau.", keys: ["Abattre progressivement", "Changement de pieds rapide", "Kite qui accompagne le virage"] },
-      { id: "foil-tack", name: "Tack en vol", level: "avance", summary: "Virer de bord par le vent en volant.", keys: ["Lofer franchement", "Kite au zénith au bon moment", "Pas de pieds fluide"] },
-      { id: "foil-toeside", name: "Toeside en vol", level: "avance", summary: "Voler sur la carre avant.", keys: ["Épaules dans l'axe", "Pression sur les orteils", "Regarder par-dessus l'épaule"] },
-      { id: "foil-saut", name: "Premier saut", level: "expert", summary: "Décoller du plan d'eau et se reposer en vol.", keys: ["Vitesse et envoi du kite doux", "Planche à plat en l'air", "Réception foil à plat, jambes souples"] },
-      { id: "foil-backroll", name: "Backroll", level: "expert", summary: "Rotation arrière en kitefoil.", keys: ["Saut maîtrisé avant", "Regard qui lance la rotation", "Kite stable pendant la rotation"] },
-    ],
+    tricks: ROADMAPS.foil,
   },
 
   /* ───────────────────────── Surf ───────────────────────── */
@@ -225,19 +187,7 @@ export const SPORTS: Record<SportId, Sport> = {
       "epaules-figees": "Épaules qui ne lancent pas le virage",
       "pas-de-compression": "Pas de compression / extension des jambes",
     },
-    tricks: [
-      { id: "surf-rame", name: "Ramer et se placer", level: "debutant", summary: "Être au bon endroit et prendre de la vitesse avant la vague.", keys: ["Corps bien centré sur la planche", "Rame longue et régulière", "Partir avant que la vague te rattrape"] },
-      { id: "surf-mousse", name: "Take-off dans la mousse", level: "debutant", summary: "Se lever sur les vagues déjà cassées.", keys: ["Mains sous les épaules", "Se lever en un seul mouvement", "Regarder devant, pas ses pieds"] },
-      { id: "surf-takeoff", name: "Take-off en vague verte", level: "debutant", summary: "Partir sur une vague qui n'a pas encore cassé.", keys: ["Quelques coups de rame de plus", "Se lever dès que la planche glisse", "Prendre l'angle tout de suite"] },
-      { id: "surf-trim", name: "Glisser en diagonale", level: "intermediaire", summary: "Suivre l'épaule de la vague en gardant la vitesse.", keys: ["Regarder loin sur l'épaule", "Poids sur le pied avant pour accélérer", "Rester dans la partie qui pousse"] },
-      { id: "surf-canard", name: "Passer la barre", level: "intermediaire", summary: "Traverser les vagues pour rejoindre le pic.", keys: ["Canard ou roll selon la planche", "Rame forte entre deux séries", "Repartir vite derrière la vague"] },
-      { id: "surf-bottom", name: "Bottom turn", level: "intermediaire", summary: "Le virage du bas de la vague, base de tout.", keys: ["Compresser en bas de la vague", "Regard vers la lèvre", "Pousser sur la carre et s'étendre"] },
-      { id: "surf-cutback", name: "Cutback", level: "avance", summary: "Revenir vers la partie qui casse.", keys: ["Partir de l'épaule avec de la vitesse", "Épaules qui lancent le virage", "Regard qui suit la mousse"] },
-      { id: "surf-top", name: "Top turn", level: "avance", summary: "Virage en haut de la vague.", keys: ["Bon bottom turn avant", "Monter vers la lèvre", "Rotation des épaules franche"] },
-      { id: "surf-floater", name: "Floater", level: "avance", summary: "Glisser sur la lèvre qui casse.", keys: ["Monter sur la section qui ferme", "Poids centré", "Redescendre en compressant"] },
-      { id: "surf-tube", name: "Tube", level: "expert", summary: "Passer sous la lèvre qui déferle.", keys: ["Lire la section qui creuse", "Se grouper, main dans la paroi", "Regarder la sortie"] },
-      { id: "surf-aerial", name: "Aerial", level: "expert", summary: "Décoller au-dessus de la lèvre.", keys: ["Beaucoup de vitesse", "Rampe sur une section qui ferme", "Planche sous les pieds, réception centrée"] },
-    ],
+    tricks: ROADMAPS.surf,
   },
 
   /* ───────────────────────── Wakeboard (téléski) ───────────────────────── */
@@ -267,20 +217,7 @@ export const SPORTS: Record<SportId, Sport> = {
       "tension-cable": "Tension du câble mal gérée",
       "planche-mal-orientee": "Planche mal orientée sur le module",
     },
-    tricks: [
-      { id: "wake-depart", name: "Départ du ponton", level: "debutant", summary: "Partir assis ou debout sans tomber.", keys: ["Bras tendus au départ, laisser tirer", "Genoux pliés, poids sur l'arrière", "Se relever doucement"] },
-      { id: "wake-virages", name: "Prendre les virages", level: "debutant", summary: "Passer les poulies du câble sans tomber.", keys: ["Anticiper le virage", "Poignée près des hanches", "Garder de la tension sur la carre"] },
-      { id: "wake-carre", name: "Changer de carre", level: "debutant", summary: "Traverser le sillage et tenir les deux carres.", keys: ["Regarder où tu vas", "Transfert du poids progressif", "Garder la poignée basse"] },
-      { id: "wake-ollie", name: "Ollie", level: "intermediaire", summary: "Décoller la planche du plat.", keys: ["Charger le pied arrière", "Ramener les genoux", "Atterrir les deux pieds en même temps"] },
-      { id: "wake-180", name: "Surface 180", level: "intermediaire", summary: "Passer en switch sur le plat.", keys: ["Poignée passée au niveau des hanches", "Épaules qui lancent", "Retrouver la carre en sortie"] },
-      { id: "wake-kicker", name: "Premier kicker", level: "intermediaire", summary: "Straight air sur un kicker.", keys: ["Approche droite, vitesse constante", "Ne pas tirer sur la poignée", "Réception jambes souples"] },
-      { id: "wake-box", name: "50-50 sur la box", level: "intermediaire", summary: "Glisser droit sur une box.", keys: ["Approche bien alignée", "Planche à plat, poids centré", "Regard sur la sortie du module"] },
-      { id: "wake-grab", name: "Grab sur kicker", level: "avance", summary: "Attraper la planche en l'air.", keys: ["Ramener la planche vers la main", "Garder la poignée près du corps", "Lâcher le grab avant la réception"] },
-      { id: "wake-boardslide", name: "Boardslide", level: "avance", summary: "Glisser en travers sur le module.", keys: ["Pop léger pour monter", "Épaules dans l'axe du module", "Planche à 90°"] },
-      { id: "wake-backroll", name: "Backroll sur kicker", level: "avance", summary: "Premier invert sur kicker.", keys: ["Carre et pop franc", "Regard par-dessus l'épaule arrière", "Poignée au niveau des hanches"] },
-      { id: "wake-frontflip", name: "Frontflip", level: "expert", summary: "Rotation avant sur kicker.", keys: ["Pop vers l'avant", "Rentrer le menton", "Poignée au nombril"] },
-      { id: "wake-tantrum", name: "Tantrum", level: "expert", summary: "Rotation arrière depuis le plat.", keys: ["Carre arrière forte", "Pop vertical", "Regard par-dessus l'épaule"] },
-    ],
+    tricks: ROADMAPS.wakeboard,
   },
 };
 

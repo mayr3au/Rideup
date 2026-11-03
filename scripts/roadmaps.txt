@@ -1,0 +1,268 @@
+# Roadmaps de figures par sport, dans l'ordre de progression.
+# « =id » reprend une figure existante telle quelle (ne jamais changer un id : la progression des riders y est liée).
+# Sinon : id|nom|niveau (deb, int, ava, exp)|résumé|clé 1;clé 2;clé 3
+
+## kitesurf
+=fenetre-vent
+kite-securite|Systèmes de sécurité|deb|Larguer, récupérer la barre et t'auto-secourir.|Largage du chicken loop répété à terre;Leash toujours relié au harnais;Savoir quand larguer : avant d'être en danger
+kite-decollage|Décoller et poser l'aile|deb|Décoller et atterrir avec un assistant, sans risque.|Aile au bord de la fenêtre, jamais au centre;Signes clairs avec l'assistant;Zone sous le vent dégagée
+kite-pilotage|Piloter d'une main|deb|Contrôler l'aile d'une main au zénith et en bord de fenêtre.|Petits mouvements doux;Regarder l'aile en permanence;Barre près du corps
+=body-drag
+kite-bodydrag-planche|Body drag pour récupérer ta planche|deb|Remonter au vent vers ta planche perdue.|Aile à 11 h ou 1 h, une main sur la barre;Bras libre devant toi comme une dérive;Avancer en zigzag
+kite-relance|Relancer l'aile depuis l'eau|deb|Relancer une aile tombée dans l'eau.|Tirer une ligne arrière pour la faire glisser;Laisser remonter par le bord de la fenêtre;Patience, pas de gestes brusques
+=water-start
+kite-glisse|Tenir la glisse|deb|Garder la vitesse sur un bord sans t'arrêter.|Aile stable à 45°;Poids sur la jambe arrière;Regard vers l'avant
+=navigation
+kite-arret|Freiner et t'arrêter|deb|Contrôler ta vitesse en carvant au vent.|Carre au vent, talons qui poussent;Aile qui remonte doucement;Barre choquée
+=remonter-vent
+kite-reglage|Régler ta puissance|int|Adapter la puissance de l'aile avec le trim.|Trimer avant d'être surtoilé;Barre choquée = moins de puissance;Une taille d'aile adaptée au vent
+=transition
+kite-sortie-plage|Sortir et revenir à la plage|int|Passer le shorebreak et revenir au bon endroit.|Aile haute et stable dans les vagues;Planche tenue côté sous le vent;Revenir sous le vent de ton départ
+=toeside
+kite-carving|Virage carvé|int|Changer de sens en carvant, sans t'arrêter.|Aile au zénith au bon moment;Genoux pliés, carre progressive;Sortie en vitesse
+kite-switch|Naviguer en switch|int|Rider pieds inversés sur un bord complet.|Changement de pied d'appui en douceur;Poids sur la nouvelle jambe arrière;Aile stable
+=premier-saut
+kite-sauts-hauts|Saut haut et long|int|Gagner en hauteur avec un envoi franc.|Vitesse et carre au vent;Envoi franc de l'aile vers l'arrière;Barre tirée au sommet
+kite-saut-grab|Saut grab|int|Attraper la planche pendant un saut simple.|Saut maîtrisé avant tout;Ramener les genoux vers la poitrine;Lâcher avant la réception
+kite-saut-transition|Saut transition|int|Changer de sens en l'air.|Aile renvoyée de l'autre côté;Corps qui pivote sous l'aile;Réception dans le nouveau sens
+kite-one-foot|One foot|int|Sortir un pied du strap en saut.|Straps un peu desserrés;Sortir le pied avant au sommet;Le remettre avant la descente
+kite-pop|Pop|int|Décoller avec la carre et la planche, aile basse.|Carre forte au vent;Pop sur la jambe arrière;Aile basse et fixe
+kite-downloop|Downloop|int|Boucler l'aile vers le bas en gardant le contrôle.|Commencer en vent modéré;Barre tirée d'un côté, franchement;Anticiper la traction
+=backroll
+kite-backroll-grab|Backroll grab|ava|Ajouter un grab à la rotation arrière.|Rotation lancée avant le grab;Grab au plus haut;Lâcher avant la réception
+kite-backroll-transition|Backroll transition|ava|Rotation arrière en changeant de sens.|Aile renvoyée pendant la rotation;Regard vers la nouvelle direction;Réception en navigation
+=frontroll
+kite-frontroll-grab|Frontroll grab|ava|Ajouter un grab à la rotation avant.|Rotation engagée avant le grab;Genoux ramenés;Regard vers la réception
+kite-double-backroll|Double backroll|ava|Deux rotations arrière dans le même saut.|Saut haut avant tout;Tête qui continue de tourner;Aile stable au zénith
+kite-grabs|Grabs variés|ava|Indy, tail, nose : varier les prises en saut.|Amener la planche à la main, pas l'inverse;Tenir le grab une seconde;Lâcher tôt
+=board-off
+kite-decroche|Rider décroché|ava|Naviguer sans le harnais pour préparer le freestyle.|Aile basse à 30°;Barre au centre, bras pliés;Commencer en vent modéré
+kite-surface-360|360 sur l'eau|ava|Faire un tour complet en glissant.|Aile à 12 h pendant la rotation;Planche à plat;Épaules qui lancent le mouvement
+=kiteloop
+kite-strapless|Strapless : premiers bords|ava|Rider une planche surf sans straps.|Pieds au centre de la planche;Aile qui tire en douceur;Carves amples
+kite-strapless-jibe|Jibe strapless|ava|Changer de sens en changeant de pieds, planche surf.|Aile qui passe au zénith;Changement de pieds après le virage;Garder la vitesse
+kite-surf-vague|Surfer la vague au kite|ava|Rider une vague en laissant l'aile en retrait.|Aile en bord de fenêtre, peu de traction;Bottom turn puis top turn;Lire la vague à l'avance
+kite-wave-turns|Bottom et top turns appuyés|ava|Enchaîner des virages puissants sur la vague.|Bottom turn profond et tôt;Top turn dans la lèvre;Aile qui suit sans tirer
+=raley
+kite-tantrum|Tantrum|exp|Rotation arrière décrochée, lancée par la carre.|Raley maîtrisé avant;Carre forte et pop vertical;Regard par-dessus l'épaule
+=s-bend
+=handle-pass
+kite-mobe|Mobe|exp|Backroll décroché avec passage de barre dans le dos.|Backroll décroché maîtrisé;Barre ramenée vers les hanches;Passage au sommet de la rotation
+kite-blind-judge|Blind judge|exp|Rotation avant décrochée avec réception en blind.|Pop franc et haut;Rotation avant serrée;Passage de barre dans le dos à la réception
+kite-front-to-blind|Front to blind|exp|Frontroll décroché avec réception dos au vent.|Frontroll décroché maîtrisé;Arrêter la rotation au bon moment;Barre passée dans le dos
+kite-triple-backroll|Triple backroll|exp|Trois rotations arrière dans un seul saut.|Gros saut et aile très stable;Rotations serrées, bras près du corps;Ouvrir pour la réception
+kite-megaloop|Megaloop|exp|Kiteloop engagé en vent fort pour la hauteur.|Vent fort maîtrisé, zone sûre;Loop au sommet, barre tirée à fond;Le faire d'abord encadré
+kite-kiteloop-backroll|Kiteloop backroll|exp|Kiteloop avec rotation arrière.|Backroll lancé avant le loop;Aile tirée au sommet;Réception sous le vent
+kite-kiteloop-handle-pass|Kiteloop handle pass|exp|Kiteloop avec passage de barre.|Kiteloop maîtrisé avant;Passage pendant que l'aile tourne;Rattraper la barre près des hanches
+kite-kiteloop-board-off|Kiteloop board off|exp|Lâcher la planche pendant un kiteloop.|Kiteloop et board off maîtrisés;Planche lâchée au sommet;Remettre les pieds avant la traction
+kite-darkslide|Darkslide|exp|Glisser sur le dos de la planche, aile basse.|Aile très basse côté vent;Rotation lente et contrôlée;Poids sur les mains et la barre
+kite-wave-aerial|Aérial en vague|exp|Décoller sur la lèvre de la vague.|Vitesse dans le bottom turn;Viser la section qui ferme;Aile qui aide sans tirer
+
+## wingfoil
+wing-securite|Sécurité et auto-sauvetage|deb|Te dégager et revenir à la nage avec ton matériel.|Leash d'aile et de planche toujours attachés;Planche comme flotteur;Ne jamais lutter contre le courant
+wing-gonfler|Préparer le matériel|deb|Gonfler l'aile et monter le foil.|Pression conseillée par le fabricant;Vis du foil serrées et vérifiées;Casque et gilet avant d'entrer
+=wing-maniement
+wing-marcher|Entrer dans l'eau|deb|Porter l'aile et la planche jusqu'à la bonne profondeur.|Aile au-dessus de la tête, bord d'attaque au vent;Planche tenue par le mât;Eau à mi-cuisse au moins
+wing-genoux|Naviguer à genoux|deb|Avancer à genoux avant de te lever.|Genoux au centre de la planche;Aile haute, bras tendus;Regard loin devant
+wing-mains|Placement des mains|deb|Tirer sans te faire tirer.|Main avant qui oriente, main arrière qui borde;Bras légèrement pliés;Aile à 45°
+=wing-debout
+=wing-bords
+wing-demi-tour|Demi-tour sans voler|deb|Changer de sens à vitesse lente.|Tourner la planche avec les pieds;Aile passée au-dessus de la tête;Petits pas
+wing-lire-vent|Lire le vent et le plan d'eau|deb|Choisir le bon moment et le bon endroit pour sortir.|Vent side-shore idéal;Repérer rafales et zones de dévent;Éviter l'offshore
+wing-pumping-decollage|Pumper pour décoller|int|Créer de la vitesse avec des pumps d'aile.|Pumps amples et rythmés;Planche à plat jusqu'au décollage;Pieds placés avant de pumper
+=wing-decollage
+wing-placement-pieds|Placer tes pieds|int|Trouver la position des pieds pour contrôler le vol.|Pied avant au-dessus du mât;Pied arrière vers la queue;Ajuster d'un pas à chaque session
+=wing-vol
+wing-hauteur|Gérer la hauteur de vol|int|Garder le mât immergé à la bonne hauteur.|Poids sur le pied avant pour descendre;Petits ajustements;Regard loin, pas sur le foil
+=wing-remonter
+wing-portant|Naviguer au portant|int|Descendre le vent en contrôle.|Aile plus ouverte;Poids légèrement en avant;Anticiper les accélérations
+wing-poser|Reposer en douceur|int|Revenir sur l'eau sans chute.|Réduire la puissance progressivement;Poids sur l'arrière en fin de vol;Genoux souples
+wing-chute-sure|Bien chuter|int|Tomber loin du foil.|Tomber sur le côté ou en arrière;Lâcher l'aile si besoin;Protéger ta tête en remontant
+wing-jibe-touche|Jibe en touchant l'eau|int|Changer de sens en reposant la planche.|Virage large;Changement de pieds planche à plat;Repartir en pumping
+wing-switch-mains|Changer de mains sur l'aile|int|Passer l'aile d'une main à l'autre en vol.|Main sur la poignée centrale;Geste fluide et rapide;Garder la traction
+wing-carving|Carves en vol|int|Enchaîner des virages appuyés.|Inclinaison progressive;Genoux pliés;L'aile suit le virage
+wing-vent-leger|Voler dans le petit temps|int|Décoller avec peu de vent.|Grande aile et grand foil;Pumping efficace;Partir dans une rafale
+wing-clapot|Voler dans le clapot|int|Garder un vol stable sur un plan d'eau agité.|Jambes souples qui absorbent;Hauteur de vol un peu plus haute;Regard au-delà des vagues
+=wing-jibe
+wing-jibe-switch|Jibe en switch|ava|Finir le jibe sans changer de pieds.|Vitesse en entrée;Rotation des épaules;Repartir en switch
+=wing-tack
+=wing-pumping
+wing-aile-neutre|Voler aile en neutre|ava|Planer sans tirer sur l'aile.|Aile tenue par la poignée centrale;Vitesse portée par la houle ou le pumping;Regard sur la surface
+=wing-downwind
+wing-vague|Surfer la houle en vol|ava|Prendre une houle et lâcher la traction.|Aile en neutre au-dessus de la tête;Pumps pour accrocher la houle;Lire la face de la vague
+wing-turns-vague|Bottom et top turns en vague|ava|Enchaîner des virages sur la face de la vague.|Bottom turn en bas de la face;Top turn sous la lèvre;Aile tenue en neutre
+wing-switch|Naviguer en switch|ava|Voler pieds inversés sur un bord complet.|Pieds bien placés avant de voler;Poids centré;Aile tenue comme d'habitude
+wing-360|360 en vol|ava|Faire un tour complet en vol.|Vitesse en entrée;Aile qui passe au-dessus de la tête;Regard qui guide le virage
+wing-touch-and-go|Touch and go|ava|Toucher l'eau et revoler aussitôt.|Pression avant contrôlée;Planche qui effleure;Pumping pour relancer
+wing-hop|Petit saut|ava|Décoller le foil de quelques centimètres.|Vitesse et pression sur la queue;Genoux ramenés;Réception à plat
+wing-foil-petit|Passer sur un foil plus petit|ava|Gagner en vitesse et en manœuvrabilité.|Plus de vitesse au décollage;Pieds plus précis;Garder le grand foil pour le petit temps
+wing-vent-fort|Vent fort|ava|Garder le contrôle quand ça charge.|Petite aile et petit foil;Bras pliés, aile ouverte;Poids sur l'avant
+wing-vitesse|Vitesse et contrôle|ava|Aller vite sans décrocher.|Posture basse;Aile bordée au maximum;Pression constante sur l'avant
+=wing-saut
+wing-saut-grab|Saut grab|exp|Attraper la planche en l'air.|Saut maîtrisé avant;Genoux ramenés vers la poitrine;Lâcher avant la réception
+wing-saut-haut|Saut haut|exp|Gagner en hauteur grâce à l'aile.|Vitesse maximale avant;Pop sur la queue;Aile qui porte au sommet
+=wing-backroll
+wing-backroll-grab|Backroll grab|exp|Ajouter un grab au backroll.|Backroll maîtrisé avant;Grab au sommet;Lâcher tôt
+wing-frontroll|Frontroll|exp|Rotation avant en l'air.|Pop franc;Épaules qui lancent la rotation;Aile qui accompagne
+wing-air-360|360 en l'air|exp|Rotation à plat pendant le saut.|Saut haut avant tout;Rotation lancée par les épaules;Regard qui cherche la réception
+wing-air-jibe|Jibe en l'air|exp|Changer de sens pendant un saut.|Saut en bord de fenêtre;Aile passée de l'autre côté en l'air;Réception dans le nouveau sens
+wing-heli-tack|Heli tack|exp|Pivoter sur le foil en passant l'aile au-dessus.|Tack maîtrisé;Rotation de la planche sur place;Aile qui pivote au-dessus de la tête
+wing-dock-start|Départ du ponton|exp|Partir en vol depuis un ponton.|Pumping fort dès le départ;Planche lâchée à plat;Commencer avec un grand foil
+wing-cutback|Cutback en vague|exp|Revenir vers la mousse avec un virage appuyé.|Vitesse sur l'épaule;Rotation des épaules;Aile tenue en neutre
+wing-downwind-long|Downwind longue distance|exp|Enchaîner les houles sur plusieurs kilomètres.|Navette ou retour prévus;Lire les séries de houle;Rester proche d'un point de sortie
+
+## foil
+foil-securite|Sécurité du foil|deb|Te protéger, toi et les autres, de l'aile de foil.|Casque et gilet d'impact;Toujours tomber loin du foil;Zone dégagée, sans baigneurs
+foil-montage|Monter et vérifier le foil|deb|Assembler le foil et contrôler la visserie.|Vis serrées au bon couple;Vérifier les jeux avant chaque session;Rincer à l'eau douce
+foil-lire-vent|Choisir les conditions|deb|Sortir dans un vent et un plan d'eau adaptés.|Vent régulier, 12 à 18 nœuds pour débuter;Plan d'eau profond et dégagé;Éviter l'offshore
+foil-mise-a-leau|Mise à l'eau et départ|deb|Partir de la plage sans toucher le fond.|Eau assez profonde pour le mât;Planche sur le côté pendant la mise en place;Kite au zénith
+foil-bodydrag|Body drag vers la planche|deb|Revenir à ta planche sans te blesser.|Approcher la planche par l'avant;Attention au foil sous l'eau;Kite stable à 11 h ou 1 h
+foil-waterstart|Water start sans décoller|deb|Te lever sur la planche de foil en restant à plat.|Envoi d'aile doux et progressif;Poids sur le pied avant;Planche à plat
+=foil-displacement
+foil-pieds|Placement des pieds|deb|Trouver la position des pieds qui contrôle le vol.|Pied avant au-dessus du mât;Pied arrière près du strap;Ajuster après chaque essai
+=foil-decollage
+foil-amerrissage|Reposer la planche|deb|Revenir au displacement sans chute.|Pression avant progressive;Kite qui descend doucement;Genoux souples au contact
+=foil-vol
+foil-hauteur|Gérer la hauteur de vol|int|Garder le mât à mi-hauteur.|Petites corrections avec le pied avant;Jambes souples;Regard loin devant
+foil-kite-zenith|Positionner le kite en vol|int|Garder le kite haut et stable pendant le vol.|Kite plus haut qu'en twin-tip;Barre peu sollicitée;Lignes tendues en permanence
+foil-vitesse|Contrôler ta vitesse|int|Ne pas partir en survitesse.|Choquer la barre;Remonter le kite;Pression avant contrôlée
+=foil-remonter
+foil-portant|Naviguer au portant|int|Descendre le vent sans perdre les lignes.|Kite qui suit, lignes tendues;Pression avant pour ne pas monter;Anticiper les rafales
+foil-ligne-tendue|Garder les lignes tendues|int|Éviter que le kite s'effondre quand tu vas vite.|Kite piloté vers l'avant;Ralentir en remontant au vent;Ne pas dépasser ton kite
+foil-trim|Régler ton foil|int|Ajuster cale, position du mât et straps.|Mât reculé = plus de portance avant;Une seule modification à la fois;Noter tes réglages
+=foil-transition
+foil-carve|Carves en vol|int|Enchaîner des virages en restant en vol.|Inclinaison progressive;Genoux pliés;Kite qui suit le virage
+foil-chutes|Bien chuter|int|Tomber sans te blesser ni abîmer le matériel.|Tomber sur le côté, loin du foil;Lâcher la barre si besoin;Protéger ta tête en remontant
+foil-vent-leger|Voler dans le petit temps|int|Profiter du foil quand les autres restent sur la plage.|Grand kite léger et grand foil;Pilotage dynamique au décollage;Lignes toujours tendues
+foil-clapot|Voler dans le clapot|int|Garder un vol stable sur l'eau agitée.|Jambes souples qui absorbent;Voler un peu plus haut;Regard au-delà des vagues
+foil-touch-and-go|Touch and go|int|Toucher l'eau et revoler aussitôt.|Pression avant contrôlée;Planche qui effleure l'eau;Kite qui relance
+=foil-jibe
+foil-jibe-serre|Jibe serré|ava|Réduire le rayon du jibe en restant en vol.|Entrée rapide;Inclinaison forte et genoux pliés;Kite envoyé tôt
+foil-jibe-switch|Jibe avec changement de pieds en vol|ava|Changer de pieds sans toucher l'eau.|Pieds glissés, pas sautés;Poids centré au-dessus du mât;Kite stable au zénith
+=foil-tack
+foil-tack-switch|Tack avec changement de pieds|ava|Finir le tack dans le bon sens, en vol.|Changement de pieds au milieu du virage;Regard vers la sortie;Garder la vitesse
+=foil-toeside
+foil-enchainement|Enchaîner jibes et tacks|ava|Naviguer sans jamais reposer la planche.|Garder la vitesse entre les manœuvres;Kite positionné tôt;Respiration et rythme
+foil-cap|Gagner du cap au près|ava|Remonter le vent plus serré et plus vite.|Planche inclinée au vent;Kite bas et efficace;Pression constante sur le pied avant
+foil-beach-start|Départ en vol depuis la plage|ava|Décoller dès le premier mètre.|Eau assez profonde;Kite envoyé en douceur;Pression avant au début
+foil-une-main|Piloter d'une main en vol|ava|Garder le contrôle avec une seule main.|Kite stable au zénith;Main au centre de la barre;Regard devant
+foil-vague|Rider la houle|ava|Utiliser l'énergie de la houle en vol.|Kite peu sollicité sur la houle;Lire les séries;Pression avant pour ne pas sortir de la vague
+foil-downwind|Downwind|ava|Descendre le vent sur plusieurs kilomètres.|Retour prévu avant de partir;Kite en neutre sur les houles;Rester groupé
+foil-vent-fort|Vent fort|ava|Garder le contrôle quand ça charge.|Petit kite et petit foil;Pression avant forte;Posture basse
+foil-360|360 en vol|ava|Faire un tour complet sans toucher l'eau.|Vitesse en entrée;Kite qui suit la rotation;Regard qui guide
+=foil-saut
+foil-saut-grab|Saut grab|exp|Attraper la planche en l'air.|Saut maîtrisé avant;Genoux ramenés;Lâcher tôt
+foil-saut-transition|Saut transition|exp|Changer de sens pendant le saut.|Kite renvoyé au sommet;Rotation sous le kite;Réception en vol
+=foil-backroll
+foil-frontroll|Frontroll|exp|Rotation avant en l'air.|Pop franc;Épaules qui lancent la rotation;Kite stable au zénith
+foil-downloop|Downloop en vol|exp|Boucler le kite vers le bas en restant en vol.|Commencer en vent modéré;Pression avant pour encaisser la traction;Barre tirée franchement
+foil-one-foot|One foot en vol|exp|Sortir un pied du strap en volant.|Straps un peu desserrés;Poids sur l'autre pied;Kite très stable
+foil-strapless|Strapless en vol|exp|Voler sans straps.|Pieds bien placés avant de décoller;Pression constante;Pas de mouvements brusques
+foil-strapless-jibe|Jibe strapless|exp|Changer de sens sans straps.|Pieds glissés sur le pad;Vitesse constante;Kite qui passe tôt
+foil-vague-neutre|Surfer la vague kite en neutre|exp|Rider la vague sans traction.|Kite garé au zénith;Pumping léger pour garder la vague;Retour au vent prévu
+foil-race|Parcours de régate|exp|Enchaîner près, bouées et portant.|Cap et vitesse optimisés;Manœuvres propres aux bouées;Anticiper les autres
+foil-race-depart|Départ chronométré|exp|Être sur la ligne au top, à pleine vitesse.|Repérer la ligne avant;Chronomètre lancé;Vitesse à la seconde près
+
+## surf
+surf-securite|Priorités et sécurité|deb|Savoir qui a la vague et où te placer.|Le plus près du pic a la priorité;Ne jamais lâcher ta planche vers les autres;Repérer les courants et les baïnes
+surf-materiel|Choisir ta planche|deb|Prendre une planche adaptée pour apprendre.|Grosse planche en mousse pour débuter;Volume et longueur généreux;Leash à la jambe arrière
+surf-lire-vagues|Lire les vagues et le spot|deb|Repérer les pics, les séries et les courants.|Observer 10 minutes avant d'entrer;Compter les séries;Repérer le chenal pour sortir
+surf-position-planche|Position allongée|deb|Trouver le bon équilibre pour ramer.|Nez légèrement hors de l'eau;Corps centré;Pieds joints
+=surf-rame
+surf-tortue|Passer la mousse|deb|Traverser les rouleaux sans reculer.|Tortue sur grosse planche;Garder la planche face à la vague;Repartir aussitôt
+=surf-mousse
+surf-pop-up|Se lever en un mouvement|deb|Passer de couché à debout d'un geste.|Mains sous les épaules;Pieds sous le corps en un mouvement;Regard devant
+surf-equilibre|Posture debout|deb|Tenir debout en posture basse.|Genoux pliés;Bras ouverts;Regard vers l'avant
+surf-tomber|Tomber et te protéger|deb|Chuter sans te blesser.|Tomber à plat, loin de la planche;Protéger ta tête en remontant;Attendre que la vague passe
+=surf-takeoff
+surf-placement-pic|Te placer au pic|int|Être au bon endroit quand la vague arrive.|Repère fixe sur la plage;Pas trop loin, pas trop dedans;Remonter au pic entre les séries
+surf-choix-vague|Choisir ta vague|int|Repérer les vagues qui ouvrent.|Regarder vers le large;Éviter les closeouts;Ramer tôt sur la bonne
+surf-angle-takeoff|Take-off en angle|int|Partir déjà dans la direction de la vague.|Ramer en diagonale;Pop-up rapide;Regard vers l'épaule
+=surf-trim
+surf-frontside|Surfer frontside|int|Rider face à la vague.|Regard sur l'épaule;Genoux pliés;Poids sur le rail intérieur
+surf-backside|Surfer backside|int|Rider dos à la vague.|Regard par-dessus l'épaule;Talons qui appuient;Épaules ouvertes vers la vague
+surf-vitesse|Prendre de la vitesse|int|Pomper pour rester dans la partie puissante.|Compressions et extensions;Rester haut sur la face;Regard devant
+=surf-canard
+=surf-bottom
+surf-kick-out|Sortir de la vague|int|Finir ta vague proprement.|Repérer la fin de la section;Pivoter par-dessus la vague;Garder la planche avec toi
+surf-retour-pic|Revenir au pic|int|Remonter efficacement après ta vague.|Ramer par le chenal;Éviter la zone d'impact;Économiser ton énergie
+surf-rame-efficace|Rame efficace|int|Ramer plus vite et plus longtemps.|Bras longs et profonds;Corps immobile;Rythme régulier
+surf-planche-courte|Passer sur une planche plus courte|int|Gagner en manœuvrabilité.|Réduire progressivement le volume;Take-off plus précis;Garder l'ancienne pour les petits jours
+=surf-cutback
+surf-cutback-backside|Cutback backside|ava|Revenir vers la mousse en backside.|Vitesse sur l'épaule;Épaules qui tournent vers la mousse;Rebond dans la mousse
+surf-roundhouse|Roundhouse cutback|ava|Cutback complet avec rebond dans la mousse.|Grande vitesse en entrée;Regard qui guide toute la courbe;Rebond sur la mousse
+=surf-top
+surf-snap|Snap|ava|Virage sec dans la lèvre.|Bottom turn vertical;Rotation rapide des épaules;Pied arrière qui pousse
+surf-backside-snap|Snap backside|ava|Virage sec dans la lèvre en backside.|Bottom turn tendu;Épaule arrière qui lance;Talons qui poussent fort
+=surf-floater
+surf-re-entry|Re-entry|ava|Remonter dans la lèvre et redescendre.|Viser la lèvre qui casse;Planche verticale;Compression en redescente
+surf-carve|Carve|ava|Grand virage appuyé sur le rail.|Rail engagé, genoux pliés;Regard vers la sortie;Garder la vitesse
+surf-late-drop|Take-off tardif|ava|Partir sur une vague déjà creuse.|Ramer fort et tard;Pop-up immédiat;Poids en avant dans la pente
+surf-pig-dog|Se placer pour le tube|ava|Prendre la ligne haute pour entrer dans le tube.|Rester haut sur la face;Ralentir avec la main ou le rail;Posture basse (pig dog en backside)
+surf-cross-step|Cross-step (longboard)|ava|Marcher sur la planche en croisant les pieds.|Pieds croisés, un pas à la fois;Planche bien trimée;Regard devant
+surf-hang-five|Hang five (longboard)|ava|Mettre un pied au bout du nez.|Planche en trim dans la partie puissante;Poids reculé avant d'avancer;Retour rapide au centre
+surf-grosse-vague|Surfer plus gros|ava|Passer à des vagues de plus de 2 mètres.|Planche plus longue et plus épaisse;Endurance et apnée travaillées;Ne jamais y aller seul
+=surf-tube
+surf-tube-backside|Tube backside|exp|Entrer et sortir du tube dos à la vague.|Pig dog, main sur le rail;Regard vers la sortie;Vitesse constante
+=surf-aerial
+surf-air-reverse|Air reverse|exp|Aérial avec rotation et réception en switch.|Vitesse maximale;Décollage sur la section;Rotation des épaules en l'air
+surf-alley-oop|Alley-oop|exp|Aérial avec rotation arrière.|Décollage sur la lèvre;Rotation vers l'arrière;Réception dans la mousse
+surf-full-rotation|Full rotation|exp|Aérial à 360°.|Vitesse et section idéale;Rotation complète des épaules;Réception jambes souples
+surf-tail-slide|Tail slide|exp|Faire déraper l'arrière dans la lèvre.|Pied arrière qui pousse;Ailerons qui décrochent volontairement;Récupérer l'appui
+surf-fins-free|Fins free snap|exp|Snap avec les ailerons hors de l'eau.|Snap engagé;Rotation rapide;Retour sur le rail
+surf-layback|Layback snap|exp|Snap en se couchant sur la vague.|Snap engagé en frontside;Corps allongé sur la vague;Remonter vite sur la planche
+surf-reverse|Surface 360|exp|Rotation complète sur la face de la vague.|Section qui ferme;Ailerons libérés;Rotation guidée par les épaules
+surf-hang-ten|Hang ten (longboard)|exp|Les deux pieds au bout du nez.|Trim parfait dans la poche;Pas croisés pour avancer;Revenir avant la fin de la section
+surf-big-wave|Grosses vagues|exp|Surfer des vagues de plus de 4 mètres.|Préparation physique et apnée;Gilet et partenaire de sécurité;Connaître parfaitement le spot
+
+## wakeboard
+wake-securite|Règles du téléski|deb|Respecter le câble, les autres et le matériel.|Casque et gilet obligatoires;Lâcher la poignée en cas de chute;Sortir vite du parcours
+wake-materiel|Choisir planche et fixations|deb|Rider avec un matériel adapté.|Planche longue et rocker doux pour débuter;Fixations bien serrées;Stance réglée
+wake-position|Position de base|deb|Tenir la bonne posture derrière le câble.|Genoux pliés, dos droit;Poignée au niveau des hanches;Regard vers l'avant
+=wake-depart
+wake-poignee|Gérer la tension de la poignée|deb|Éviter les à-coups du câble.|Bras souples;Poignée basse;Anticiper les accélérations
+=wake-virages
+wake-tomber|Chuter et sortir du parcours|deb|Tomber sans te blesser et libérer la ligne.|Lâcher la poignée;Tomber sur le côté;Sortir vite vers le bord
+wake-tour-complet|Faire un tour complet|deb|Boucler le câble sans tomber.|Gérer chaque virage;Récupérer après chaque coin;Rythme régulier
+=wake-carre
+=wake-ollie
+wake-nollie|Nollie|int|Décoller en chargeant le pied avant.|Charger le pied avant;Ramener les genoux;Réception les deux pieds ensemble
+wake-switch|Rider en switch|int|Rider pieds inversés.|Poids sur la nouvelle jambe arrière;Poignée sur l'autre hanche;Commencer en ligne droite
+=wake-180
+wake-surface-360|Surface 360|int|Tour complet sur le plat.|Poignée passée dans le dos;Épaules qui lancent;Retrouver la carre
+wake-press|Press sur le plat|int|Rider sur le nose ou le tail.|Poids sur un pied;Genoux pliés;Équilibre avec les bras
+wake-air-180|180 sauté|int|Ollie avec rotation de 180°.|Ollie maîtrisé avant;Épaules qui lancent;Poignée près des hanches
+wake-grab-ollie|Grab sur ollie|int|Attraper la planche sur un ollie.|Ollie haut;Genoux ramenés;Lâcher tôt
+=wake-kicker
+=wake-box
+wake-ollie-box|Monter sur une box en ollie|int|Arriver sur le module avec un ollie.|Approche alignée;Ollie au bon moment;Planche à plat sur le module
+wake-funbox|Funbox|int|Passer une funbox ou un rooftop.|Vitesse constante;Planche à plat;Regard sur la sortie
+wake-rail-50|50-50 sur le rail|int|Glisser droit sur un rail.|Approche parfaitement alignée;Poids centré;Bras écartés pour l'équilibre
+=wake-grab
+wake-tail-grab|Tail grab|ava|Attraper l'arrière de la planche en l'air.|Ramener la planche vers la main;Main arrière sur le tail;Lâcher avant la réception
+wake-nose-grab|Nose grab|ava|Attraper l'avant de la planche en l'air.|Genoux ramenés;Main avant sur le nose;Garder la poignée près du corps
+wake-method|Method|ava|Grab stylé, planche tirée derrière toi.|Grab heelside;Planche tirée vers le haut;Tenir le grab
+=wake-boardslide
+wake-frontside-boardslide|Frontside boardslide|ava|Boardslide en arrivant face au module.|Pop léger;Épaules dans l'axe du module;Planche à 90°
+wake-lipslide|Lipslide|ava|Monter sur le module par l'arrière de la planche.|Pop plus haut;Planche passée par-dessus;Épaules contraires
+wake-180-out|Sortie 180 d'un module|ava|Sortir d'un module avec une rotation.|Pop en fin de module;Épaules qui lancent;Réception en switch
+wake-press-box|Press sur box|ava|Nose ou tail press sur un module.|Poids sur un pied;Planche à plat sur le module;Regard vers la sortie
+wake-transfer|Transfert entre modules|ava|Passer d'un module à un autre.|Repérer la trajectoire;Pop au bon moment;Réception douce
+wake-kicker-180|180 frontside sur kicker|ava|Rotation de 180° sur un kicker.|Approche droite;Rotation lancée au décollage;Poignée près des hanches
+wake-kicker-180-bs|180 backside sur kicker|ava|Rotation de 180° dans l'autre sens.|Regard par-dessus l'épaule;Rotation lancée tôt;Réception souple
+wake-kicker-360|360 sur kicker|ava|Rotation complète sur un kicker.|180 maîtrisé avant;Poignée passée dans le dos;Regard qui guide la rotation
+wake-switch-kicker|Kicker en switch|ava|Sauter un kicker en switch.|Switch maîtrisé sur le plat;Approche alignée;Réception jambes souples
+=wake-backroll
+=wake-frontflip
+=wake-tantrum
+wake-backroll-indy|Backroll indy|exp|Backroll avec un grab indy.|Backroll maîtrisé;Grab au sommet;Lâcher avant la réception
+wake-toeside-backroll|Backroll toeside|exp|Backroll depuis la carre toeside.|Carre toeside forte;Regard par-dessus l'épaule;Poignée au niveau des hanches
+wake-switch-backroll|Backroll en switch|exp|Backroll en arrivant switch.|Backroll et switch maîtrisés;Carre franche;Rotation guidée par la tête
+wake-backroll-blind|Backroll to blind|exp|Backroll avec réception dos au câble.|Backroll maîtrisé;Arrêter la rotation au bon moment;Poignée dans le dos
+wake-raley|Raley|exp|Corps tendu à l'horizontale derrière le câble.|Carre forte et pop;Laisser le câble tirer;Ramener la planche sous toi
+wake-s-bend|S-Bend|exp|Raley avec rotation inversée.|Raley maîtrisé;Épaule qui lance la rotation;Planche ramenée sous toi
+wake-scarecrow|Scarecrow|exp|Frontflip avec rotation de 180°.|Frontflip maîtrisé;Rotation des épaules;Réception en switch
+wake-540|540 sur kicker|exp|Une rotation et demie sur un kicker.|360 maîtrisé;Poignée passée deux fois;Regard qui cherche la réception
+wake-rail-boardslide|Boardslide sur rail|exp|Glisser en travers sur un rail.|Boardslide sur box maîtrisé;Pop précis;Épaules dans l'axe du rail
+wake-hardway-180|180 hardway sur module|exp|Rotation dans le sens difficile en sortie de module.|Rotation lancée contre le sens naturel;Poignée près du corps;Réception en switch
+wake-handle-pass|Handle pass sur le plat|exp|Passer la poignée dans le dos sur une rotation.|Poignée ramenée vers les hanches;Rotation lancée par la carre;Rattraper la poignée de l'autre main
