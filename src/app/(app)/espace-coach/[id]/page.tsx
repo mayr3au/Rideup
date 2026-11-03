@@ -7,8 +7,8 @@ import { normalizeResult } from "@/lib/analysis-result";
 import { errorLabel, errorsFor, LEVEL_LABELS, phaseLabel, SPORTS, trickById, tricksFor } from "@/lib/sports";
 import { disciplineFor, gearFor, levelFor } from "@/lib/rider";
 import type { Profile, VideoAnalysis } from "@/lib/types";
-import { ReviewForm } from "@/components/review-form";
-import { claimAnalysis, submitReview, unclaimAnalysis } from "../actions";
+import { CoachReviewWorkspace } from "@/components/coach-review-workspace";
+import { claimAnalysis, structureReview, submitReview, unclaimAnalysis } from "../actions";
 
 export const metadata: Metadata = { title: "Analyse coach" };
 export const dynamic = "force-dynamic";
@@ -135,7 +135,8 @@ export default async function CoachAnalysis({ params }: { params: Promise<{ id: 
           {takenByOther && <div className="panel p-6 text-slate">Un autre coach analyse cette vidéo.</div>}
 
           {mine && (
-            <ReviewForm
+            <CoachReviewWorkspace
+              structure={structureReview}
               action={submitReview}
               analysisId={a.id}
               defaultFigure={trick?.name ?? ""}

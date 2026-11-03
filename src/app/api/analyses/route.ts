@@ -70,8 +70,9 @@ export async function POST(request: NextRequest) {
     status: "envoi",
   });
   if (error) {
+    console.error("création analyse", error);
     await releaseAnalysis(id);
-    return NextResponse.json({ error: "Création de l'analyse impossible." }, { status: 500 });
+    return NextResponse.json({ error: `Création de l'analyse impossible (${error.message}).` }, { status: 500 });
   }
 
   return NextResponse.json({ id, videoPath });

@@ -5,13 +5,14 @@ import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { clipFingerprint } from "@/lib/clip";
+import { canExportClip, DIRECT_UPLOAD_MAX, exportSegment } from "@/lib/clip-export";
 import { MAX_SEGMENT_SECONDS } from "@/lib/plans";
 import { LEVEL_LABELS, LEVEL_ORDER, SPORTS, trickById, tricksFor, type SportId } from "@/lib/sports";
 import { ClipTrimmer } from "./clip-trimmer";
 
-const MAX_SIZE = 200 * 1024 * 1024;
+const MAX_SIZE = 1024 * 1024 * 1024;
 
-type Step = "idle" | "preparation" | "envoi" | "file";
+type Step = "idle" | "preparation" | "decoupe" | "envoi" | "file";
 
 /** Envoi d'une vidéo à un coach RIDE'UP : choix du passage, figure, question au coach. */
 export function AnalyseUploader({
@@ -36,6 +37,7 @@ export function AnalyseUploader({
   const [step, setStep] = useState<Step>("idle");
   const [error, setError] = useState<{ text: string; upgrade?: boolean } | null>(null);
   const [dragging, setDragging] = useState(false);
+  const [cutProgress, setCutProgress] = useState(0);
 
   useEffect(() => () => { if (src) URL.revokeObjectURL(src); }, [src]);
 
@@ -52,12 +54,12 @@ export function AnalyseUploader({
   function pick(f: File | undefined) {
     setError(null);
     if (!f) return;
-    if (!/^video\/(mp4|quicktime|webm)$/.test(f.type)) {
+    if (!/^video\/(mp4|quicktime|webm|x-m4v)$/.test(f.type) && !/\.(mp4|mov|m4v|webm)$/i.test(f.name)) {
       setError({ text: "Formats acceptés : MP4, MOV ou WebM." });
       return;
     }
     if (f.size > MAX_SIZE) {
-      setError({ text: "Vidéo trop lourde (200 Mo max). Coupe-la autour de ta figure dans ta galerie." });
+      setError({ text: "Vidéo trop lourde (1 Go max). Coupe-la autour de ta figure dans ta galerie." });
       return;
     }
     setFile(f);
@@ -74,7 +76,25 @@ export function AnalyseUploader({
     try {
       setStep("preparation");
       const clipHash = await clipFingerprint(file);
-      const ext = file.type === "video/quicktime" ? "mov" : file.type === "video/webm" ? "webm" : "mp4";
+      const lower = file.name.toLowerCase();
+      let ext: "mp4" | "mov" | "webm" = file.type === "video/quicktime" || lower.endsWith(".mov") ? "mov" : file.type === "video/webm" || lower.endsWith(".webm") ? "webm" : "mp4";
+      let upload: Blob = file;
+      let segStart = seg.start;
+      let segEnd = seg.end;
+
+      // Vidéo lourde : on n'envoie que le passage choisi, réencodé en 720p (le stockage refuse les gros fichiers).
+      if (file.size > DIRECT_UPLOAD_MAX) {
+        if (!canExportClip()) {
+          throw new Error("Ta vidéo est trop lourde pour être envoyée telle quelle. Coupe-la autour de ta figure dans ta galerie, puis réessaie.");
+        }
+        setStep("decoupe");
+        setCutProgress(0);
+        const cut = await exportSegment(file, seg.start, seg.end, setCutProgress);
+        upload = cut.blob;
+        ext = cut.extension;
+        segStart = 0;
+        segEnd = Math.round(cut.duration * 10) / 10;
+      }
 
       const res = await fetch("/api/analyses", {
         method: "POST",
@@ -85,8 +105,8 @@ export function AnalyseUploader({
           notes: form.get("notes") ?? "",
           extension: ext,
           clipHash,
-          segStart: seg.start,
-          segEnd: seg.end,
+          segStart,
+          segEnd,
         }),
       });
       const created = await res.json();
@@ -98,10 +118,14 @@ export function AnalyseUploader({
       analysisId = created.id as string;
 
       setStep("envoi");
+      const contentType = ext === "mov" ? "video/quicktime" : ext === "webm" ? "video/webm" : "video/mp4";
       const up = await createClient()
         .storage.from("clips")
-        .upload(created.videoPath, file, { contentType: file.type, upsert: false });
-      if (up.error) throw new Error("L'envoi de la vidéo a échoué. Vérifie ta connexion et réessaie : rien n'est décompté.");
+        .upload(created.videoPath, upload, { contentType, upsert: false });
+      if (up.error) {
+        console.error("envoi vidéo", up.error);
+        throw new Error(`L'envoi de la vidéo a échoué (${up.error.message}). Vérifie ta connexion et réessaie : rien n'est décompté.`);
+      }
 
       setStep("file");
       const done = await fetch(`/api/analyses/${analysisId}`, {
@@ -144,7 +168,7 @@ export function AnalyseUploader({
           <span className="mt-2 max-w-xs text-slate">
             Depuis ta galerie, ou glisse le fichier ici. Tu choisiras ensuite le passage à montrer au coach, {MAX_SEGMENT_SECONDS} secondes maximum.
           </span>
-          <span className="mt-3 text-xs text-slate">MP4, MOV ou WebM · 200 Mo max</span>
+          <span className="mt-3 text-xs text-slate">MP4, MOV ou WebM · 1 Go max</span>
         </label>
         <input id="clip" type="file" accept="video/mp4,video/quicktime,video/webm" className="sr-only" onChange={(e) => pick(e.target.files?.[0])} />
         {error && <p role="alert" className="text-danger">{error.text}</p>}
@@ -174,6 +198,7 @@ export function AnalyseUploader({
 
   const STEPS: { id: Step; label: string }[] = [
     { id: "preparation", label: "Préparation" },
+    ...(file && file.size > DIRECT_UPLOAD_MAX ? [{ id: "decoupe" as Step, label: "Découpe du passage" }] : []),
     { id: "envoi", label: "Envoi de la vidéo" },
     { id: "file", label: "Transmission au coach" },
   ];
@@ -276,6 +301,7 @@ export function AnalyseUploader({
                     {done ? "✓" : ""}
                   </span>
                   {x.label}
+                  {now && x.id === "decoupe" && ` · ${Math.round(cutProgress * 100)} %, garde cette page ouverte`}
                   {now && x.id === "envoi" && " · garde cette page ouverte"}
                 </li>
               );
