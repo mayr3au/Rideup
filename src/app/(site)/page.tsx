@@ -496,9 +496,9 @@ function Team() {
                   href={instagramUrl(c.instagram)}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="btn w-full bg-gradient-to-r from-[#f58529] via-[#dd2a7b] to-[#8134af] text-white hover:opacity-90"
+                  className="btn w-full whitespace-nowrap !px-3 !text-[0.95rem] bg-gradient-to-r from-[#f58529] via-[#dd2a7b] to-[#8134af] text-white hover:opacity-90"
                 >
-                  <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" className="h-5 w-5 shrink-0" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
                     <rect x="3" y="3" width="18" height="18" rx="5" />
                     <circle cx="12" cy="12" r="4" />
                     <circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none" />

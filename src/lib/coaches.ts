@@ -36,6 +36,15 @@ export const TEAM: TeamCoach[] = [
     photo: "/coachs/coach-wake.jpg",
     pos: "50% 25%",
   },
+  {
+    name: "Yann Sassa",
+    sports: ["wakeboard"],
+    title: "Wakeboarder pro · team Dup",
+    bio: "Rider pro français, il ride les meilleurs câbles d'Europe et d'Asie. Kickers, modules, gros airs : il t'emmène au niveau supérieur.",
+    instagram: "yann.sassa",
+    photo: "/coachs/coach-yann.jpg",
+    pos: "50% 30%",
+  },
 ];
 
 export const instagramUrl = (handle: string) => `https://www.instagram.com/${handle.replace(/^@/, "")}/`;
