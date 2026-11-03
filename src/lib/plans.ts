@@ -13,6 +13,7 @@ export const PLANS = {
       "Erreurs techniques et corrections, phase par phase",
       "Exercices et priorité pour ta prochaine session",
       "Historique et suivi des analyses",
+      "Tous les cours, figure par figure",
       "Coach et roadmap de figures",
       "Accès au Spot Finder",
       "Objectifs de progression",

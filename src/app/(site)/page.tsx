@@ -301,7 +301,7 @@ function Features() {
     {
       icon: "book" as const,
       title: "Cours figure par figure",
-      text: "Pour chaque sport : les étapes, les erreurs courantes, les exercices.",
+      text: "Pour chaque sport : les étapes, les erreurs courantes, les exercices. Inclus dans Progress et Elite.",
       photo: PHOTOS.sunset,
       href: "/cours",
       link: "Lire les cours",
