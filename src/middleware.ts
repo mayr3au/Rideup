@@ -1,4 +1,4 @@
-import { SUPABASE_ANON_KEY, SUPABASE_URL, SUPABASE_CONFIGURED } from "@/lib/supabase/env";
+import { DEMO_MODE, SUPABASE_ANON_KEY, SUPABASE_URL, SUPABASE_CONFIGURED } from "@/lib/supabase/env";
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
@@ -6,7 +6,7 @@ const PROTECTED = ["/dashboard", "/coach", "/analyse", "/compte", "/admin", "/pr
 
 export async function middleware(request: NextRequest) {
   let response = NextResponse.next({ request });
-  if (!SUPABASE_CONFIGURED) return response; // aperçu sans base : pas d'authentification
+  if (!SUPABASE_CONFIGURED || DEMO_MODE) return response; // aperçu sans base ou démo : pas d'authentification
 
   const supabase = createServerClient(
     SUPABASE_URL,

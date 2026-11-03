@@ -8,5 +8,9 @@ export const SUPABASE_CONFIGURED = Boolean(
   process.env.NEXT_PUBLIC_SUPABASE_URL && !process.env.NEXT_PUBLIC_SUPABASE_URL.includes("placeholder"),
 );
 
-/** Mode démo : en local (npm run dev) sans Supabase, un faux compte Elite déjà rempli. Jamais en production. */
-export const DEMO_MODE = !SUPABASE_CONFIGURED && process.env.NODE_ENV === "development";
+/**
+ * Mode démo : un faux compte Elite déjà rempli, uniquement en local (jamais en production).
+ * Actif sans Supabase, ou forcé avec `npm run dev:demo` (NEXT_PUBLIC_RIDEUP_DEMO=1) même si .env.local est rempli.
+ */
+export const DEMO_MODE =
+  process.env.NODE_ENV === "development" && (process.env.NEXT_PUBLIC_RIDEUP_DEMO === "1" || !SUPABASE_CONFIGURED);

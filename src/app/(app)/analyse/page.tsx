@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { CoachAvatars } from "@/components/coach-avatars";
 import { CoachTabs } from "@/components/coach-tabs";
 import { requireSession, effectivePlan } from "@/lib/auth";
 import { getQuota, sweepStaleAnalyses } from "@/lib/usage";
@@ -40,6 +41,7 @@ export default async function AnalysePage({ searchParams }: { searchParams: Prom
       <p className="mt-2 text-slate">
         Un moniteur diplômé d&apos;État regarde ta figure image par image et te dit exactement quoi corriger.
       </p>
+      <CoachAvatars sport={sport} className="mt-4" />
 
       <ul className="mt-5 grid grid-cols-3 gap-2 text-center text-sm">
         {[
