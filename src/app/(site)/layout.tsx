@@ -1,5 +1,6 @@
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
+import { SiteTabBar } from "@/components/site-tab-bar";
 
 export default function SiteLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -7,6 +8,7 @@ export default function SiteLayout({ children }: { children: React.ReactNode }) 
       <SiteHeader />
       <main className="bg-white pt-[8.25rem]">{children}</main>
       <SiteFooter />
+      <SiteTabBar />
     </>
   );
 }

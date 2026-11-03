@@ -17,6 +17,7 @@ const I = {
   ),
   coach: <path d="M12 3a4 4 0 1 1 0 8 4 4 0 0 1 0-8zM4 21v-1a6 6 0 0 1 6-6h4a6 6 0 0 1 6 6v1" />,
   chart: <path d="M4 20V10M10 20V4M16 20v-7M22 20H2" />,
+  book: <path d="M4 5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2zM4 21V5M8 7h7" />,
   map: <path d="M12 21s-7-6.1-7-11a7 7 0 0 1 14 0c0 4.9-7 11-7 11zm0-8.5a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5z" />,
   more: <path d="M4 7h16M4 12h16M4 17h16" />,
   close: <path d="M6 6l12 12M18 6 6 18" />,
@@ -32,18 +33,18 @@ function Icon({ children, size = 24 }: { children: React.ReactNode; size?: numbe
   );
 }
 
-/** Les cinq fonctions principales, à portée de pouce sur téléphone. */
+/** Les fonctions principales, à portée de pouce sur téléphone. */
 const MAIN: Item[] = [
   { href: "/dashboard", label: "Accueil", icon: <Icon>{I.home}</Icon> },
   { href: "/coach", label: "Coach", icon: <Icon>{I.coach}</Icon> },
   { href: "/analyse", label: "Analyser", icon: <Icon>{I.camera}</Icon> },
+  { href: "/cours", label: "Cours", icon: <Icon>{I.book}</Icon> },
   { href: "/progression", label: "Progression", short: "Progrès", icon: <Icon>{I.chart}</Icon> },
   { href: "/spots", label: "Spots", icon: <Icon>{I.map}</Icon> },
 ];
 
 const SECONDARY = [
   { href: "/historique", label: "Historique des analyses" },
-  { href: "/cours", label: "Cours" },
   { href: "/week-end", label: "Spots du week-end" },
   { href: "/profil", label: "Mon profil rider" },
   { href: "/compte", label: "Abonnement et compte" },
@@ -108,49 +109,7 @@ export function AppNav({ isAdmin, isCoach, planLabel }: { isAdmin: boolean; isCo
         </button>
       </div>
 
-      {/* … et barre d'onglets en bas */}
-      <nav
-        className="fixed inset-x-0 bottom-0 z-40 border-t border-line bg-spray/92 pb-[env(safe-area-inset-bottom)] backdrop-blur-xl lg:hidden"
-        aria-label="Navigation principale"
-      >
-        <ul className="grid grid-cols-5">
-          {MAIN.map((l) =>
-            l.href === "/analyse" ? (
-              /* Action principale : bouton rond surélevé au centre */
-              <li key={l.href} className="relative">
-                <Link
-                  href={l.href}
-                  aria-current={active(l.href) ? "page" : undefined}
-                  className="group flex min-h-16 flex-col items-center gap-0.5 pb-2 pt-1 text-[0.72rem] font-semibold text-lagoon"
-                >
-                  <span
-                    aria-hidden="true"
-                    className={`-mt-6 flex h-14 w-14 items-center justify-center rounded-full text-white shadow-[0_12px_24px_-8px_rgba(22,136,200,0.8)] ring-4 ring-spray transition-[transform,background-color] duration-200 group-active:scale-90 ${active(l.href) ? "bg-lagoon-dark" : "bg-brand"}`}
-                  >
-                    <Icon size={26}>{I.camera}</Icon>
-                  </span>
-                  {l.label}
-                </Link>
-              </li>
-            ) : (
-              <li key={l.href}>
-                <Link
-                  href={l.href}
-                  aria-current={active(l.href) ? "page" : undefined}
-                  className={`group flex min-h-16 flex-col items-center justify-center gap-0.5 py-2 text-[0.72rem] font-medium transition-colors duration-200 ${active(l.href) ? "text-lagoon" : "text-slate"}`}
-                >
-                  <span
-                    className={`flex h-8 w-12 items-center justify-center rounded-full transition-[background-color,transform] duration-200 group-active:scale-90 ${active(l.href) ? "bg-brand-light" : ""}`}
-                  >
-                    {l.icon}
-                  </span>
-                  {l.short ?? l.label}
-                </Link>
-              </li>
-            ),
-          )}
-        </ul>
-      </nav>
+      <AppTabBar />
 
       {open && (
         <Portal>
@@ -189,5 +148,55 @@ export function AppNav({ isAdmin, isCoach, planLabel }: { isAdmin: boolean; isCo
         </Portal>
       )}
     </>
+  );
+}
+
+/** Barre d'onglets du bas (téléphone). Aussi affichée sur les pages publiques (cours) quand on est connecté. */
+export function AppTabBar() {
+  const path = usePathname();
+  const active = (href: string) => path === href || path.startsWith(href + "/");
+  return (
+    <nav
+      className="fixed inset-x-0 bottom-0 z-40 border-t border-line bg-spray/92 pb-[env(safe-area-inset-bottom)] backdrop-blur-xl lg:hidden"
+      aria-label="Navigation principale"
+    >
+      <ul className="grid grid-cols-6">
+        {MAIN.map((l) =>
+          l.href === "/analyse" ? (
+            /* Action principale : bouton rond surélevé au centre */
+            <li key={l.href} className="relative">
+              <Link
+                href={l.href}
+                aria-current={active(l.href) ? "page" : undefined}
+                className="group flex min-h-16 flex-col items-center gap-0.5 pb-2 pt-1 text-[0.72rem] font-semibold text-lagoon"
+              >
+                <span
+                  aria-hidden="true"
+                  className={`-mt-6 flex h-14 w-14 items-center justify-center rounded-full text-white shadow-[0_12px_24px_-8px_rgba(22,136,200,0.8)] ring-4 ring-spray transition-[transform,background-color] duration-200 group-active:scale-90 ${active(l.href) ? "bg-lagoon-dark" : "bg-brand"}`}
+                >
+                  <Icon size={26}>{I.camera}</Icon>
+                </span>
+                {l.label}
+              </Link>
+            </li>
+          ) : (
+            <li key={l.href}>
+              <Link
+                href={l.href}
+                aria-current={active(l.href) ? "page" : undefined}
+                className={`group flex min-h-16 flex-col items-center justify-center gap-0.5 py-2 text-[0.72rem] font-medium transition-colors duration-200 ${active(l.href) ? "text-lagoon" : "text-slate"}`}
+              >
+                <span
+                  className={`flex h-8 w-11 items-center justify-center rounded-full transition-[background-color,transform] duration-200 group-active:scale-90 ${active(l.href) ? "bg-brand-light" : ""}`}
+                >
+                  {l.icon}
+                </span>
+                {l.short ?? l.label}
+              </Link>
+            </li>
+          ),
+        )}
+      </ul>
+    </nav>
   );
 }
