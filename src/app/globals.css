@@ -24,6 +24,7 @@
   --ink: #ffffff;
   --line: rgba(14, 42, 71, 0.09);
   --danger: #d6453d;
+  --sun: #ffc53d; /* accent « peps » : soleil de fin de session */
   --font-main: "Plus Jakarta Sans Variable";
   --shadow-soft: 0 18px 40px -22px rgba(14, 42, 71, 0.28);
   --shadow-card: 0 30px 60px -30px rgba(14, 42, 71, 0.45);
@@ -43,6 +44,7 @@
   --color-ink: var(--ink);
   --color-line: var(--line);
   --color-danger: var(--danger);
+  --color-sun: var(--sun);
   --font-display: var(--font-main), system-ui, sans-serif;
   --font-sans: var(--font-main), system-ui, sans-serif;
   /* Rayons généreux, façon app mobile */
@@ -498,4 +500,55 @@ p {
 
 .leaflet-container {
   font-family: inherit;
+}
+
+/* ───────── Accroche de l'accueil : fond océan, vague, accents soleil ───────── */
+.btn-sun {
+  background: var(--sun);
+  color: var(--deep);
+  box-shadow: 0 14px 30px -12px rgba(255, 197, 61, 0.75);
+}
+.btn-sun:hover:not(:disabled) {
+  background: #ffd36b;
+}
+.hero-ocean {
+  background:
+    radial-gradient(1200px 600px at 85% 20%, rgba(22, 136, 200, 0.55), transparent 60%),
+    radial-gradient(800px 500px at 0% 100%, rgba(15, 120, 181, 0.45), transparent 60%),
+    linear-gradient(160deg, #0b2440 0%, #0e2a47 45%, #0d3d66 100%);
+}
+@keyframes wave-drift {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+.wave-drift {
+  animation: wave-drift 18s linear infinite;
+}
+.wave-drift-slow {
+  animation: wave-drift 30s linear infinite reverse;
+}
+@keyframes pop-in {
+  0% {
+    opacity: 0;
+    transform: translateY(12px) scale(0.9);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+.pop-in {
+  animation: pop-in 0.6s cubic-bezier(0.2, 1.4, 0.4, 1) both;
+  animation-delay: var(--d, 0s);
+}
+@media (prefers-reduced-motion: reduce) {
+  .wave-drift,
+  .wave-drift-slow,
+  .pop-in {
+    animation: none;
+  }
 }

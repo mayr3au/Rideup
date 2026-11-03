@@ -138,7 +138,7 @@ function AnalyseScreen() {
         <div aria-hidden="true" className="sweep absolute inset-x-0 top-0 h-12 bg-gradient-to-b from-transparent via-brand/40 to-transparent" />
         <span aria-hidden="true" className="absolute left-3 top-3 h-4 w-4 rounded-tl-md border-l-2 border-t-2 border-white/80" />
         <span aria-hidden="true" className="absolute right-3 top-3 h-4 w-4 rounded-tr-md border-r-2 border-t-2 border-white/80" />
-        <span className="tag-glass absolute left-1/2 top-3 -translate-x-1/2 rounded-full px-2 py-0.5 text-[0.58rem] font-bold">
+        <span className="tag-glass absolute left-1/2 top-3 -translate-x-1/2 whitespace-nowrap rounded-full px-2 py-0.5 text-[0.58rem] font-bold">
           <span aria-hidden="true" className="mr-1 inline-block h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-300" />
           Analysé par ton coach
         </span>

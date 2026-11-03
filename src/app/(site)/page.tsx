@@ -47,57 +47,113 @@ function Icon({ name, className = "h-6 w-6" }: { name: "video" | "camera" | "cut
 
 /* ───────────── 1. Hero : fond blanc, gros titre, l'appli dans un téléphone ───────────── */
 function Hero() {
+  const d = (v: number) => ({ "--d": `${v}s` }) as React.CSSProperties;
   return (
-    <section className="relative -mt-[8.25rem] overflow-hidden bg-white pt-[8.25rem]">
-      {/* halos qui respirent */}
-      <div aria-hidden="true" className="breathe pointer-events-none absolute -right-48 -top-48 h-[640px] w-[640px] rounded-full bg-brand-light blur-3xl" />
-      <div aria-hidden="true" className="breathe pointer-events-none absolute -bottom-56 -left-40 h-[480px] w-[480px] rounded-full bg-brand-light/60 blur-3xl [animation-delay:-7s]" />
+    <section className="hero-ocean relative -mt-[8.25rem] overflow-hidden pt-[8.25rem] text-white">
+      {/* halo qui respire derrière le téléphone */}
+      <div aria-hidden="true" className="breathe pointer-events-none absolute -right-40 top-10 h-[560px] w-[560px] rounded-full bg-brand/40 blur-3xl" />
 
-      <div className="relative mx-auto grid max-w-6xl items-center gap-14 px-5 pb-16 pt-12 sm:px-6 md:grid-cols-[1.15fr_0.85fr] md:gap-8 lg:gap-14 lg:pb-28 lg:pt-20">
+      <div className="relative mx-auto grid max-w-6xl items-center gap-14 px-5 pb-28 pt-12 sm:px-6 md:grid-cols-[1.15fr_0.85fr] md:gap-8 lg:gap-14 lg:pb-40 lg:pt-20">
         <div>
-          <span className="tag rise" style={{ "--d": "0s" } as React.CSSProperties}>
-            <span aria-hidden="true" className="h-1.5 w-1.5 rounded-full bg-brand" />
+          <span className="rise inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-3 py-1.5 text-sm font-bold backdrop-blur" style={d(0)}>
+            <span aria-hidden="true" className="relative flex h-2 w-2">
+              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-sun opacity-75" />
+              <span className="relative inline-flex h-2 w-2 rounded-full bg-sun" />
+            </span>
             Coachs diplômés d&apos;État · 5 sports
           </span>
-          <h1 className="mt-6 text-[3rem] leading-[0.98] sm:text-6xl lg:text-[5rem]">
-            <span className="rise block" style={{ "--d": "0.08s" } as React.CSSProperties}>Chaque session</span>
-            <span className="rise block" style={{ "--d": "0.18s" } as React.CSSProperties}>mérite un vrai</span>
-            <span className="rise block" style={{ "--d": "0.28s" } as React.CSSProperties}>
-              <em className="italic text-brand">coach</em>.
+          <h1 className="mt-6 text-[3rem] leading-[0.98] text-white sm:text-6xl lg:text-[5rem]">
+            <span className="rise block" style={d(0.08)}>Chaque session</span>
+            <span className="rise block" style={d(0.18)}>mérite un vrai</span>
+            <span className="rise block" style={d(0.28)}>
+              <span className="relative inline-block">
+                <em className="italic text-sun">coach</em>
+                {/* trait de pinceau sous le mot */}
+                <svg aria-hidden="true" viewBox="0 0 300 24" preserveAspectRatio="none" className="absolute -bottom-2 left-0 h-4 w-full text-sun sm:-bottom-3">
+                  <path d="M3 17 C 70 5, 150 4, 297 12" fill="none" stroke="currentColor" strokeWidth="7" strokeLinecap="round" opacity="0.85" />
+                </svg>
+              </span>
+              .
             </span>
           </h1>
-          <p className="rise mt-6 max-w-xl text-lg text-slate sm:text-xl" style={{ "--d": "0.4s" } as React.CSSProperties}>
+          <p className="rise mt-7 max-w-xl text-lg text-white/80 sm:text-xl" style={d(0.4)}>
             Kite, wing, foil, surf, wake. Envoie la vidéo de ta figure : un coach diplômé d&apos;État la décortique image par
             image et te dit exactement quoi corriger, et quoi bosser à la prochaine session.
           </p>
-          <div className="rise mt-8 flex flex-col gap-4 sm:flex-row sm:items-center" style={{ "--d": "0.5s" } as React.CSSProperties}>
-            <Link href="/inscription" className="btn btn-primary">
+          <div className="rise mt-8 flex flex-col gap-3 sm:flex-row sm:items-center" style={d(0.5)}>
+            <Link href="/inscription" className="btn btn-sun group">
               Essayer gratuitement
+              <svg viewBox="0 0 24 24" className="ml-1 h-5 w-5 transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
             </Link>
-            <Link href="#analyse" className="inline-flex min-h-12 items-center gap-1.5 px-1 font-semibold text-deep hover:text-brand">
+            <Link href="#analyse" className="btn btn-glass">
               Comment ça marche
-              <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6" /></svg>
             </Link>
           </div>
-          <p className="rise mt-4 text-sm text-slate" style={{ "--d": "0.58s" } as React.CSSProperties}>1 analyse offerte. Sans carte bancaire.</p>
 
-          <dl className="rise mt-10 grid max-w-md grid-cols-3 gap-4 border-t border-line pt-6" style={{ "--d": "0.68s" } as React.CSSProperties}>
+          {/* les 5 sports en pastilles photo */}
+          <div className="rise mt-8 flex items-center gap-3" style={d(0.6)}>
+            <div className="flex -space-x-3">
+              {SPORT_IDS.map((sp) => (
+                <span key={sp} className="relative h-10 w-10 overflow-hidden rounded-full ring-2 ring-[#0e2a47]">
+                  <Image src={SPORT_PHOTOS[sp]} alt="" fill sizes="80px" className="object-cover" style={{ objectPosition: SPORT_PHOTO_POS[sp] }} />
+                </span>
+              ))}
+            </div>
+            <p className="text-sm text-white/75">
+              <span className="font-bold text-white">1 analyse offerte</span>
+              <br />
+              Sans carte bancaire
+            </p>
+          </div>
+
+          <dl className="rise mt-10 grid max-w-md grid-cols-3 gap-4 border-t border-white/15 pt-6" style={d(0.7)}>
             {[
               ["1 vidéo", "suffit"],
               ["24 à 72 h", "pour ton retour"],
               ["5", "sports couverts"],
             ].map(([n, l]) => (
               <div key={n}>
-                <dt className="text-2xl font-extrabold tracking-tight sm:text-3xl">{n}</dt>
-                <dd className="text-sm text-slate">{l}</dd>
+                <dt className="text-2xl font-extrabold tracking-tight text-white sm:text-3xl">{n}</dt>
+                <dd className="text-sm text-white/65">{l}</dd>
               </div>
             ))}
           </dl>
         </div>
 
-        <div className="rise" style={{ "--d": "0.3s" } as React.CSSProperties}>
+        <div className="rise relative" style={d(0.3)}>
           <PhoneMock />
+          {/* notifications qui flottent autour du téléphone */}
+          <div className="pop-in absolute -left-2 top-[44%] hidden sm:block lg:-left-14" style={d(1.1)}>
+            <div className="float flex items-center gap-2.5 rounded-2xl bg-white px-3.5 py-2.5 text-deep shadow-[0_20px_40px_-18px_rgba(0,0,0,0.6)]" style={d(0.5)}>
+              <span aria-hidden="true" className="flex h-8 w-8 items-center justify-center rounded-full bg-emerald-100 text-emerald-600">
+                <Icon name="check" className="h-4 w-4" />
+              </span>
+              <span className="leading-tight">
+                <span className="block text-sm font-bold">Retour du coach reçu</span>
+                <span className="block text-xs text-slate">Backroll · il y a 2 min</span>
+              </span>
+            </div>
+          </div>
+          <div className="pop-in absolute -right-2 bottom-20 hidden sm:block lg:-right-10" style={d(1.5)}>
+            <div className="float flex items-center gap-2.5 rounded-2xl bg-sun px-3.5 py-2.5 text-deep shadow-[0_20px_40px_-18px_rgba(0,0,0,0.6)]" style={d(1.8)}>
+              <span aria-hidden="true" className="text-xl">🔥</span>
+              <span className="leading-tight">
+                <span className="block text-sm font-extrabold">+2 points</span>
+                <span className="block text-xs font-semibold">sur ton appel</span>
+              </span>
+            </div>
+          </div>
         </div>
+      </div>
+
+      {/* vagues qui défilent en bas de l'accroche */}
+      <div aria-hidden="true" className="pointer-events-none absolute inset-x-0 bottom-0 h-24 overflow-hidden lg:h-32">
+        <svg viewBox="0 0 2880 120" preserveAspectRatio="none" className="wave-drift-slow absolute bottom-0 h-full w-[200%] text-white/10">
+          <path fill="currentColor" d="M0 60 Q 180 20 360 60 T 720 60 T 1080 60 T 1440 60 T 1800 60 T 2160 60 T 2520 60 T 2880 60 V120 H0Z" />
+        </svg>
+        <svg viewBox="0 0 2880 120" preserveAspectRatio="none" className="wave-drift absolute bottom-0 h-[70%] w-[200%] text-white">
+          <path fill="currentColor" d="M0 70 Q 240 30 480 70 T 960 70 T 1440 70 T 1920 70 T 2400 70 T 2880 70 V120 H0Z" />
+        </svg>
       </div>
     </section>
   );
