@@ -6,11 +6,11 @@ import { Suspense } from "react";
 import { requireSession, effectivePlan } from "@/lib/auth";
 import { getQuota } from "@/lib/usage";
 import { getProgressData } from "@/lib/progress";
-import { hasSpotFinder, PLANS } from "@/lib/plans";
-import { courseForTrick } from "@/lib/courses";
+import { hasSpotFinder } from "@/lib/plans";
+import { COURSES, courseForTrick, courseSport } from "@/lib/courses";
 import { activeSport, levelFor } from "@/lib/rider";
 import { LEVEL_LABELS, SPORTS } from "@/lib/sports";
-import { SPORT_PHOTOS } from "@/lib/photos";
+import { SITE_PHOTOS, SPORT_PHOTOS, SPORT_PHOTO_POS } from "@/lib/photos";
 import { DashboardConditions, DashboardConditionsSkeleton } from "@/components/dashboard-conditions";
 
 export const metadata: Metadata = { title: "Accueil" };
@@ -32,6 +32,7 @@ export default async function Dashboard({ searchParams }: { searchParams: Promis
   const next = data.working[0] ?? data.nextTrick;
   const course = next ? courseForTrick(next.id) : undefined;
   const showConditions = hasSpotFinder(plan) && S.spot !== "cable";
+  const courseCount = COURSES.filter((c) => courseSport(c) === sport).length;
 
   return (
     <div className="mx-auto max-w-3xl space-y-6">
@@ -41,35 +42,90 @@ export default async function Dashboard({ searchParams }: { searchParams: Promis
         </p>
       )}
 
-      <div>
-        <p className="text-slate">{firstName ? `Salut ${firstName}` : "Salut"}</p>
-        <h1 className="text-3xl font-bold">Prêt pour ta session de {S.name.toLowerCase()} ?</h1>
-      </div>
-
-      {/* Action principale */}
-      <Link href="/analyse" className="photo-card relative flex min-h-56 flex-col justify-end overflow-hidden">
-        <Image src={SPORT_PHOTOS[sport]} alt="" fill sizes="(min-width: 768px) 768px, 100vw" quality={85} className="object-cover" priority />
-        <div className="photo-veil absolute inset-0" />
-        <div className="relative flex items-end justify-between gap-4 p-5 text-white">
-          <div>
-            <p className="text-2xl font-bold">Envoyer une vidéo au coach</p>
-            <p className="text-white/85">Un vrai coach regarde ta figure et te dit quoi corriger.</p>
-            <p className="mt-1 text-sm text-white/75">
-              {quota.remaining} analyse{quota.remaining > 1 ? "s" : ""} restante{quota.remaining > 1 ? "s" : ""}
-              {plan === "free" ? " (essai)" : ` ce mois-ci · ${PLANS[plan].name}`}
-            </p>
-          </div>
-          <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-white text-brand" aria-hidden="true">
-            <svg viewBox="0 0 24 24" className="h-6 w-6" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      {/* Bandeau : où tu en es, en un coup d'œil */}
+      <section className="photo-card relative overflow-hidden">
+        <Image src={SPORT_PHOTOS[sport]} alt="" fill priority sizes="(min-width: 768px) 768px, 100vw" quality={85} className="object-cover" style={{ objectPosition: SPORT_PHOTO_POS[sport] ?? "50% 50%" }} />
+        <div className="absolute inset-0 bg-gradient-to-r from-deep/90 via-deep/65 to-deep/20" />
+        <div className="relative p-5 text-white sm:p-7">
+          <p className="text-sm font-bold uppercase tracking-wider text-white/80">{firstName ? `Salut ${firstName}` : "Salut"} 🤙</p>
+          <h1 className="mt-1 text-3xl font-extrabold leading-tight text-white sm:text-4xl">
+            Prêt pour ta session de <em className="italic">{S.name.toLowerCase()}</em> ?
+          </h1>
+          <ul className="mt-5 grid grid-cols-3 gap-2">
+            {[
+              [`${quota.remaining}`, `analyse${quota.remaining > 1 ? "s" : ""} coach ${plan === "free" ? "offerte" + (quota.remaining > 1 ? "s" : "") : "restante" + (quota.remaining > 1 ? "s" : "")}`],
+              [`${data.validated.length}/${data.totalTricks}`, "figures validées"],
+              [data.average != null ? `${data.average.toFixed(1).replace(".", ",")}` : "–", "note moyenne /10"],
+            ].map(([v, l]) => (
+              <li key={l} className="rounded-2xl border border-white/20 bg-white/10 px-3 py-2.5 backdrop-blur">
+                <p className="text-2xl font-extrabold leading-none">{v}</p>
+                <p className="mt-1 text-xs leading-tight text-white/80">{l}</p>
+              </li>
+            ))}
+          </ul>
+          <Link href="/analyse" className="btn btn-kite mt-5 !min-h-11 !px-5 !py-2 !text-sm">
+            <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
               <path d="M4 8h3l2-3h6l2 3h3v11H4z" />
               <circle cx="12" cy="13" r="3.5" />
             </svg>
-          </span>
+            Envoyer une vidéo au coach
+          </Link>
         </div>
-      </Link>
+      </section>
+
+      {/* Les 4 services, ce que chacun t'apporte */}
+      <section aria-label="Tes outils" className="grid grid-cols-2 gap-3">
+        {[
+          {
+            href: "/analyse",
+            photo: SITE_PHOTOS.coach,
+            title: "Coach vidéo",
+            line: "Un moniteur diplômé corrige ta figure.",
+            badge: quota.remaining > 0 ? `${quota.remaining} dispo` : "Quota atteint",
+            tone: quota.remaining > 0 ? "bg-emerald-500 text-white" : "bg-amber-400 text-ink",
+          },
+          {
+            href: hasSpotFinder(plan) ? "/spots" : "/week-end",
+            photo: SITE_PHOTOS.spots,
+            title: "Spot Finder",
+            line: S.spot === "cable" ? "Les téléskis autour de toi." : S.spot === "waves" ? "Où il y a des vagues pour toi." : "Où il y a du vent pour toi.",
+            badge: hasSpotFinder(plan) ? "7 jours" : "Week-end",
+            tone: "bg-white text-brand",
+          },
+          {
+            href: "/cours",
+            photo: SITE_PHOTOS.cours,
+            title: "Cours",
+            line: "Le vent, la sécurité, chaque figure.",
+            badge: plan === "free" ? "🔒 Abonnés" : `${courseCount} cours`,
+            tone: plan === "free" ? "bg-white/90 text-ink" : "bg-white text-brand",
+          },
+          {
+            href: "/progression",
+            photo: SITE_PHOTOS.progression,
+            title: "Progrès",
+            line: "Ta roadmap, figure par figure.",
+            badge: `${Math.round((data.validated.length / Math.max(1, data.totalTricks)) * 100)} %`,
+            tone: "bg-white text-brand",
+          },
+        ].map((t) => (
+          <Link key={t.title} href={t.href} className="photo-card group relative flex min-h-36 flex-col justify-end overflow-hidden sm:min-h-40">
+            <Image src={t.photo} alt="" fill sizes="(min-width: 768px) 380px, 50vw" quality={85} className="object-cover transition duration-500 group-hover:scale-105" />
+            <div className="absolute inset-0 bg-gradient-to-t from-deep/90 via-deep/45 to-deep/5" />
+            <span className={`absolute right-2.5 top-2.5 rounded-full px-2.5 py-1 text-xs font-bold shadow-sm ${t.tone}`}>{t.badge}</span>
+            <div className="relative p-3.5 text-white sm:p-4">
+              <p className="flex items-center gap-1 text-lg font-bold">
+                {t.title}
+                <span aria-hidden="true" className="transition group-hover:translate-x-0.5">→</span>
+              </p>
+              <p className="line-clamp-2 text-sm leading-snug text-white/85">{t.line}</p>
+            </div>
+          </Link>
+        ))}
+      </section>
       {plan === "free" && (
         <p className="text-center text-sm text-slate">
-          Plus d&apos;analyses ?{" "}
+          Plus d&apos;analyses, les cours et le Spot Finder 7 jours ?{" "}
           <Link href="/tarifs" className="font-semibold text-lagoon">Voir les formules</Link>
         </p>
       )}
@@ -130,7 +186,7 @@ export default async function Dashboard({ searchParams }: { searchParams: Promis
       </section>
       )}
 
-      <div className={`grid gap-4 ${showConditions ? "" : "sm:grid-cols-2"}`}>
+      <div>
         {next && (
           <section className="panel p-5">
             <p className="text-sm font-semibold text-brand">{data.working.length ? "Figure en cours" : "Prochaine figure"}</p>
@@ -141,22 +197,6 @@ export default async function Dashboard({ searchParams }: { searchParams: Promis
               {course && <Link href={`/cours/${course.slug}`} className="inline-flex min-h-10 items-center text-sm font-semibold text-lagoon">Lire le cours</Link>}
             </div>
           </section>
-        )}
-        {!showConditions && (
-        <section className="panel p-5">
-          <p className="text-sm font-semibold text-brand">{S.spot === "cable" ? "Où rider" : "Conditions"}</p>
-          <h2 className="mt-1 text-xl font-bold">Spot Finder</h2>
-          <p className="mt-1 text-[0.95rem] text-slate">
-            {S.spot === "cable"
-              ? "Les téléskis nautiques autour de toi."
-              : S.spot === "waves"
-                ? "Les spots où il y a des vagues pour ton niveau, cette semaine."
-                : "Les spots où il y a du vent pour ton niveau et ton matériel, cette semaine."}
-          </p>
-          <Link href={plan === "free" ? "/week-end" : "/spots"} className="mt-3 inline-flex min-h-10 items-center text-sm font-semibold text-lagoon">
-            {plan === "free" ? "Voir les spots du week-end" : "Trouver un spot"}
-          </Link>
-        </section>
         )}
       </div>
 

@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { getConditions } from "@/lib/weather";
-import { distanceKm, ORIENTATION_LABEL, summarizeDay, type DaySummary, type Rider } from "@/lib/wind";
+import { distanceKm, ORIENTATION_LABEL, summarizeDay, windName, type DaySummary, type Rider } from "@/lib/wind";
 import { gearSizes, levelFor } from "@/lib/rider";
 import { SPORTS, type SportId } from "@/lib/sports";
 import type { Profile, Spot } from "@/lib/types";
@@ -131,6 +131,7 @@ export async function DashboardConditions({ profile, sport }: { profile: Profile
             <li key={o.spot.id} className="flex items-center justify-between gap-3 px-5 py-3">
               <div className="min-w-0">
                 <p className="truncate font-semibold">
+                  {S.spot !== "waves" && <span aria-hidden="true">{windName(o.day.avgWind ?? 0).emoji} </span>}
                   {o.spot.name}
                   {i > 0 && (
                     <span className="font-normal text-slate">
@@ -143,12 +144,12 @@ export async function DashboardConditions({ profile, sport }: { profile: Profile
                 <p className="truncate text-sm text-slate">
                   {S.spot === "waves"
                     ? `${(o.day.avgWave ?? 0).toFixed(1).replace(".", ",")} m${o.day.period != null ? ` · ${o.day.period} s` : ""}`
-                    : `${o.day.avgWind} nds${o.day.orientation ? ` · ${ORIENTATION_LABEL[o.day.orientation]}` : ""}`}
+                    : `${windName(o.day.avgWind ?? 0).name} · ${o.day.avgWind} nds${o.day.orientation ? ` · ${ORIENTATION_LABEL[o.day.orientation]}` : ""}`}
                   {o.day.gear != null && ` · ${o.day.gearName ?? "aile"} ${o.day.gear} m²`}
                   {` · ${Math.round(o.km)} km`}
                 </p>
               </div>
-              <span className="shrink-0 rounded-full bg-brand-light px-2.5 py-1 text-sm font-bold text-brand">{o.day.goodHours} h</span>
+              <span className={`shrink-0 rounded-full px-2.5 py-1 text-sm font-bold ${o.day.caution ? "bg-amber-100 text-amber-800" : "bg-emerald-100 text-emerald-800"}`}>{o.day.caution ? "⚠ " : "✓ "}{o.day.goodHours} h</span>
             </li>
           ))}
         </ul>
