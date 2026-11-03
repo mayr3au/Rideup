@@ -177,7 +177,7 @@ export default async function ProgressionPage() {
                     </div>
                     <div className="flex shrink-0 gap-2 text-sm font-semibold text-lagoon">
                       {course && <Link href={`/cours/${course.slug}`}>Cours</Link>}
-                      <Link href={`/analyse?figure=${t.id}`}>Analyser</Link>
+                      <Link href={`/analyse?figure=${t.id}`}>Envoyer une vidéo</Link>
                     </div>
                   </li>
                 );

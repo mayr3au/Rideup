@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { CoachTabs } from "@/components/coach-tabs";
 import { requireSession } from "@/lib/auth";
 import { SPORTS, trickById, tricksFor } from "@/lib/sports";
 import { activeSport } from "@/lib/rider";
@@ -9,7 +10,7 @@ export const metadata: Metadata = { title: "Historique" };
 type Row = {
   id: string;
   trick: string | null;
-  status: "termine" | "erreur";
+  status: "en-attente" | "en-cours" | "termine" | "erreur";
   created_at: string;
   seg_start: number | string;
   seg_end: number | string;
@@ -33,7 +34,7 @@ export default async function HistoryPage({ searchParams }: { searchParams: Prom
       "id, trick, status, created_at, seg_start, seg_end, figure:result->>figure, note:result->>note, priorite:result->>priorite_session, moment:result->>moment, mini:result->>mini, image:result->>image",
     )
     .eq("sport", sport)
-    .in("status", ["termine", "erreur"])
+    .in("status", ["en-attente", "en-cours", "termine", "erreur"])
     .order("created_at", { ascending: false })
     .limit(100);
   if (figure) q = q.eq("trick", figure);
@@ -59,6 +60,7 @@ export default async function HistoryPage({ searchParams }: { searchParams: Prom
 
   return (
     <div className="mx-auto max-w-3xl">
+      <CoachTabs />
       <div className="flex flex-wrap items-end justify-between gap-3">
         <h1 className="text-3xl font-bold sm:text-4xl">Historique {SPORTS[sport].name.toLowerCase()}</h1>
         <Link href="/analyse" className="btn btn-primary !min-h-10 !px-4 !py-2 !text-sm">Nouvelle analyse</Link>
@@ -68,7 +70,7 @@ export default async function HistoryPage({ searchParams }: { searchParams: Prom
         <dl className="mt-5 grid grid-cols-3 gap-3">
           {[
             { label: "Analyses", value: String(notes.length) },
-            { label: "Moyenne", value: avg!.toFixed(1).replace(".", ",") },
+            { label: "Note moyenne", value: avg!.toFixed(1).replace(".", ",") },
             { label: "Meilleure", value: `${best}/10` },
           ].map((s) => (
             <div key={s.label} className="panel px-4 py-3">
@@ -134,10 +136,10 @@ export default async function HistoryPage({ searchParams }: { searchParams: Prom
                             {new Date(a.created_at).toLocaleDateString("fr-FR", { weekday: "short", day: "numeric", month: "short" })}
                             {photo ? (a.moment ? ` · ${a.moment}` : " · photo") : ` · vidéo ${(Number(a.seg_end) - Number(a.seg_start)).toFixed(0)} s`}
                           </span>
-                          {a.priorite && <span className="mt-0.5 line-clamp-1 text-sm text-slate">{a.priorite}</span>}
+                          {a.priorite && <span className="mt-0.5 line-clamp-1 block text-sm text-slate">{a.priorite}</span>}
                         </span>
                         <span className={`shrink-0 ${ok ? "text-xl font-extrabold text-brand" : "text-sm font-semibold text-slate"}`}>
-                          {ok ? `${Number(a.note)}/10` : a.status === "erreur" ? "Échec" : "En cours…"}
+                          {ok ? `${Number(a.note)}/10` : a.status === "erreur" ? "Annulée" : a.status === "en-cours" ? "Chez le coach" : "En attente"}
                         </span>
                       </Link>
                     </li>
@@ -150,8 +152,8 @@ export default async function HistoryPage({ searchParams }: { searchParams: Prom
       ) : (
         <div className="panel mt-6 p-6 text-center">
           <p className="text-lg font-bold">Aucune analyse pour l&apos;instant</p>
-          <p className="mt-1 text-slate">Envoie une photo de ta figure et reçois ton premier retour de coach.</p>
-          <Link href="/analyse" className="btn btn-primary mt-4">Analyser ma position</Link>
+          <p className="mt-1 text-slate">Envoie la vidéo de ta figure et reçois le retour d&apos;un vrai coach.</p>
+          <Link href="/analyse" className="btn btn-primary mt-4">Envoyer une vidéo</Link>
         </div>
       )}
     </div>

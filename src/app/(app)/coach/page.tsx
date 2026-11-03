@@ -9,6 +9,7 @@ import { activeSport } from "@/lib/rider";
 import type { CoachMessage, TrickProgress, VideoAnalysis } from "@/lib/types";
 import { courseForTrick } from "@/lib/courses";
 import { CoachChat } from "@/components/coach-chat";
+import { CoachTabs } from "@/components/coach-tabs";
 import { clearChat, setTrickStatus } from "./actions";
 
 export const metadata: Metadata = { title: "Coach" };
@@ -53,16 +54,9 @@ export default async function CoachPage({ searchParams }: { searchParams: Promis
   const next = tricks.find((t) => t.id === firstOpen);
   if (next && !suggestions.some((x) => x.includes(next.name.toLowerCase()))) suggestions.push(`Comment je prépare mon ${next.name.toLowerCase()} ?`);
 
-  const tab = (on: boolean) =>
-    `flex-1 rounded-xl py-2.5 text-center text-sm font-semibold ${on ? "bg-white text-deep shadow" : "text-slate"}`;
-
   return (
     <div>
-      {/* Onglets sur téléphone */}
-      <div className="mx-auto mb-6 flex max-w-md gap-1 rounded-2xl bg-raised p-1 lg:hidden">
-        <Link href="/coach" className={tab(!chatFirst)} aria-current={!chatFirst ? "page" : undefined}>Ma roadmap</Link>
-        <Link href="/coach?vue=chat" className={tab(chatFirst)} aria-current={chatFirst ? "page" : undefined}>Poser une question</Link>
-      </div>
+      <CoachTabs />
 
       <div className="grid gap-10 lg:grid-cols-[1fr_1.1fr]">
         <section className={chatFirst ? "hidden lg:block" : ""}>
@@ -150,7 +144,7 @@ export default async function CoachPage({ searchParams }: { searchParams: Promis
                           <div className="mt-3 flex flex-wrap items-center gap-2">
                             <TrickControls trickId={t.id} status={s} />
                             <Link href={`/analyse?figure=${t.id}`} className="inline-flex min-h-9 items-center px-1 text-sm font-semibold text-lagoon">
-                              Analyser
+                              Envoyer une vidéo
                             </Link>
                             {course && (
                               <Link href={`/cours/${course.slug}`} className="inline-flex min-h-9 items-center px-1 text-sm font-semibold text-lagoon">

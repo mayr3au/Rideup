@@ -48,12 +48,12 @@ export default async function Dashboard({ searchParams }: { searchParams: Promis
 
       {/* Action principale */}
       <Link href="/analyse" className="photo-card relative flex min-h-56 flex-col justify-end overflow-hidden">
-        <Image src={SPORT_PHOTOS[sport]} alt="" fill sizes="(min-width: 768px) 768px, 100vw" className="object-cover" priority />
+        <Image src={SPORT_PHOTOS[sport]} alt="" fill sizes="(min-width: 768px) 768px, 100vw" quality={85} className="object-cover" priority />
         <div className="photo-veil absolute inset-0" />
         <div className="relative flex items-end justify-between gap-4 p-5 text-white">
           <div>
-            <p className="text-2xl font-bold">Analyser ma position</p>
-            <p className="text-white/85">Une photo de toi en action, et tu sais quoi corriger.</p>
+            <p className="text-2xl font-bold">Envoyer une vidéo au coach</p>
+            <p className="text-white/85">Un vrai coach regarde ta figure et te dit quoi corriger.</p>
             <p className="mt-1 text-sm text-white/75">
               {quota.remaining} analyse{quota.remaining > 1 ? "s" : ""} restante{quota.remaining > 1 ? "s" : ""}
               {plan === "free" ? " (essai)" : ` ce mois-ci · ${PLANS[plan].name}`}
@@ -88,7 +88,7 @@ export default async function Dashboard({ searchParams }: { searchParams: Promis
           <ol className="mt-4 space-y-3">
             {[
               { done: true, title: "Ton profil rider est créé", text: `${S.name}${levelFor(profile, sport) ? `, niveau ${LEVEL_LABELS[levelFor(profile, sport)!].toLowerCase()}` : ""}.`, href: "/profil", cta: "Modifier" },
-              { done: false, title: plan === "free" ? "Analyse ta première figure, c'est offert" : "Analyse ta première figure", text: "Une photo de toi pendant ta figure, et tu sais quoi corriger dans ta position.", href: "/analyse", cta: "Analyser" },
+              { done: false, title: plan === "free" ? "Analyse ta première figure, c'est offert" : "Analyse ta première figure", text: "Envoie la vidéo de ta figure : un coach te dit quoi corriger.", href: "/analyse", cta: "Envoyer" },
               { done: false, title: "Pose une question au coach", text: "Sur ton matériel, une figure, ta prochaine session.", href: "/coach?vue=chat", cta: "Demander" },
             ].map((s, i) => (
               <li key={i} className="flex items-start gap-3">

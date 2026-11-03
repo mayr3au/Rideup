@@ -121,14 +121,14 @@ export function CoachChat({
         if (done) break;
         reply += decoder.decode(value, { stream: true });
         if (reply.includes("\u0000ERREUR")) {
-          fail({ text: "Le coach ne répond pas pour le moment. Réessaie dans un instant." });
+          fail({ text: "Pas de réponse pour le moment. Réessaie dans un instant." });
           return;
         }
         const current = reply;
         setMessages((m) => [...m.slice(0, -1), { role: "assistant", content: current }]);
       }
       if (!reply.trim()) {
-        fail({ text: "Le coach ne répond pas pour le moment. Réessaie dans un instant." });
+        fail({ text: "Pas de réponse pour le moment. Réessaie dans un instant." });
         return;
       }
       setRemaining((r) => (r == null ? r : Math.max(0, r - 1)));
@@ -144,7 +144,8 @@ export function CoachChat({
     <div className="panel flex h-[calc(100dvh-15rem)] min-h-[420px] flex-col lg:h-[70dvh]">
       <div className="flex items-center justify-between border-b border-line px-5 py-3">
         <div>
-          <h2 className="text-xl font-bold">Ton coach · {sportName}</h2>
+          <h2 className="text-xl font-bold">Questions rapides</h2>
+          <p className="text-xs text-slate">{sportName} · réponse immédiate</p>
           {remaining != null && (
             <p className={`text-xs ${remaining <= 5 ? "font-semibold text-danger" : "text-slate"}`}>
               {remaining} message{remaining > 1 ? "s" : ""} restant{remaining > 1 ? "s" : ""} sur la période
@@ -153,7 +154,7 @@ export function CoachChat({
         </div>
         {messages.length > 0 && (
           <form action={async () => { await clearAction(); setMessages([]); }}>
-            <button className="text-sm text-slate hover:text-deep">Effacer la conversation</button>
+            <button className="text-sm text-slate hover:text-deep">Effacer</button>
           </form>
         )}
       </div>
@@ -204,13 +205,13 @@ export function CoachChat({
           );
         })}
         {pending && !(streaming && messages.at(-1)?.content) && (
-          <div className="flex items-center gap-2 text-slate" aria-label="Le coach réfléchit">
+          <div className="flex items-center gap-2 text-slate" aria-label="Réponse en cours">
             <span className="flex gap-1 rounded-2xl rounded-bl-md bg-salt px-3 py-2.5" aria-hidden="true">
               {[0, 1, 2].map((i) => (
                 <span key={i} className="h-2 w-2 animate-bounce rounded-full bg-slate/60" style={{ animationDelay: `${i * 0.15}s` }} />
               ))}
             </span>
-            <span className="text-sm">Le coach réfléchit…</span>
+            <span className="text-sm">Réponse en cours…</span>
           </div>
         )}
         <div ref={endRef} />

@@ -3,13 +3,13 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Schema } from "@/components/schemas";
 import type { Course } from "@/lib/course-types";
-import { COURSES, courseBySlug, courseForTrick, courseSport } from "@/lib/courses";
+import { courseBySlug, courseForTrick, courseSport } from "@/lib/courses";
 import { LESSONS, LESSON_CATEGORIES, lessonBySlug, type Block, type Lesson } from "@/lib/lessons";
 import { SPORTS, tricksFor } from "@/lib/sports";
+import { getSession, effectivePlan } from "@/lib/auth";
 
-export function generateStaticParams() {
-  return [...LESSONS.map((l) => ({ slug: l.slug })), ...COURSES.map((c) => ({ slug: c.slug }))];
-}
+// Le contenu dépend de l'abonnement : page rendue à chaque visite, jamais en cache statique.
+export const dynamic = "force-dynamic";
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
@@ -17,6 +17,42 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   if (l) return { title: `${l.title} — cours RIDE'UP`, description: l.intro };
   const c = courseBySlug(slug);
   return c ? { title: `${c.title} — cours de ${SPORTS[courseSport(c)].name.toLowerCase()}`, description: c.intro } : {};
+}
+
+/* ───────────────────────── Accès réservé aux abonnés ───────────────────────── */
+
+/** Cours réservés à Progress et Elite : titre et intro visibles, contenu remplacé par l'offre. */
+function Paywall({ signedIn, contents }: { signedIn: boolean; contents: string[] }) {
+  return (
+    <section className="mt-8 rounded-3xl border-2 border-brand/30 bg-brand-light p-6 sm:p-8">
+      <p className="text-sm font-bold uppercase tracking-wider text-lagoon">Réservé aux abonnés</p>
+      <h2 className="mt-1 text-2xl font-bold sm:text-3xl">Débloque ce cours et tous les autres</h2>
+      <p className="mt-2 text-slate">
+        Les cours sont inclus dans les formules Progress et Elite, avec tes vidéos analysées par un vrai coach, ton suivi
+        de progression et le Spot Finder.
+      </p>
+      {contents.length > 0 && (
+        <ul className="mt-4 space-y-1.5">
+          {contents.map((c) => (
+            <li key={c} className="flex gap-2">
+              <span aria-hidden="true" className="text-lagoon">🔒</span>
+              {c}
+            </li>
+          ))}
+        </ul>
+      )}
+      <div className="mt-6 flex flex-wrap gap-3">
+        <Link href="/tarifs" className="btn btn-primary">
+          Voir les formules
+        </Link>
+        {!signedIn && (
+          <Link href="/connexion" className="btn btn-ghost">
+            J&apos;ai déjà un compte
+          </Link>
+        )}
+      </div>
+    </section>
+  );
 }
 
 /* ───────────────────────── Leçon (blocs + schémas) ───────────────────────── */
@@ -95,7 +131,7 @@ function BlockView({ b }: { b: Block }) {
   }
 }
 
-function LessonView({ l }: { l: Lesson }) {
+function LessonView({ l, locked, signedIn }: { l: Lesson; locked: boolean; signedIn: boolean }) {
   const cat = LESSON_CATEGORIES.find((c) => c.id === l.category)!;
   const related = LESSONS.filter((x) => x.slug !== l.slug && (x.category === l.category || x.sports.some((s) => l.sports.includes(s)))).slice(0, 3);
   const sports = l.sports.length ? l.sports.map((s) => SPORTS[s].name).join(", ") : "Tous les sports";
@@ -114,6 +150,17 @@ function LessonView({ l }: { l: Lesson }) {
           <p className="mt-4 text-lg text-slate">{l.intro}</p>
           <p className="mt-2 text-sm font-semibold text-lagoon">{sports}</p>
 
+          {locked ? (
+            <Paywall
+              signedIn={signedIn}
+              contents={[
+                `${l.blocks.filter((x) => x.type === "h").length || 1} parties détaillées${l.blocks.some((x) => x.type === "schema") ? ", avec schémas" : ""}`,
+                ...(l.blocks.some((x) => x.type === "quiz") ? ["Un quiz pour vérifier que tu as compris"] : []),
+                "L'essentiel à retenir",
+              ]}
+            />
+          ) : (
+            <>
           {l.blocks.map((b, i) => (
             <BlockView key={i} b={b} />
           ))}
@@ -149,11 +196,13 @@ function LessonView({ l }: { l: Lesson }) {
               </>
             )}
           </div>
-        </div>
+                    </>
+          )}
+</div>
 
         <aside className="hidden lg:block">
           <div className="sticky top-28 space-y-6">
-            <section className="rounded-2xl bg-deep p-5 text-white">
+            {!locked && <section className="rounded-2xl bg-deep p-5 text-white">
               <h2 className="text-lg font-bold">À retenir</h2>
               <ul className="mt-3 space-y-2 text-[0.95rem]">
                 {l.retenir.map((r) => (
@@ -163,7 +212,7 @@ function LessonView({ l }: { l: Lesson }) {
                   </li>
                 ))}
               </ul>
-            </section>
+            </section>}
             {related.length > 0 && (
               <section>
                 <h2 className="text-sm font-bold uppercase tracking-wider text-slate">À lire ensuite</h2>
@@ -202,7 +251,7 @@ function LessonView({ l }: { l: Lesson }) {
 
 /* ───────────────────────── Cours de figure ───────────────────────── */
 
-function CourseView({ c }: { c: Course }) {
+function CourseView({ c, locked, signedIn }: { c: Course; locked: boolean; signedIn: boolean }) {
   const sportId = courseSport(c);
   const sport = SPORTS[sportId];
   const tricks = tricksFor(sportId);
@@ -235,6 +284,18 @@ function CourseView({ c }: { c: Course }) {
             </p>
           )}
 
+          {locked ? (
+            <Paywall
+              signedIn={signedIn}
+              contents={[
+                `${c.etapes.length} étapes détaillées${c.schema ? ", avec schéma de trajectoire" : ""}`,
+                `${c.erreurs.length} erreurs courantes et leur correction`,
+                `${c.exercices.length} exercices pour ta prochaine session`,
+                ...(c.quiz?.length ? ["Un quiz pour vérifier que tu as compris"] : []),
+              ]}
+            />
+          ) : (
+            <>
           {c.phases && c.phases.length > 0 && (
             <section className="mt-8">
               <h2 className="text-sm font-bold uppercase tracking-wider text-slate">Le repère de chaque phase</h2>
@@ -314,8 +375,8 @@ function CourseView({ c }: { c: Course }) {
               <p className="text-sm font-bold uppercase tracking-wider text-lagoon">Pour ton analyse</p>
               <p className="mt-1">{c.filmer}</p>
               <p className="mt-2 text-sm text-slate">
-                Ensuite, fais une capture d&apos;écran au moment clé et envoie-la dans{" "}
-                <Link href="/analyse" className="font-semibold text-lagoon">Analyser</Link> : tu reçois un retour sur ta position.
+                Ensuite, envoie le passage de ta figure dans{" "}
+                <Link href="/analyse" className="font-semibold text-lagoon">Coach</Link> : un coach la regarde et te dit quoi corriger.
               </p>
             </aside>
           )}
@@ -343,11 +404,14 @@ function CourseView({ c }: { c: Course }) {
 
           <div className="mt-10 rounded-2xl bg-brand p-6 text-white">
             <h2 className="text-2xl font-bold">Tu as essayé ?</h2>
-            <p className="mt-2 text-white/80">Filme ta tentative et fais-la analyser : note par phase, erreurs, corrections, exercices.</p>
+            <p className="mt-2 text-white/80">Filme ta tentative et envoie-la à un coach : note par phase, erreurs, corrections, exercices.</p>
             <Link href={`/analyse?figure=${c.trickId}`} className="btn btn-kite mt-5">
               Analyser ma tentative
             </Link>
           </div>
+
+            </>
+          )}
 
           <nav className="mt-8 grid gap-3 sm:grid-cols-2" aria-label="Figures voisines">
             {prevTrick && (
@@ -367,7 +431,7 @@ function CourseView({ c }: { c: Course }) {
 
         <aside className="hidden lg:block">
           <div className="sticky top-28 space-y-6">
-            {c.retenir && (
+            {c.retenir && !locked && (
               <section className="rounded-2xl bg-deep p-5 text-white">
                 <h2 className="text-lg font-bold">À retenir</h2>
                 <ul className="mt-3 space-y-2 text-[0.95rem]">
@@ -402,8 +466,14 @@ function CourseView({ c }: { c: Course }) {
 export default async function CoursePage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
   const lesson = lessonBySlug(slug);
-  if (lesson) return <LessonView l={lesson} />;
-  const c = courseBySlug(slug);
-  if (!c) notFound();
-  return <CourseView c={c} />;
+  const c = lesson ? undefined : courseBySlug(slug);
+  if (!lesson && !c) notFound();
+
+  // Cours réservés aux abonnés Progress et Elite (et à l'admin)
+  const session = await getSession();
+  const signedIn = Boolean(session?.profile);
+  const locked = !(session?.profile && (session.profile.is_admin || effectivePlan(session.profile) !== "free"));
+
+  if (lesson) return <LessonView l={lesson} locked={locked} signedIn={signedIn} />;
+  return <CourseView c={c!} locked={locked} signedIn={signedIn} />;
 }

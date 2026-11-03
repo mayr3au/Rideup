@@ -8,7 +8,7 @@ import { SPORT_IDS, SPORTS } from "@/lib/sports";
 export const metadata: Metadata = {
   title: "Cours de glisse",
   description:
-    "Cours en ligne gratuits : fenêtre de vent, lecture du vent, sécurité, self-rescue, priorités, courants, et chaque figure étape par étape en kitesurf, wingfoil, foil, surf et wakeboard.",
+    "Cours en ligne pour les abonnés RIDE'UP : fenêtre de vent, lecture du vent, sécurité, self-rescue, priorités, courants, et chaque figure étape par étape en kitesurf, wingfoil, foil, surf et wakeboard.",
 };
 
 function sportsLabel(ids: typeof SPORT_IDS | readonly string[]) {
@@ -27,8 +27,9 @@ export default function CoursesPage() {
         Comprendre, puis <em className="italic text-brand">rider</em>.
       </h1>
       <p className="mt-3 max-w-2xl text-lg text-slate">
-        {total} cours gratuits avec schémas : d&apos;abord le vent et la sécurité, ensuite chaque figure étape par étape. Lis, va sur
-        l&apos;eau, puis fais analyser ta tentative.
+        {total} cours avec schémas : d&apos;abord le vent et la sécurité, ensuite chaque figure étape par étape. Lis, va sur
+        l&apos;eau, puis fais analyser ta tentative par un coach. Inclus dans les formules{" "}
+        <Link href="/tarifs" className="font-semibold text-lagoon hover:underline">Progress et Elite</Link>.
       </p>
 
       <nav className="scroll-x -mx-5 mt-6 flex gap-2 px-5 pb-1" aria-label="Sections">

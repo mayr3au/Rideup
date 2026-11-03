@@ -8,8 +8,8 @@ export default function Page() {
     <LegalPage title="Conditions générales d'utilisation">
       <h2>Le service</h2>
       <p>
-        RIDE&apos;UP propose un accompagnement en ligne pour progresser en sports de glisse (kitesurf, wingfoil, foil, surf, wakeboard) : analyse de photos par
-        intelligence artificielle, roadmap de figures et coach conversationnel. Les conseils fournis sont
+        RIDE&apos;UP propose un accompagnement en ligne pour progresser en sports de glisse (kitesurf, wingfoil, foil, surf, wakeboard) : analyse de vidéos par
+        des coachs, roadmap de figures et coach conversationnel par intelligence artificielle. Les conseils fournis sont
         indicatifs et ne remplacent pas un enseignement encadré par un moniteur diplômé.
       </p>
       <h2>Sécurité</h2>

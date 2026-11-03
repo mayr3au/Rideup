@@ -8,6 +8,9 @@ import type { VideoAnalysis } from "@/lib/types";
 import { ConfirmButton } from "@/components/confirm-button";
 import { AutoRefresh } from "@/components/auto-refresh";
 import { ShareAnalysis } from "@/components/share-analysis";
+import { CancelAnalysis } from "@/components/cancel-analysis";
+import { createAdminClient } from "@/lib/supabase/admin";
+import { REVIEW_DELAY_HOURS } from "@/lib/plans";
 import { deleteAnalysis } from "../actions";
 import { setTrickStatus } from "../../coach/actions";
 
@@ -24,10 +27,10 @@ export default async function AnalysisDetail({
   searchParams,
 }: {
   params: Promise<{ id: string }>;
-  searchParams: Promise<{ deja?: string }>;
+  searchParams: Promise<{ envoye?: string }>;
 }) {
   const { id } = await params;
-  const { deja } = await searchParams;
+  const { envoye } = await searchParams;
   const { supabase } = await requireSession();
 
   const { data: a } = await supabase.from("video_analyses").select("*").eq("id", id).single<VideoAnalysis>();
@@ -36,6 +39,16 @@ export default async function AnalysisDetail({
   const { data: signed } = a.video_path
     ? await supabase.storage.from("clips").createSignedUrl(a.video_path, 3600)
     : { data: null };
+
+  const { data: coach } = a.coach_id
+    ? await createAdminClient().from("profiles")
+        .select("full_name, coach_diploma, coach_bio")
+        .eq("id", a.coach_id)
+        .maybeSingle<{ full_name: string | null; coach_diploma: string | null; coach_bio: string | null }>()
+    : { data: null };
+  const coachName = coach?.full_name?.split(" ")[0] || "ton coach";
+  const waiting = a.status === "envoi" || a.status === "en-attente" || a.status === "en-cours";
+  const delay = a.priority ? REVIEW_DELAY_HOURS.elite : REVIEW_DELAY_HOURS.progress;
 
   const trick = a.trick ? trickById(a.trick) : undefined;
   const r = a.result ? normalizeResult(a.result) : null;
@@ -48,9 +61,9 @@ export default async function AnalysisDetail({
         ← Historique
       </Link>
 
-      {deja && (
+      {envoye && waiting && (
         <p role="status" className="mt-4 rounded-2xl bg-brand-light p-4 font-semibold text-lagoon">
-          Ce passage avait déjà été analysé : voici le résultat, sans nouvelle analyse décomptée.
+          Vidéo envoyée ! Un coach te répond sous {delay} h, tu recevras un e-mail dès que son retour est prêt.
         </p>
       )}
 
@@ -59,7 +72,6 @@ export default async function AnalysisDetail({
           <p className="text-slate">
             {new Date(a.created_at).toLocaleDateString("fr-FR", { weekday: "long", day: "numeric", month: "long" })}
             {SPORTS[a.sport] && ` · ${SPORTS[a.sport].name}`}
-            {a.depth === "approfondie" && " · analyse approfondie"}
           </p>
           <h1 className="text-3xl font-extrabold sm:text-4xl">{r?.figure ?? trick?.name ?? "Analyse"}</h1>
         </div>
@@ -73,20 +85,35 @@ export default async function AnalysisDetail({
 
       {a.status === "erreur" && (
         <div role="alert" className="mt-6 rounded-2xl bg-danger/10 p-4">
-          <p className="font-semibold">Cette analyse a échoué et n&apos;a pas été décomptée.</p>
+          <p className="font-semibold">Cette vidéo n&apos;a pas été envoyée au coach et n&apos;a pas été décomptée.</p>
           {a.error && <p className="mt-1 text-sm text-slate">{a.error}</p>}
-          <Link href={`/analyse${trick ? `?figure=${trick.id}` : ""}`} className="btn btn-primary mt-3 !min-h-10 !px-4 !py-2 !text-sm">Relancer une analyse</Link>
+          <Link href={`/analyse${trick ? `?figure=${trick.id}` : ""}`} className="btn btn-primary mt-3 !min-h-10 !px-4 !py-2 !text-sm">Renvoyer une vidéo</Link>
         </div>
       )}
 
-      {(a.status === "en-attente" || a.status === "en-cours") && (
-        <div role="status" className="mt-6 flex items-center gap-3 rounded-2xl bg-brand-light p-4">
-          <AutoRefresh seconds={5} />
-          <span aria-hidden="true" className="h-5 w-5 shrink-0 animate-spin rounded-full border-2 border-brand border-t-transparent" />
-          <p>
-            Analyse en cours, la page se met à jour toute seule. Si elle reste bloquée plus de 10 minutes, elle sera annulée
-            et ne sera pas décomptée.
+      {waiting && (
+        <div role="status" className="mt-6 rounded-2xl bg-brand-light p-4">
+          <AutoRefresh seconds={60} />
+          <ol className="flex flex-wrap gap-x-5 gap-y-2 text-sm">
+            {[
+              ["Vidéo envoyée", a.status !== "envoi"],
+              [a.status === "en-cours" ? `${coachName[0].toUpperCase()}${coachName.slice(1)} analyse ta vidéo` : "Un coach va la prendre", a.status === "en-cours"],
+              ["Retour du coach", false],
+            ].map(([label, done], i) => (
+              <li key={i} className={`flex items-center gap-2 ${done ? "font-semibold text-lagoon" : "text-slate"}`}>
+                <span aria-hidden="true" className={`flex h-5 w-5 items-center justify-center rounded-full text-[0.65rem] font-bold ${done ? "bg-brand text-white" : "border-2 border-line"}`}>
+                  {done ? "✓" : ""}
+                </span>
+                {label}
+              </li>
+            ))}
+          </ol>
+          <p className="mt-3">
+            {a.status === "envoi"
+              ? "Ta vidéo est en cours d'envoi. Si l'envoi n'aboutit pas, elle sera annulée et ne sera pas décomptée."
+              : `Retour sous ${delay} h${a.priority ? " (Elite, ta vidéo passe en priorité)" : ""}. Tu recevras un e-mail dès qu'il est prêt.`}
           </p>
+          {a.status === "en-attente" && <CancelAnalysis id={a.id} />}
         </div>
       )}
 
@@ -98,13 +125,6 @@ export default async function AnalysisDetail({
             <img src={r.image} alt="Ta photo analysée" className="w-full rounded-lg bg-brand" />
           ) : signed?.signedUrl ? (
             <video src={`${signed.signedUrl}#t=${start},${end}`} controls playsInline className="w-full rounded-lg bg-brand" />
-          ) : a.video_path && Date.now() - new Date(a.created_at).getTime() < 15 * 60_000 ? (
-            // Le clip part en arrière-plan après l'analyse : on rafraîchit jusqu'à ce qu'il soit arrivé.
-            <div className="rounded-lg bg-raised p-6 text-slate">
-              <span className="font-semibold text-deep">Ta vidéo est en cours d&apos;envoi.</span> Elle apparaîtra ici dans un instant, garde
-              cette page ouverte.
-              <AutoRefresh seconds={8} />
-            </div>
           ) : (
             <div className="rounded-lg bg-raised p-6 text-slate">Média indisponible.</div>
           )}
@@ -121,13 +141,33 @@ export default async function AnalysisDetail({
           )}
           {r && r.visibilite !== "bonne" && (
             <p className="mt-3 rounded-md bg-kite/20 p-3 text-[0.95rem]">
-              Visibilité {r.visibilite} : {r.image ? "prends une photo plus proche et nette, rider entier dans le cadre" : "filme plus près et de côté, en gardant tout le rider dans le cadre"}, pour une analyse plus fine.
+              Visibilité {r.visibilite} : {r.image ? "prends une photo plus proche et nette, rider entier dans le cadre" : "filme plus près et de côté, en gardant tout le rider dans le cadre"}, pour que ton coach voie mieux les détails.
             </p>
           )}
         </div>
 
         {r && (
           <div className="space-y-8">
+            {a.coach_id && (
+              <div className="flex items-start gap-3 rounded-2xl bg-deep p-4 text-white">
+                <span aria-hidden="true" className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-brand text-lg font-bold">
+                  {coachName[0].toUpperCase()}
+                </span>
+                <div className="min-w-0">
+                  <p className="font-semibold">
+                    Analysé par {coach?.full_name?.split(" ")[0] ?? "ton coach"}
+                    {a.reviewed_at && (
+                      <span className="font-normal text-white/70">
+                        {" "}· {new Date(a.reviewed_at).toLocaleDateString("fr-FR", { day: "numeric", month: "long" })}
+                      </span>
+                    )}
+                  </p>
+                  <p className="text-sm text-white/80">{coach?.coach_diploma ? `Moniteur diplômé d'État · ${coach.coach_diploma}` : "Coach RIDE'UP"}</p>
+                  {coach?.coach_bio && <p className="mt-1 text-sm text-white/70">{coach.coach_bio}</p>}
+                </div>
+              </div>
+            )}
+
             <p className="text-lg">{r.resume}</p>
 
             {r.securite && (
@@ -159,7 +199,12 @@ export default async function AnalysisDetail({
                         <span className="block font-semibold">{phaseLabel(a.sport, p.phase)}</span>
                         <span className="font-display text-lg font-bold">{p.note}/10</span>
                       </dt>
-                      <dd className="text-slate">{p.commentaire}</dd>
+                      <dd>
+                        <span aria-hidden="true" className="mb-1.5 block h-1.5 overflow-hidden rounded-full bg-raised">
+                          <span className="block h-full rounded-full bg-brand" style={{ width: `${Math.max(0, Math.min(10, p.note)) * 10}%` }} />
+                        </span>
+                        <span className="text-slate">{p.commentaire}</span>
+                      </dd>
                     </div>
                   ))}
                 </dl>
@@ -244,7 +289,7 @@ export default async function AnalysisDetail({
         <Link
           href={`/coach?q=${encodeURIComponent(
             r?.priorite_session
-              ? `Sur ma dernière analyse (${r.figure}), on me dit : « ${r.priorite_session} » Comment je travaille ça à ma prochaine session ?`
+              ? `Sur ma dernière analyse (${r.figure}), mon coach me dit : « ${r.priorite_session} » Comment je travaille ça à ma prochaine session ?`
               : "Comment je travaille ce que mon analyse a relevé ?",
           )}`}
           className="btn btn-ghost"
@@ -257,12 +302,12 @@ export default async function AnalysisDetail({
             text={`${r.resume} Priorité : ${r.priorite_session}`}
           />
         )}
-        <form action={deleteAnalysis} className="sm:ml-auto">
+        {!waiting && <form action={deleteAnalysis} className="sm:ml-auto">
           <input type="hidden" name="id" value={a.id} />
           <ConfirmButton message="Supprimer définitivement cette analyse ?" className="btn text-danger hover:bg-danger/5">
             Supprimer
           </ConfirmButton>
-        </form>
+        </form>}
       </div>
     </div>
   );

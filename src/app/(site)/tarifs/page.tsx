@@ -3,7 +3,7 @@ import Link from "next/link";
 import { getSession, effectivePlan } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { getPlanSettings } from "@/lib/usage";
-import { PLANS, type PaidPlan } from "@/lib/plans";
+import { PLANS, REVIEW_DELAY_HOURS, type PaidPlan } from "@/lib/plans";
 import { Reveal } from "@/components/reveal";
 
 export const metadata: Metadata = {
@@ -42,8 +42,8 @@ export default async function PricingPage() {
                 <span className="text-slate"> par mois</span>
               </p>
               <p className="mt-4 text-lg font-semibold">
-                {n} analyses de position par mois
-                <span className="block text-base font-normal text-slate">Environ {Math.round(n / 4.3)} par semaine</span>
+                {n} vidéo{n > 1 ? "s" : ""} analysée{n > 1 ? "s" : ""} par un coach
+                <span className="block text-base font-normal text-slate">Chaque mois · retour sous {REVIEW_DELAY_HOURS[key]} h</span>
               </p>
               <ul className="mt-5 flex-1 space-y-2.5">
                 {plan.features.map((f) => (
@@ -76,15 +76,15 @@ export default async function PricingPage() {
       <div className="mt-12 grid gap-4 text-[0.95rem] sm:grid-cols-3">
         <div className="rounded-2xl bg-salt p-5">
           <h2 className="font-semibold">Une analyse, c&apos;est quoi ?</h2>
-          <p className="mt-1 text-slate">Une photo de toi (ou une capture de ta vidéo) et une phrase pour dire ce que tu fais : tu reçois un retour précis sur ta position.</p>
+          <p className="mt-1 text-slate">Tu envoies le passage de ta figure (30 s max) et ta question : un vrai coach la regarde et te renvoie note, corrections phase par phase et exercices.</p>
         </div>
         <div className="rounded-2xl bg-salt p-5">
-          <h2 className="font-semibold">Et si je renvoie la même photo ?</h2>
-          <p className="mt-1 text-slate">La même photo avec la même description te redonne le résultat, sans décompter d&apos;analyse.</p>
+          <h2 className="font-semibold">En combien de temps ?</h2>
+          <p className="mt-1 text-slate">Sous 72 h en Progress, sous 24 h en Elite : tes vidéos passent en priorité. Tu reçois un e-mail dès que le retour est prêt.</p>
         </div>
         <div className="rounded-2xl bg-salt p-5">
-          <h2 className="font-semibold">Si l&apos;analyse échoue ?</h2>
-          <p className="mt-1 text-slate">Elle n&apos;est pas décomptée. Tu peux relancer avec la même photo.</p>
+          <h2 className="font-semibold">Si l&apos;envoi échoue ?</h2>
+          <p className="mt-1 text-slate">Il n&apos;est pas décompté. Et tant qu&apos;aucun coach n&apos;a pris ta vidéo, tu peux la retirer et récupérer ton analyse.</p>
         </div>
       </div>
       <p className="mt-8 text-sm text-slate">Paiement sécurisé par Stripe. Prix TTC.</p>

@@ -3,11 +3,11 @@
 import Image from "next/image";
 import { useEffect, useState } from "react";
 
-const TABS = ["Accueil", "Coach", "Analyser", "Progrès", "Spots"];
+const TABS = ["Accueil", "Cours", "Coach", "Progrès", "Spots"];
 /** Mêmes icônes que la vraie barre de l'appli */
 const ICONS = [
   "M3 11 12 4l9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z",
-  "M12 3a4 4 0 1 1 0 8 4 4 0 0 1 0-8zM4 21v-1a6 6 0 0 1 6-6h4a6 6 0 0 1 6 6v1",
+  "M4 5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2zM4 21V5M8 7h7",
   "M3 6h12v12H3zM15 10l6-3v10l-6-3z",
   "M4 20V10M10 20V4M16 20v-7M22 20H2",
   "M12 21s-7-6.1-7-11a7 7 0 0 1 14 0c0 4.9-7 11-7 11zm0-8.5a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5z",
@@ -23,7 +23,7 @@ function TabIcon({ d, size }: { d: string; size: number }) {
 /** Écran affiché → onglet actif */
 const SCREENS = [
   { id: "analyse", tab: 2, title: "Ta session kite", sub: "Analyse · aujourd'hui" },
-  { id: "coach", tab: 1, title: "Ton coach", sub: "Kitesurf · en ligne" },
+  { id: "coach", tab: 2, title: "Questions rapides", sub: "Kitesurf · réponse immédiate" },
   { id: "spots", tab: 4, title: "Spot Finder", sub: "Samedi · autour de Nice" },
 ] as const;
 
@@ -57,8 +57,8 @@ export function PhoneScreens() {
       {/* Notification qui sort de la Dynamic Island */}
       <div
         aria-hidden="true"
-        className={`absolute left-1/2 top-3 z-30 flex -translate-x-1/2 items-center gap-2 overflow-hidden rounded-[22px] bg-black text-white transition-all duration-500 ease-[cubic-bezier(0.2,0.8,0.2,1)] ${
-          notif ? "h-12 w-[88%] px-3" : "h-[28px] w-[96px] px-0"
+        className={`absolute left-1/2 top-[6px] z-30 flex -translate-x-1/2 items-center gap-2 overflow-hidden rounded-[22px] bg-black text-white transition-all duration-500 ease-[cubic-bezier(0.2,0.8,0.2,1)] ${
+          notif ? "h-12 w-[88%] px-3" : "h-[34px] w-[98px] px-0"
         }`}
       >
         <span className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-brand text-[0.6rem] font-extrabold transition-opacity ${notif ? "opacity-100 delay-200" : "opacity-0"}`}>
@@ -80,7 +80,7 @@ export function PhoneScreens() {
       </div>
 
       {/* écrans empilés en fondu */}
-      <div className="relative h-[400px] lg:h-[440px]">
+      <div className="relative h-[470px]">
         <Screen on={i === 0}>
           <AnalyseScreen />
         </Screen>
@@ -133,14 +133,14 @@ function AnalyseScreen() {
   return (
     <div>
       <div className="relative mx-3 h-52 overflow-hidden rounded-[22px] lg:h-60">
-        <Image src="/sports/kite-v1.jpg" alt="" fill sizes="310px" className="object-cover object-[62%_50%]" />
+        <Image src="/sports/kite-v1.jpg" alt="" fill sizes="480px" quality={85} className="object-cover object-[48%_50%]" />
         <div className="photo-veil absolute inset-0" />
         <div aria-hidden="true" className="sweep absolute inset-x-0 top-0 h-12 bg-gradient-to-b from-transparent via-brand/40 to-transparent" />
         <span aria-hidden="true" className="absolute left-3 top-3 h-4 w-4 rounded-tl-md border-l-2 border-t-2 border-white/80" />
         <span aria-hidden="true" className="absolute right-3 top-3 h-4 w-4 rounded-tr-md border-r-2 border-t-2 border-white/80" />
-        <span className="tag-glass absolute left-1/2 top-3 -translate-x-1/2 rounded-full px-2 py-0.5 text-[0.58rem] font-bold">
+        <span className="tag-glass absolute left-1/2 top-3 -translate-x-1/2 whitespace-nowrap rounded-full px-2 py-0.5 text-[0.58rem] font-bold">
           <span aria-hidden="true" className="mr-1 inline-block h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-300" />
-          IA en analyse
+          Analysé par ton coach
         </span>
         <div className="absolute inset-x-0 bottom-0 flex items-end justify-between p-3 text-white">
           <div>

@@ -14,14 +14,22 @@ export default async function AdminOverview() {
   const since7 = new Date(Date.now() - 7 * 24 * 3600 * 1000).toISOString();
   const head = { count: "exact" as const, head: true };
 
-  const [users, newUsers, subs, usage, analyses30, failed30] = await Promise.all([
+  const [users, newUsers, subs, usage, analyses30, failed30, queue, reviewed] = await Promise.all([
     db.from("profiles").select("id", head),
     db.from("profiles").select("id", head).gte("created_at", since7),
     db.from("profiles").select("plan, plan_override, subscription_status"),
     db.from("ai_usage").select("kind, cost_usd, created_at").gte("created_at", since30.toISOString()).limit(50000),
     db.from("video_analyses").select("id", head).eq("status", "termine").gte("created_at", since30.toISOString()),
     db.from("video_analyses").select("id", head).eq("status", "erreur").eq("counted", false).neq("error", "Annulée").gte("created_at", since30.toISOString()),
+    db.from("video_analyses").select("status, priority, submitted_at").in("status", ["en-attente", "en-cours"]),
+    db.from("video_analyses").select("submitted_at, reviewed_at").eq("status", "termine").not("reviewed_at", "is", null).gte("reviewed_at", since30.toISOString()).limit(5000),
   ]);
+  const waiting = (queue.data ?? []).filter((q) => q.status === "en-attente").length;
+  const inReview = (queue.data ?? []).filter((q) => q.status === "en-cours").length;
+  const delays = (reviewed.data ?? [])
+    .filter((r) => r.submitted_at)
+    .map((r) => (new Date(r.reviewed_at).getTime() - new Date(r.submitted_at).getTime()) / 3600_000);
+  const avgDelay = delays.length ? delays.reduce((a, b) => a + b, 0) / delays.length : null;
 
   const paying = (subs.data ?? []).filter((p) => p.plan !== "free" && ["active", "trialing"].includes(p.subscription_status ?? ""));
   const progress = paying.filter((p) => p.plan === "progress").length;
@@ -45,15 +53,18 @@ export default async function AdminOverview() {
     if (byDay.has(d)) byDay.set(d, byDay.get(d)! + Number(r.cost_usd));
   }
   const maxDay = Math.max(0.01, ...byDay.values());
-  const analyse = byKind.get("analyse");
 
   const stats = [
     { label: "Comptes", value: String(users.count ?? 0), sub: `+${newUsers.count ?? 0} sur 7 jours` },
     { label: "Abonnés", value: String(progress + elite), sub: `${progress} Progress · ${elite} Elite${offered ? ` · ${offered} offerts` : ""}` },
     { label: "Revenu mensuel estimé", value: eur(mrr), sub: "TTC, avant frais Stripe" },
     { label: "Dépense IA (30 j)", value: usd(total), sub: mrr ? `${((total / (mrr * 1.08)) * 100).toFixed(1).replace(".", ",")} % du revenu` : undefined },
-    { label: "Analyses (30 j)", value: String(analyses30.count ?? 0), sub: `${failed30.count ?? 0} en échec` },
-    { label: "Coût moyen d'une analyse", value: analyse?.n ? usd(analyse.cost / analyse.n) : "–" },
+    { label: "Analyses coach (30 j)", value: String(analyses30.count ?? 0), sub: `${failed30.count ?? 0} envois ratés` },
+    {
+      label: "File des coachs",
+      value: `${waiting} en attente`,
+      sub: `${inReview} en cours · délai moyen ${avgDelay === null ? "–" : `${avgDelay.toFixed(0)} h`}`,
+    },
   ];
 
   return (

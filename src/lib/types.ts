@@ -32,6 +32,14 @@ export type Profile = {
   current_period_end: string | null;
   stripe_customer_id: string | null;
   is_admin: boolean;
+  /** Coach RIDE'UP : analyse les vidéos des riders */
+  is_coach?: boolean;
+  /** Sports que ce coach analyse (vide = tous) */
+  coach_sports?: SportId[];
+  /** Diplôme affiché au rider (ex. « BPJEPS kitesurf ») */
+  coach_diploma?: string | null;
+  /** Courte présentation du coach */
+  coach_bio?: string | null;
   created_at: string;
 };
 
@@ -87,11 +95,19 @@ export type VideoAnalysis = {
   cache_key: string | null;
   reused_from: string | null;
   counted: boolean;
-  status: "en-attente" | "en-cours" | "termine" | "erreur";
+  status: AnalysisStatus;
   result: AnalysisResult | null;
   error: string | null;
+  coach_id?: string | null;
+  submitted_at?: string | null;
+  claimed_at?: string | null;
+  reviewed_at?: string | null;
+  priority?: boolean;
   created_at: string;
 };
+
+/** envoi → en-attente (file des coachs) → en-cours (pris par un coach) → termine ; erreur si envoi raté ou annulée. */
+export type AnalysisStatus = "envoi" | "en-attente" | "en-cours" | "termine" | "erreur";
 
 export type Spot = {
   id: string;
