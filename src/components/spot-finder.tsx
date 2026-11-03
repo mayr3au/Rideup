@@ -278,9 +278,15 @@ export function SpotFinder({
             <span aria-hidden="true" className="absolute right-5 top-1/2 -translate-y-1/2 text-3xl opacity-80">→</span>
           </button>
         ) : (
-          <div className="rounded-3xl bg-raised p-5">
-            <p className="font-semibold">Pas de bon créneau cette semaine dans ce rayon.</p>
-            <p className="mt-1 text-sm text-slate">Élargis le rayon ou reviens plus tard : les prévisions bougent tous les jours.</p>
+          <div className="flex items-start gap-3 rounded-3xl bg-raised p-5">
+            <span aria-hidden="true" className="text-2xl">🧭</span>
+            <div>
+              <p className="font-semibold">Pas de « Go ! » franc cette semaine dans ce rayon.</p>
+              <p className="mt-1 text-sm text-slate">
+                Regarde les spots en orange ci-dessous (à faire avec prudence), élargis le rayon, ou reviens demain : les
+                prévisions bougent tous les jours.
+              </p>
+            </div>
           </div>
         ))}
 
