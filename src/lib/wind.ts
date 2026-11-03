@@ -24,6 +24,23 @@ export type HourForecast = {
   models?: Partial<Record<string, number>>;
 };
 
+/** Le nom du vent, comme on le dit sur la plage (en nœuds). */
+const WIND_NAMES: [number, string, string][] = [
+  [10, "Pétole", "😴"],
+  [14, "Petit temps", "🍃"],
+  [19, "Ça se lève", "🌬️"],
+  [24, "Ça envoie", "💨"],
+  [29, "Ça charge", "🔥"],
+  [34, "Gros temps", "⚡"],
+  [44, "Carton !", "💥"],
+  [Infinity, "To the moon", "🚀"],
+];
+
+export function windName(knots: number) {
+  const [, name, emoji] = WIND_NAMES.find(([max]) => knots <= max)!;
+  return { name, emoji };
+}
+
 export type Confidence = "haute" | "moyenne" | "faible";
 
 /** Fiabilité d'une prévision : écart entre modèles (relatif à la force du vent), plus prudente au-delà de 3 jours. */

@@ -3,7 +3,7 @@
 import dynamic from "next/dynamic";
 import { useMemo, useState, useTransition } from "react";
 import { toggleFavorite } from "@/app/(app)/spots/actions";
-import { compass, confidenceFor, ORIENTATION_LABEL, weatherLabel, type Confidence, type DaySummary, type HourForecast } from "@/lib/wind";
+import { compass, confidenceFor, ORIENTATION_LABEL, weatherLabel, windName, type Confidence, type DaySummary, type HourForecast } from "@/lib/wind";
 import type { LiveWind } from "@/lib/live-wind";
 import type { SpotKind } from "@/lib/sports";
 import type { Spot } from "@/lib/types";
@@ -71,7 +71,7 @@ function verdict(d: DaySummary | undefined, kind: SpotKind, dayIdx = 0): Verdict
     if (conf === "faible") return make("maybe", "Pas sûr");
     const q = quality(d);
     if (q < 0.3) return make("maybe", "Court créneau");
-    return make("go", q >= 0.6 ? (kind === "waves" ? "Ça rentre" : "Ça envoie") : "Oui");
+    return make("go", q >= 0.6 ? "Go !" : "Oui");
   }
   if (kind === "cable") return make("no", "Bof");
   if (!d.reason || CALM_REASONS.includes(d.reason)) return make("calm", kind === "waves" ? "Trop petit" : "Pas de vent");
@@ -92,6 +92,17 @@ function peakLine(d: DaySummary, kind: SpotKind) {
   ]
     .filter(Boolean)
     .join(" · ");
+}
+
+/** Pastille « Pétole », « Ça envoie », « Carton ! »… selon la force du vent. */
+function WindName({ knots, className = "" }: { knots: number; className?: string }) {
+  const n = windName(knots);
+  return (
+    <span className={`inline-flex shrink-0 items-center gap-1 rounded-full bg-deep px-2 py-0.5 text-xs font-bold text-white ${className}`}>
+      <span aria-hidden="true">{n.emoji}</span>
+      {n.name}
+    </span>
+  );
 }
 
 function Legend() {
@@ -142,7 +153,7 @@ function LiveChip({ live }: { live: LiveWind | null | undefined }) {
         <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-500 opacity-60" />
         <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-500" />
       </span>
-      {live.wind} nds mesurés{live.dir != null ? ` de ${compass(live.dir)}` : ""}
+      {live.wind} nds mesurés{live.dir != null ? ` de ${compass(live.dir)}` : ""} · {windName(live.wind).name}
     </span>
   );
 }
@@ -371,7 +382,8 @@ export function SpotFinder({
                               })()}
                             </div>
                             {good ? (
-                              <p className="mt-2 flex items-center gap-1.5 font-semibold text-deep">
+                              <p className="mt-2 flex flex-wrap items-center gap-1.5 font-semibold text-deep">
+                                {kind === "wind" && d.avgWind != null && <WindName knots={d.avgWind} />}
                                 {kind === "wind" && d.dir != null && <WindArrow deg={d.dir} size={16} />}
                                 {oneLiner(d, kind)}
                               </p>
@@ -379,7 +391,8 @@ export function SpotFinder({
                               d && (
                                 <>
                                   {peakLine(d, kind) && (
-                                    <p className="mt-2 flex items-center gap-1.5 text-deep/80">
+                                    <p className="mt-2 flex flex-wrap items-center gap-1.5 text-deep/80">
+                                      {kind === "wind" && d.peak && <WindName knots={d.peak.wind} />}
                                       {kind === "wind" && d.peak && <WindArrow deg={d.peak.dir} size={16} />}
                                       {peakLine(d, kind)}
                                     </p>
@@ -606,6 +619,7 @@ function DayVerdict({
           <p className="mt-2 text-2xl font-extrabold leading-tight">
             {kind === "cable" ? "Bonne journée pour rider" : "Vas-y"} de {d.window!.from} à {d.window!.to}
           </p>
+          {kind === "wind" && d.avgWind != null && <WindName knots={d.avgWind} className="mt-2 !px-3 !py-1 !text-sm" />}
           {kind !== "cable" && (
             <dl className="mt-4 grid grid-cols-3 gap-2 text-center">
               {kind === "wind" ? (
@@ -633,6 +647,7 @@ function DayVerdict({
             {v.status === "no" ? "Pas pour toi ce jour-là" : kind === "waves" ? "Pas de vagues pour toi" : "Pas assez de vent"}
           </p>
           {d?.reason && <p className={`mt-1 font-semibold ${v.status === "no" ? "text-danger" : "text-slate"}`}>{d.reason}</p>}
+          {kind === "wind" && d?.peak && <WindName knots={d.peak.wind} className="mt-2 !px-3 !py-1 !text-sm" />}
           {d?.peak && kind !== "cable" && (
             <>
               <p className="mt-3 text-sm font-semibold text-slate">La prévision quand même</p>
@@ -681,7 +696,7 @@ function DayVerdict({
           <p className="min-w-0 flex-1">
             <span className="font-bold">
               {live.wind} nds mesurés{live.gust != null && live.gust > live.wind ? `, rafales ${live.gust}` : ""}
-              {live.dir != null && ` de ${compass(live.dir)}`}
+              {live.dir != null && ` de ${compass(live.dir)}`} · {windName(live.wind).emoji} {windName(live.wind).name}
             </span>
             <span className="block text-slate">
               Balise {live.station} · à {live.distanceKm.toFixed(1).replace(".", ",")} km · il y a {live.minutesAgo} min
@@ -715,7 +730,8 @@ function WindBars({ hours }: { hours: RatedHour[] }) {
       <div className="scroll-x mt-2">
         <div className="flex min-w-max items-end gap-1.5 pb-1">
           {hours.map((h) => (
-            <div key={h.time} className={`flex w-9 flex-col items-center rounded-lg py-1 text-xs ${h.ok ? (h.caution ? "bg-amber-50" : "bg-emerald-50") : ""}`}>
+            <div key={h.time} title={`${h.time.slice(11, 13)}h : ${windName(h.wind).name}`} className={`flex w-9 flex-col items-center rounded-lg py-1 text-xs ${h.ok ? (h.caution ? "bg-amber-50" : "bg-emerald-50") : ""}`}>
+              <span aria-hidden="true" className="text-sm leading-none">{windName(h.wind).emoji}</span>
               <span className="font-semibold">{Math.round(h.wind)}</span>
               <div className="relative mt-1 flex h-28 w-4 items-end rounded-full bg-raised">
                 <div className={`absolute bottom-0 w-full rounded-full ${h.ok ? (h.caution ? "bg-amber-400/30" : "bg-emerald-500/25") : "bg-slate/15"}`} style={{ height: `${(h.gust / max) * 100}%` }} />
