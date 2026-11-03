@@ -8,54 +8,119 @@ import type { HourForecast } from "@/lib/wind";
 const KEY = process.env.OPEN_METEO_API_KEY;
 const BASE = KEY ? "https://customer-api.open-meteo.com/v1/forecast" : "https://api.open-meteo.com/v1/forecast";
 
-type Point = { lat: number; lng: number };
+/** `water: "lac"` (téléskis, plans d'eau intérieurs) → point de grille terrestre ; sinon point en mer. */
+type Point = { lat: number; lng: number; water?: string | null };
+
+/**
+ * Prévisions croisées de 4 modèles, pour ne pas dépendre d'un seul :
+ * - Météo-France AROME/ARPEGE (1,5 à 2,5 km sur la France : brises thermiques, effets de côte) ;
+ * - DWD ICON (Allemagne) ; ECMWF IFS (centre européen) ; NOAA GFS (États-Unis).
+ * Le vent retenu est une moyenne pondérée (AROME compte double quand il couvre la zone),
+ * et l'écart entre modèles donne la fiabilité de la prévision.
+ */
+export const MODELS = [
+  { id: "meteofrance_seamless", label: "Météo-France AROME", weight: 2 },
+  { id: "icon_seamless", label: "DWD ICON", weight: 1 },
+  { id: "ecmwf_ifs025", label: "ECMWF", weight: 1 },
+  { id: "gfs_seamless", label: "NOAA GFS", weight: 1 },
+] as const;
+export type ModelId = (typeof MODELS)[number]["id"];
+
+const VARS = ["wind_speed_10m", "wind_gusts_10m", "wind_direction_10m", "weather_code", "temperature_2m"] as const;
 
 type ApiResult = {
   utc_offset_seconds: number;
-  hourly: {
-    time: string[];
-    wind_speed_10m: number[];
-    wind_gusts_10m: number[];
-    wind_direction_10m: number[];
-    weather_code: number[];
-    temperature_2m: number[];
-  };
+  hourly: { time: string[] } & Record<string, (number | null)[] | string[]>;
 };
+
+/** Moyenne de directions (degrés) pondérée, sur le cercle : 350° et 10° donnent 0°, pas 180°. */
+function circularMean(values: { v: number; w: number }[]) {
+  let x = 0;
+  let y = 0;
+  for (const { v, w } of values) {
+    x += Math.cos((v * Math.PI) / 180) * w;
+    y += Math.sin((v * Math.PI) / 180) * w;
+  }
+  return ((Math.atan2(y, x) * 180) / Math.PI + 360) % 360;
+}
+
+/** Combine les modèles disponibles pour une heure. */
+function consensus(r: ApiResult, k: number): Omit<HourForecast, "time"> {
+  const get = (v: string, m: string) => {
+    const arr = r.hourly[`${v}_${m}`] as (number | null)[] | undefined;
+    const x = arr?.[k];
+    return typeof x === "number" && Number.isFinite(x) ? x : null;
+  };
+  const wind: { v: number; w: number; m: ModelId }[] = [];
+  const gust: { v: number; w: number }[] = [];
+  const dir: { v: number; w: number }[] = [];
+  for (const m of MODELS) {
+    const ws = get("wind_speed_10m", m.id);
+    if (ws == null) continue;
+    wind.push({ v: ws, w: m.weight, m: m.id });
+    const g = get("wind_gusts_10m", m.id);
+    if (g != null) gust.push({ v: g, w: m.weight });
+    const d = get("wind_direction_10m", m.id);
+    if (d != null) dir.push({ v: d, w: m.weight });
+  }
+  const wavg = (l: { v: number; w: number }[]) => (l.length ? l.reduce((s, x) => s + x.v * x.w, 0) / l.reduce((s, x) => s + x.w, 0) : 0);
+  const first = (v: string) => {
+    for (const m of MODELS) {
+      const x = get(v, m.id);
+      if (x != null) return x;
+    }
+    return 0;
+  };
+  const speeds = wind.map((x) => x.v);
+  const w = wavg(wind);
+  return {
+    wind: w,
+    // Rafales jamais sous le vent moyen (certains modèles ne les fournissent pas)
+    gust: Math.max(w, wavg(gust)),
+    dir: dir.length ? circularMean(dir) : 0,
+    code: first("weather_code"),
+    temp: first("temperature_2m"),
+    spread: speeds.length > 1 ? Math.max(...speeds) - Math.min(...speeds) : null,
+    models: Object.fromEntries(wind.map((x) => [x.m, Math.round(x.v)])) as Partial<Record<ModelId, number>>,
+  };
+}
 
 /** Prévisions horaires (7 jours) pour une liste de points, en heure locale de chaque point. */
 export async function getForecasts(points: Point[]): Promise<HourForecast[][]> {
-  const out: HourForecast[][] = [];
-  for (let i = 0; i < points.length; i += 50) {
-    const batch = points.slice(i, i + 50);
-    const params = new URLSearchParams({
-      latitude: batch.map((p) => p.lat.toFixed(3)).join(","),
-      longitude: batch.map((p) => p.lng.toFixed(3)).join(","),
-      hourly: "wind_speed_10m,wind_gusts_10m,wind_direction_10m,weather_code,temperature_2m",
-      wind_speed_unit: "kn",
-      timezone: "auto",
-      forecast_days: "7",
-    });
-    if (KEY) params.set("apikey", KEY);
-
-    const res = await fetch(`${BASE}?${params}`, { next: { revalidate: 1800 } });
-    if (!res.ok) throw new Error(`Open-Meteo ${res.status}`);
-    const json = (await res.json()) as ApiResult | ApiResult[];
-    const list = Array.isArray(json) ? json : [json];
-    for (const r of list) {
-      const h = r.hourly;
-      out.push(
-        h.time.map((t, k) => ({
-          time: t,
-          wind: h.wind_speed_10m[k] ?? 0,
-          gust: h.wind_gusts_10m[k] ?? 0,
-          dir: h.wind_direction_10m[k] ?? 0,
-          code: h.weather_code[k] ?? 0,
-          temp: h.temperature_2m[k] ?? 0,
-        })),
-      );
+  const out: HourForecast[][] = new Array(points.length);
+  const groups = [
+    { cell: "sea", idx: points.map((p, i) => (p.water === "lac" ? -1 : i)).filter((i) => i >= 0) },
+    { cell: "land", idx: points.map((p, i) => (p.water === "lac" ? i : -1)).filter((i) => i >= 0) },
+  ];
+  for (const g of groups) {
+    for (let i = 0; i < g.idx.length; i += 25) {
+      const ids = g.idx.slice(i, i + 25);
+      const res = await fetchBatch(ids.map((k) => points[k]), g.cell);
+      res.forEach((hours, k) => (out[ids[k]] = hours));
     }
   }
   return out;
+}
+
+async function fetchBatch(batch: Point[], cell: string): Promise<HourForecast[][]> {
+  const params = new URLSearchParams({
+    latitude: batch.map((p) => p.lat.toFixed(3)).join(","),
+    longitude: batch.map((p) => p.lng.toFixed(3)).join(","),
+    hourly: VARS.join(","),
+    models: MODELS.map((m) => m.id).join(","),
+    wind_speed_unit: "kn",
+    timezone: "auto",
+    forecast_days: "7",
+    // En mer pour les spots côtiers : le vent du plan d'eau, pas celui de l'arrière-pays freiné par le relief
+    cell_selection: cell,
+  });
+  if (KEY) params.set("apikey", KEY);
+
+  const res = await fetch(`${BASE}?${params}`, { next: { revalidate: 1800 } });
+  if (!res.ok) throw new Error(`Open-Meteo ${res.status}`);
+  const json = (await res.json()) as ApiResult | ApiResult[];
+  const list = Array.isArray(json) ? json : [json];
+  return list.map((r) => r.hourly.time.map((t, k) => ({ time: t, ...consensus(r, k) })));
 }
 
 type MarineResult = {

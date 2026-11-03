@@ -105,9 +105,56 @@ export async function importSpotCatalogue() {
   const db = await requireAdmin();
   const { SPOT_CATALOGUE } = await import("@/lib/spot-catalogue");
   await db.from("spots").upsert(
-    SPOT_CATALOGUE.map((s) => ({ ...s, sports: ["kitesurf", "wingfoil", "foil"], active: true })),
+    SPOT_CATALOGUE.map((s) => ({ ...s, sports: s.sports ?? ["kitesurf", "wingfoil", "foil"], active: true })),
     { onConflict: "id", ignoreDuplicates: true },
   );
   revalidatePath("/admin/spots");
   revalidatePath("/spots");
+}
+
+/**
+ * Ajoute les spots cartographiés dans OpenStreetMap qui manquent (à plus de 1,5 km d'un spot existant).
+ * L'orientation est calculée depuis le trait de côte ; le niveau reste « intermédiaire » par prudence.
+ */
+export async function importOsmSpots(_: AdminState, formData: FormData): Promise<AdminState> {
+  const db = await requireAdmin();
+  const country = String(formData.get("country") ?? "FR").toUpperCase().slice(0, 2);
+  const { fetchOsmSpots } = await import("@/lib/osm-spots");
+  const { distanceKm } = await import("@/lib/wind");
+  let found;
+  try {
+    found = await fetchOsmSpots(country);
+  } catch (e) {
+    console.error("import OSM", e);
+    return { error: "OpenStreetMap ne répond pas pour le moment. Réessaie dans quelques minutes." };
+  }
+  const { data: existing } = await db.from("spots").select("id, lat, lng");
+  const known = existing ?? [];
+  const fresh = found.filter(
+    (f) => !known.some((k) => k.id === f.id || distanceKm(k.lat, k.lng, f.lat, f.lng) < 1.5),
+  );
+  // Doublons dans OSM même (plusieurs objets pour une même plage)
+  const unique = fresh.filter((f, i) => !fresh.slice(0, i).some((g) => distanceKm(g.lat, g.lng, f.lat, f.lng) < 1.5));
+  if (!unique.length) return { ok: `${found.length} spots trouvés dans OpenStreetMap, aucun nouveau.` };
+  const COUNTRY_NAME: Record<string, string> = { FR: "France", ES: "Espagne", IT: "Italie", PT: "Portugal", BE: "Belgique", NL: "Pays-Bas" };
+  const { error } = await db.from("spots").insert(
+    unique.map((f) => ({
+      id: f.id,
+      name: f.name,
+      sports: f.sports,
+      country: COUNTRY_NAME[country] ?? country,
+      region: null,
+      lat: f.lat,
+      lng: f.lng,
+      sea_bearing: f.sea_bearing,
+      water: f.sports.includes("surf") ? "vagues" : "chop",
+      min_level: "intermediaire",
+      notes: "Ajouté depuis OpenStreetMap : orientation calculée automatiquement, à vérifier.",
+      active: true,
+    })),
+  );
+  if (error) return { error: `Import impossible : ${error.message}` };
+  revalidatePath("/admin/spots");
+  revalidatePath("/spots");
+  return { ok: `${unique.length} nouveaux spots ajoutés depuis OpenStreetMap (sur ${found.length} trouvés).` };
 }

@@ -3,6 +3,8 @@
  * (sans toucher aux spots existants). Même contenu que supabase/migrations/0003_more_spots.sql.
  * Coordonnées et orientations approximatives, à affiner depuis l'admin.
  */
+import { SPOT_CATALOGUE_FR } from "./spot-catalogue-fr";
+
 export type CatalogueSpot = {
   id: string;
   name: string;
@@ -11,12 +13,14 @@ export type CatalogueSpot = {
   lat: number;
   lng: number;
   sea_bearing: number;
-  water: "flat" | "chop" | "vagues";
+  water: "flat" | "chop" | "vagues" | "lac";
   min_level: "debutant" | "intermediaire" | "avance";
   notes: string | null;
+  /** Par défaut : kitesurf, wingfoil, foil. */
+  sports?: string[];
 };
 
-export const SPOT_CATALOGUE: CatalogueSpot[] = [
+const BASE: CatalogueSpot[] = [
   { id: "cagnes-hippodrome", name: "Cagnes-sur-Mer – Hippodrome", country: "France", region: "Alpes-Maritimes", lat: 43.652, lng: 7.163, sea_bearing: 150, water: "chop", min_level: "intermediaire", notes: "Plage de galets. Renseigne-toi sur les périodes autorisées en été." },
   { id: "antibes-salis", name: "Antibes – La Salis", country: "France", region: "Alpes-Maritimes", lat: 43.569, lng: 7.128, sea_bearing: 90, water: "chop", min_level: "intermediaire", notes: "Fonctionne surtout par vent d'est. Baigneurs nombreux en été." },
   { id: "mandelieu-napoule", name: "Mandelieu – La Napoule", country: "France", region: "Alpes-Maritimes", lat: 43.52, lng: 6.945, sea_bearing: 160, water: "chop", min_level: "intermediaire", notes: null },
@@ -36,3 +40,6 @@ export const SPOT_CATALOGUE: CatalogueSpot[] = [
   { id: "piantarella", name: "Bonifacio – Piantarella", country: "France", region: "Corse-du-Sud", lat: 41.38, lng: 9.22, sea_bearing: 110, water: "flat", min_level: "debutant", notes: "Lagon peu profond, eau turquoise." },
   { id: "porto-pollo", name: "Porto-Pollo", country: "France", region: "Corse-du-Sud", lat: 41.71, lng: 8.8, sea_bearing: 250, water: "chop", min_level: "intermediaire", notes: null },
 ];
+
+/** Catalogue complet : la sélection d'origine + les spots France et outre-mer (scripts/spots-fr.txt). */
+export const SPOT_CATALOGUE: CatalogueSpot[] = [...BASE, ...SPOT_CATALOGUE_FR];

@@ -4,10 +4,12 @@ import { requireAdmin } from "@/lib/auth";
 import type { Spot } from "@/lib/types";
 import { SPORT_IDS, SPORTS } from "@/lib/sports";
 import { AdminForm } from "@/components/admin-form";
-import { importSpotCatalogue, saveSpot, toggleSpot } from "../actions";
+import { importOsmSpots, importSpotCatalogue, saveSpot, toggleSpot } from "../actions";
 import { SPOT_CATALOGUE } from "@/lib/spot-catalogue";
 
 export const metadata: Metadata = { title: "Admin · Spots" };
+// L'import OpenStreetMap peut prendre jusqu'à une minute
+export const maxDuration = 60;
 
 export default async function AdminSpots({ searchParams }: { searchParams: Promise<{ edit?: string }> }) {
   const { edit } = await searchParams;
@@ -84,10 +86,29 @@ export default async function AdminSpots({ searchParams }: { searchParams: Promi
         {missing.length > 0 && (
           <form action={importSpotCatalogue} className="mt-3 rounded-2xl bg-brand-light p-4">
             <p className="font-semibold">{missing.length} spots du catalogue ne sont pas encore dans ta base</p>
-            <p className="mt-1 text-sm text-slate">{missing.map((m) => m.name).join(", ")}.</p>
+            <p className="mt-1 text-sm text-slate">
+              {missing.slice(0, 12).map((m) => m.name).join(", ")}
+              {missing.length > 12 ? ` et ${missing.length - 12} autres.` : "."}
+            </p>
             <button className="btn btn-primary mt-3 !min-h-10 !px-4 !py-2 !text-sm">Importer ces {missing.length} spots</button>
           </form>
         )}
+        <AdminForm action={importOsmSpots} submitLabel="Chercher les spots manquants" className="mt-3 rounded-2xl border border-line p-4">
+          <p className="font-semibold">Compléter depuis OpenStreetMap</p>
+          <p className="mt-1 text-sm text-slate">
+            Ajoute les spots de kite, windsurf et surf cartographiés dans OpenStreetMap qui ne sont pas encore dans ta base.
+            L&apos;orientation est calculée à partir du trait de côte : vérifie-la sur les spots importés.
+          </p>
+          <label htmlFor="country" className="label mt-3">Pays</label>
+          <select id="country" name="country" defaultValue="FR" className="field !w-auto">
+            <option value="FR">France</option>
+            <option value="ES">Espagne</option>
+            <option value="IT">Italie</option>
+            <option value="PT">Portugal</option>
+            <option value="BE">Belgique</option>
+            <option value="NL">Pays-Bas</option>
+          </select>
+        </AdminForm>
         <ul className="mt-4 divide-y divide-line border-y border-line">
           {(spots ?? []).map((s) => (
             <li key={s.id} className="flex items-center justify-between gap-3 py-3">
