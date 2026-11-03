@@ -6,6 +6,7 @@ import { SPORT_IDS, SPORTS } from "@/lib/sports";
 import { Reveal } from "@/components/reveal";
 import { Tilt } from "@/components/tilt";
 import { PhoneScreens } from "@/components/phone-screens";
+import { SampleReport } from "@/components/sample-report";
 
 export default function Home() {
   return (
@@ -14,6 +15,7 @@ export default function Home() {
       <Ribbon />
       <Sports />
       <Steps />
+      <Coachs />
       <Features />
       <PricingTeaser />
       <Faq />
@@ -53,7 +55,7 @@ function Hero() {
         <div>
           <span className="tag rise" style={{ "--d": "0s" } as React.CSSProperties}>
             <span aria-hidden="true" className="h-1.5 w-1.5 rounded-full bg-brand" />
-            Vrais coachs · 5 sports
+            Coachs diplômés d&apos;État · 5 sports
           </span>
           <h1 className="mt-6 text-[3rem] leading-[0.98] sm:text-6xl lg:text-[5rem]">
             <span className="rise block" style={{ "--d": "0.08s" } as React.CSSProperties}>Chaque session</span>
@@ -63,8 +65,8 @@ function Hero() {
             </span>
           </h1>
           <p className="rise mt-6 max-w-xl text-lg text-slate sm:text-xl" style={{ "--d": "0.4s" } as React.CSSProperties}>
-            Kite, wing, foil, surf, wake. Envoie la vidéo de ta figure : un vrai coach la décortique et te dit exactement
-            quoi corriger, et quoi bosser à la prochaine session.
+            Kite, wing, foil, surf, wake. Envoie la vidéo de ta figure : un coach diplômé d&apos;État la décortique image par
+            image et te dit exactement quoi corriger, et quoi bosser à la prochaine session.
           </p>
           <div className="rise mt-8 flex flex-col gap-4 sm:flex-row sm:items-center" style={{ "--d": "0.5s" } as React.CSSProperties}>
             <Link href="/inscription" className="btn btn-primary">
@@ -161,7 +163,7 @@ function PhoneMock() {
 
 /* Ruban qui défile : bande bleu nuit légèrement inclinée, mots en capitales italiques */
 function Ribbon() {
-  const items = ["Kitesurf", "Wingfoil", "Foil", "Surf", "Wakeboard", "Analyse vidéo", "Vrais coachs", "Spot Finder", "Progresse"];
+  const items = ["Kitesurf", "Wingfoil", "Foil", "Surf", "Wakeboard", "Analyse vidéo", "Coachs diplômés d'État", "Spot Finder", "Progresse"];
   const row = [...items, ...items];
   return (
     <div className="border-y border-line bg-white py-5" aria-hidden="true">
@@ -281,6 +283,69 @@ function Steps() {
   );
 }
 
+/* ───────────── 3 bis. Les coachs : diplômés d'État, retour structuré ───────────── */
+function Coachs() {
+  const proofs = [
+    {
+      title: "Diplômés d'État",
+      text: "BPJEPS ou DEJEPS : le diplôme obligatoire en France pour enseigner les sports de glisse. Ceux qui donnent les cours dans les écoles.",
+    },
+    {
+      title: "Spécialistes de ton sport",
+      text: "Ta vidéo de kite part chez un moniteur de kite, ta vidéo de surf chez un moniteur de surf. Chacun connaît les figures qu'il analyse.",
+    },
+    {
+      title: "Un vrai regard, pas un algorithme",
+      text: "Ton coach regarde ta figure image par image, lit ta question, tient compte de ton niveau et de tes retours précédents.",
+    },
+    {
+      title: "Un retour que tu peux appliquer",
+      text: "Note par phase, erreurs dans l'ordre où les corriger, exercices et une seule priorité pour ta prochaine session.",
+    },
+  ];
+  return (
+    <section id="coachs" className="mx-auto max-w-6xl scroll-mt-20 px-5 pt-14 sm:px-6 sm:pt-20">
+      <div className="grid items-start gap-10 lg:grid-cols-[1fr_0.9fr] lg:gap-14">
+        <div>
+          <Reveal>
+            <p className="eyebrow">Tes coachs</p>
+            <h2 className="mt-2 text-3xl sm:text-4xl">
+              L&apos;œil d&apos;un moniteur diplômé d&apos;État, <em className="italic text-brand">sur chacune de tes figures</em>
+            </h2>
+            <p className="mt-3 max-w-xl text-lg text-slate">
+              Un cours particulier coûte souvent plus de 60 € de l&apos;heure. Avec RIDE&apos;UP, un moniteur diplômé regarde tes
+              figures toute l&apos;année, entre deux sessions.
+            </p>
+          </Reveal>
+          <ul className="mt-8 grid gap-4 sm:grid-cols-2">
+            {proofs.map((p, i) => (
+              <Reveal as="li" key={p.title} delay={i * 0.08} className="panel p-5">
+                <span aria-hidden="true" className="flex h-9 w-9 items-center justify-center rounded-xl bg-brand-light text-brand">
+                  <Icon name="check" className="h-5 w-5" />
+                </span>
+                <h3 className="mt-3 text-lg">{p.title}</h3>
+                <p className="mt-1 text-[0.95rem] text-slate">{p.text}</p>
+              </Reveal>
+            ))}
+          </ul>
+          <Reveal delay={0.3}>
+            <Link href="/inscription" className="btn btn-primary mt-8">
+              Envoyer ma première vidéo
+            </Link>
+            <p className="mt-2 text-sm text-slate">1 analyse offerte. Sans carte bancaire.</p>
+          </Reveal>
+        </div>
+        <Reveal delay={0.15}>
+          <Tilt>
+            <SampleReport />
+          </Tilt>
+          <p className="mt-3 text-center text-sm text-slate">Exemple de retour, tel que tu le reçois dans l&apos;appli.</p>
+        </Reveal>
+      </div>
+    </section>
+  );
+}
+
 /* ───────────── 4. Le reste de l'appli : liste claire ───────────── */
 function Features() {
   const items = [
@@ -391,11 +456,11 @@ function Faq() {
     },
     {
       q: "Qui analyse ma vidéo ?",
-      a: "Un coach RIDE'UP spécialiste de ton sport. Il regarde ta figure image par image, de l'approche à la réception, et te répond sous 72 h (24 h en Elite). Tu reçois un e-mail dès que son retour est prêt.",
+      a: "Un coach RIDE'UP diplômé d'État (BPJEPS ou DEJEPS) et spécialiste de ton sport. Il regarde ta figure image par image, de l'approche à la réception, et te répond sous 72 h (24 h en Elite). Tu reçois un e-mail dès que son retour est prêt.",
     },
     {
-      q: "Ça remplace un moniteur ?",
-      a: "Non. Pour débuter, prends des cours dans une école. RIDE'UP t'aide à progresser entre les sessions une fois autonome.",
+      q: "Ça remplace un cours en école ?",
+      a: "Pour débuter, prends des cours sur l'eau dans une école. Une fois autonome, RIDE'UP te donne l'œil d'un moniteur diplômé sur chaque figure, entre deux sessions, pour une fraction du prix d'un cours particulier.",
     },
     {
       q: "Je peux arrêter quand je veux ?",

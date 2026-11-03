@@ -17,6 +17,8 @@ type Row = {
   is_admin: boolean;
   is_coach: boolean;
   coach_sports: string[];
+  coach_diploma: string | null;
+  coach_bio: string | null;
 };
 
 export default async function AdminUsers({ searchParams }: { searchParams: Promise<{ q?: string }> }) {
@@ -27,7 +29,7 @@ export default async function AdminUsers({ searchParams }: { searchParams: Promi
   monthStart.setUTCDate(1);
   monthStart.setUTCHours(0, 0, 0, 0);
 
-  const cols = "id, email, full_name, plan, plan_override, subscription_status, created_at, is_admin, is_coach, coach_sports";
+  const cols = "id, email, full_name, plan, plan_override, subscription_status, created_at, is_admin, is_coach, coach_sports, coach_diploma, coach_bio";
   const term = (q ?? "").replace(/[%_\\]/g, "").trim().slice(0, 80);
   let users: Row[] = [];
   if (term) {
@@ -115,6 +117,8 @@ export default async function AdminUsers({ searchParams }: { searchParams: Promi
                         </label>
                       ))}
                     </div>
+                    <input name="coach_diploma" defaultValue={u.coach_diploma ?? ""} placeholder="Diplôme (ex. BPJEPS kitesurf)" aria-label="Diplôme du coach" className="field !py-1.5 text-sm" />
+                    <textarea name="coach_bio" defaultValue={u.coach_bio ?? ""} rows={2} maxLength={300} placeholder="Présentation courte, vue par les riders" aria-label="Présentation du coach" className="field !py-1.5 text-sm" />
                     <button className="btn btn-ghost !px-3 !py-1.5 text-sm">Enregistrer</button>
                   </form>
                 </td>
@@ -126,7 +130,7 @@ export default async function AdminUsers({ searchParams }: { searchParams: Promi
       <p className="mt-4 text-sm text-slate">
         « Accès offert » donne la formule sans paiement (testeurs, partenaires). Les abonnements payants se gèrent dans
         Stripe. « Coach » donne accès à l&apos;espace coach pour analyser les vidéos des sports cochés (aucun coché = tous
-        les sports).
+        les sports). Le diplôme et la présentation s&apos;affichent au rider avec chaque retour.
       </p>
     </div>
   );

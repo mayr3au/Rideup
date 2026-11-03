@@ -30,7 +30,16 @@ export async function setCoach(formData: FormData) {
   const id = String(formData.get("id"));
   const isCoach = formData.get("is_coach") === "on";
   const sports = formData.getAll("coach_sports").map(String).filter((s) => (SPORT_IDS as string[]).includes(s));
-  await db.from("profiles").update({ is_coach: isCoach, coach_sports: isCoach ? sports : [] }).eq("id", id);
+  const text = (k: string, max: number) => String(formData.get(k) ?? "").trim().slice(0, max) || null;
+  await db
+    .from("profiles")
+    .update({
+      is_coach: isCoach,
+      coach_sports: isCoach ? sports : [],
+      coach_diploma: text("coach_diploma", 80),
+      coach_bio: text("coach_bio", 300),
+    })
+    .eq("id", id);
   revalidatePath("/admin/utilisateurs");
 }
 

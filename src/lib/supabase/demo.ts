@@ -87,6 +87,8 @@ function seed(): Store {
     current_period_end: daysAgo(-18),
     stripe_customer_id: null,
     is_admin: true,
+    coach_diploma: "BPJEPS kitesurf",
+    coach_bio: "Moniteur à Nice depuis 8 ans, spécialiste freestyle et premiers sauts.",
     created_at: daysAgo(60),
   };
 

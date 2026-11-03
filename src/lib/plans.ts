@@ -9,7 +9,7 @@ export const PLANS = {
     priceEnv: "STRIPE_PRICE_PROGRESS",
     tagline: "Pour progresser chaque semaine.",
     features: [
-      "2 vidéos analysées par un vrai coach chaque mois",
+      "2 vidéos analysées par un coach diplômé d'État chaque mois",
       "Erreurs techniques et corrections, phase par phase",
       "Exercices et priorité pour ta prochaine session",
       "Historique et suivi des analyses",
@@ -26,7 +26,7 @@ export const PLANS = {
     tagline: "Pour les riders qui s'entraînent sérieusement.",
     features: [
       "Tout ce qui est inclus dans Progress",
-      "6 vidéos analysées par un vrai coach chaque mois",
+      "6 vidéos analysées par un coach diplômé d'État chaque mois",
       "Retour du coach sous 24 h, tes vidéos passent en priorité",
       "Ton coach compare avec tes tentatives précédentes",
       "Détection de l'évolution de tes erreurs",

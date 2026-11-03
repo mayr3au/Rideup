@@ -41,7 +41,10 @@ export default async function AnalysisDetail({
     : { data: null };
 
   const { data: coach } = a.coach_id
-    ? await createAdminClient().from("profiles").select("full_name").eq("id", a.coach_id).maybeSingle<{ full_name: string | null }>()
+    ? await createAdminClient().from("profiles")
+        .select("full_name, coach_diploma, coach_bio")
+        .eq("id", a.coach_id)
+        .maybeSingle<{ full_name: string | null; coach_diploma: string | null; coach_bio: string | null }>()
     : { data: null };
   const coachName = coach?.full_name?.split(" ")[0] || "ton coach";
   const waiting = a.status === "envoi" || a.status === "en-attente" || a.status === "en-cours";
@@ -69,7 +72,6 @@ export default async function AnalysisDetail({
           <p className="text-slate">
             {new Date(a.created_at).toLocaleDateString("fr-FR", { weekday: "long", day: "numeric", month: "long" })}
             {SPORTS[a.sport] && ` · ${SPORTS[a.sport].name}`}
-            {a.status === "termine" && a.coach_id && ` · analysé par ${coachName}`}
           </p>
           <h1 className="text-3xl font-extrabold sm:text-4xl">{r?.figure ?? trick?.name ?? "Analyse"}</h1>
         </div>
@@ -146,6 +148,26 @@ export default async function AnalysisDetail({
 
         {r && (
           <div className="space-y-8">
+            {a.coach_id && (
+              <div className="flex items-start gap-3 rounded-2xl bg-deep p-4 text-white">
+                <span aria-hidden="true" className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-brand text-lg font-bold">
+                  {coachName[0].toUpperCase()}
+                </span>
+                <div className="min-w-0">
+                  <p className="font-semibold">
+                    Analysé par {coach?.full_name?.split(" ")[0] ?? "ton coach"}
+                    {a.reviewed_at && (
+                      <span className="font-normal text-white/70">
+                        {" "}· {new Date(a.reviewed_at).toLocaleDateString("fr-FR", { day: "numeric", month: "long" })}
+                      </span>
+                    )}
+                  </p>
+                  <p className="text-sm text-white/80">{coach?.coach_diploma ? `Moniteur diplômé d'État · ${coach.coach_diploma}` : "Coach RIDE'UP"}</p>
+                  {coach?.coach_bio && <p className="mt-1 text-sm text-white/70">{coach.coach_bio}</p>}
+                </div>
+              </div>
+            )}
+
             <p className="text-lg">{r.resume}</p>
 
             {r.securite && (
@@ -177,7 +199,12 @@ export default async function AnalysisDetail({
                         <span className="block font-semibold">{phaseLabel(a.sport, p.phase)}</span>
                         <span className="font-display text-lg font-bold">{p.note}/10</span>
                       </dt>
-                      <dd className="text-slate">{p.commentaire}</dd>
+                      <dd>
+                        <span aria-hidden="true" className="mb-1.5 block h-1.5 overflow-hidden rounded-full bg-raised">
+                          <span className="block h-full rounded-full bg-brand" style={{ width: `${Math.max(0, Math.min(10, p.note)) * 10}%` }} />
+                        </span>
+                        <span className="text-slate">{p.commentaire}</span>
+                      </dd>
                     </div>
                   ))}
                 </dl>

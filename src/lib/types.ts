@@ -36,6 +36,10 @@ export type Profile = {
   is_coach?: boolean;
   /** Sports que ce coach analyse (vide = tous) */
   coach_sports?: SportId[];
+  /** Diplôme affiché au rider (ex. « BPJEPS kitesurf ») */
+  coach_diploma?: string | null;
+  /** Courte présentation du coach */
+  coach_bio?: string | null;
   created_at: string;
 };
 
