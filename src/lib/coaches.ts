@@ -20,9 +20,9 @@ export type TeamCoach = {
 export const TEAM: TeamCoach[] = [
   {
     name: "Anil Garnier",
-    sports: ["kitesurf", "foil"],
-    title: "Kitefoil & big air · team Eleveight",
-    bio: "Top 11 Young World Kite Foil. Kitefoileur dans l'âme, big air dans le cœur : il t'aide à voler plus haut et plus propre.",
+    sports: ["kitesurf", "foil", "wingfoil", "surf"],
+    title: "Moniteur diplômé d'État · team Eleveight",
+    bio: "Top 11 Young World Kite Foil, spécialiste du big air. Kite, foil, wing ou surf : il t'aide à voler plus haut et plus propre.",
     instagram: "anil_garnier",
     photo: "/coachs/coach-kite.jpg",
     pos: "50% 30%",
@@ -30,7 +30,7 @@ export const TEAM: TeamCoach[] = [
   {
     name: "Endy Beltrame",
     sports: ["wakeboard"],
-    title: "Wakeboard câble",
+    title: "Moniteur diplômé d'État · wakeboard câble",
     bio: "Kickers, modules et premiers inverts : il te fait progresser à chaque tour de câble.",
     instagram: "endy_beltrame",
     photo: "/coachs/coach-wake.jpg",
