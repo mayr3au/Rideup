@@ -168,8 +168,10 @@ function PhoneMock() {
       <div aria-hidden="true" className="absolute -bottom-14 left-1/2 h-7 w-[78%] -translate-x-1/2 rounded-[50%] bg-black/40 blur-xl" />
 
       <Tilt>
-        <div className="float relative">
-          {/* boutons latéraux en titane noir */}
+        <div className="float relative" style={{ perspective: "1400px" }}>
+        {/* balancement 3D lent : on voit la tranche en titane accrocher la lumière */}
+        <div className="phone-sway relative">
+          {/* boutons latéraux en titane naturel */}
           {[
             { side: "left", top: "17%", h: "h-7" },
             { side: "left", top: "25%", h: "h-14" },
@@ -180,19 +182,19 @@ function PhoneMock() {
               key={k}
               aria-hidden="true"
               style={{ top: b.top }}
-              className={`absolute ${b.h} w-[4px] ${b.side === "left" ? "-left-[3px] rounded-l-[3px]" : "-right-[3px] rounded-r-[3px]"} bg-[linear-gradient(90deg,#1a1a1c,#4a4a4e_45%,#1a1a1c)]`}
+              className={`titanium-button absolute ${b.h} w-[5px] ${b.side === "left" ? "-left-[4px] rounded-l-[3px]" : "-right-[4px] rounded-r-[3px]"}`}
             />
           ))}
 
-          {/* cadre titane noir : liseré brossé + reflet sur l'arête */}
-          <div className="rounded-[58px] bg-[linear-gradient(145deg,#5a5a5f_0%,#232326_18%,#111113_50%,#2a2a2d_82%,#57575c_100%)] p-[2.5px] shadow-[0_50px_80px_-40px_rgba(0,0,0,0.55),0_30px_40px_-30px_rgba(0,0,0,0.35)]">
-            <div className="rounded-[55.5px] bg-[#0b0b0c] p-[1.5px]">
+          {/* cadre en titane naturel brossé, avec un reflet qui glisse sur l'arête */}
+          <div className="titanium-frame rounded-[61px] p-[5px] shadow-[0_60px_90px_-40px_rgba(14,42,71,0.6),0_30px_40px_-30px_rgba(0,0,0,0.35)]">
+            <div className="rounded-[56px] bg-[#0b0b0c] p-[1.5px] shadow-[inset_0_0_0_1px_rgba(255,255,255,0.08)]">
               {/* bordure noire de l'écran, très fine */}
               <div className="rounded-[54px] bg-black p-[7px] ring-1 ring-inset ring-white/[0.06]">
                 {/* écran */}
                 <div className="relative overflow-hidden rounded-[47px] bg-salt text-deep">
-                  {/* reflet vitre discret */}
-                  <div aria-hidden="true" className="pointer-events-none absolute inset-0 z-20 bg-[linear-gradient(120deg,rgba(255,255,255,0.18)_0%,rgba(255,255,255,0)_28%)]" />
+                  {/* reflet de la vitre, qui suit le balancement */}
+                  <div aria-hidden="true" className="screen-glare pointer-events-none absolute inset-0 z-20" />
 
                   {/* barre d'état */}
                   <div className="relative z-10 flex h-12 items-center justify-between px-8 pt-1 text-[0.74rem] font-semibold">
@@ -213,6 +215,7 @@ function PhoneMock() {
               </div>
             </div>
           </div>
+        </div>
         </div>
       </Tilt>
 
