@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { CoachTabs } from "@/components/coach-tabs";
 import { requireSession, effectivePlan } from "@/lib/auth";
 import { getQuota, sweepStaleAnalyses } from "@/lib/usage";
 import { activeSport, riderSports } from "@/lib/rider";
@@ -22,6 +23,7 @@ export default async function AnalysePage({ searchParams }: { searchParams: Prom
 
   return (
     <div className="mx-auto max-w-2xl">
+      <CoachTabs />
       <h1 className="text-3xl font-bold sm:text-4xl">Fais analyser ta vidéo</h1>
       <p className="mt-2 text-slate">
         Envoie le passage de ta figure : un vrai coach RIDE&apos;UP la regarde image par image et te renvoie ses corrections,

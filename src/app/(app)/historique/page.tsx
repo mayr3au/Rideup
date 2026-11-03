@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { CoachTabs } from "@/components/coach-tabs";
 import { requireSession } from "@/lib/auth";
 import { SPORTS, trickById, tricksFor } from "@/lib/sports";
 import { activeSport } from "@/lib/rider";
@@ -59,6 +60,7 @@ export default async function HistoryPage({ searchParams }: { searchParams: Prom
 
   return (
     <div className="mx-auto max-w-3xl">
+      <CoachTabs />
       <div className="flex flex-wrap items-end justify-between gap-3">
         <h1 className="text-3xl font-bold sm:text-4xl">Historique {SPORTS[sport].name.toLowerCase()}</h1>
         <Link href="/analyse" className="btn btn-primary !min-h-10 !px-4 !py-2 !text-sm">Nouvelle analyse</Link>

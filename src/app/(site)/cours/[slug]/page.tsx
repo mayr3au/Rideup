@@ -376,7 +376,7 @@ function CourseView({ c, locked, signedIn }: { c: Course; locked: boolean; signe
               <p className="mt-1">{c.filmer}</p>
               <p className="mt-2 text-sm text-slate">
                 Ensuite, envoie le passage de ta figure dans{" "}
-                <Link href="/analyse" className="font-semibold text-lagoon">Analyser</Link> : un coach la regarde et te dit quoi corriger.
+                <Link href="/analyse" className="font-semibold text-lagoon">Coach</Link> : un coach la regarde et te dit quoi corriger.
               </p>
             </aside>
           )}

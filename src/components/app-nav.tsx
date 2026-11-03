@@ -36,15 +36,20 @@ function Icon({ children, size = 24 }: { children: React.ReactNode; size?: numbe
 /** Les fonctions principales, à portée de pouce sur téléphone. */
 const MAIN: Item[] = [
   { href: "/dashboard", label: "Accueil", icon: <Icon>{I.home}</Icon> },
-  { href: "/coach", label: "Coach", icon: <Icon>{I.coach}</Icon> },
-  { href: "/analyse", label: "Analyser", icon: <Icon>{I.camera}</Icon> },
   { href: "/cours", label: "Cours", icon: <Icon>{I.book}</Icon> },
+  { href: "/analyse", label: "Coach", icon: <Icon>{I.camera}</Icon> },
   { href: "/progression", label: "Progression", short: "Progrès", icon: <Icon>{I.chart}</Icon> },
   { href: "/spots", label: "Spots", icon: <Icon>{I.map}</Icon> },
 ];
 
+/** L'onglet Coach couvre la vidéo, la roadmap, les questions et l'historique. */
+const COACH_PATHS = ["/analyse", "/coach", "/historique"];
+function isActive(path: string, href: string) {
+  const match = (h: string) => path === h || path.startsWith(h + "/");
+  return href === "/analyse" ? COACH_PATHS.some(match) : match(href);
+}
+
 const SECONDARY = [
-  { href: "/historique", label: "Historique des analyses" },
   { href: "/week-end", label: "Spots du week-end" },
   { href: "/profil", label: "Mon profil rider" },
   { href: "/compte", label: "Abonnement et compte" },
@@ -59,7 +64,7 @@ export function AppNav({ isAdmin, isCoach, planLabel }: { isAdmin: boolean; isCo
     ...SECONDARY,
     ...(isAdmin ? [{ href: "/admin", label: "Administration" }] : []),
   ];
-  const active = (href: string) => path === href || path.startsWith(href + "/");
+  const active = (href: string) => isActive(path, href);
 
   useEffect(() => setOpen(false), [path]);
   useScrollLock(open);
@@ -154,13 +159,13 @@ export function AppNav({ isAdmin, isCoach, planLabel }: { isAdmin: boolean; isCo
 /** Barre d'onglets du bas (téléphone). Aussi affichée sur les pages publiques (cours) quand on est connecté. */
 export function AppTabBar() {
   const path = usePathname();
-  const active = (href: string) => path === href || path.startsWith(href + "/");
+  const active = (href: string) => isActive(path, href);
   return (
     <nav
       className="fixed inset-x-0 bottom-0 z-40 border-t border-line bg-spray/92 pb-[env(safe-area-inset-bottom)] backdrop-blur-xl lg:hidden"
       aria-label="Navigation principale"
     >
-      <ul className="grid grid-cols-6">
+      <ul className="grid grid-cols-5">
         {MAIN.map((l) =>
           l.href === "/analyse" ? (
             /* Action principale : bouton rond surélevé au centre */
@@ -187,7 +192,7 @@ export function AppTabBar() {
                 className={`group flex min-h-16 flex-col items-center justify-center gap-0.5 py-2 text-[0.72rem] font-medium transition-colors duration-200 ${active(l.href) ? "text-lagoon" : "text-slate"}`}
               >
                 <span
-                  className={`flex h-8 w-11 items-center justify-center rounded-full transition-[background-color,transform] duration-200 group-active:scale-90 ${active(l.href) ? "bg-brand-light" : ""}`}
+                  className={`flex h-8 w-12 items-center justify-center rounded-full transition-[background-color,transform] duration-200 group-active:scale-90 ${active(l.href) ? "bg-brand-light" : ""}`}
                 >
                   {l.icon}
                 </span>
