@@ -80,7 +80,7 @@ export function PhoneScreens() {
       </div>
 
       {/* écrans empilés en fondu */}
-      <div className="relative h-[400px] lg:h-[440px]">
+      <div className="relative h-[470px]">
         <Screen on={i === 0}>
           <AnalyseScreen />
         </Screen>

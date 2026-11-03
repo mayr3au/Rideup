@@ -124,7 +124,7 @@ function Hero() {
         <div className="rise relative" style={d(0.3)}>
           <PhoneMock />
           {/* notifications qui flottent autour du téléphone */}
-          <div className="pop-in absolute left-0 top-[44%] hidden sm:block xl:-left-14" style={d(1.1)}>
+          <div className="pop-in absolute -left-6 top-[30%] hidden sm:block xl:-left-28" style={d(1.1)}>
             <div className="float flex items-center gap-2.5 rounded-2xl bg-white px-3.5 py-2.5 text-deep shadow-[0_20px_40px_-18px_rgba(14,42,71,0.45)] ring-1 ring-line" style={d(0.5)}>
               <span aria-hidden="true" className="flex h-8 w-8 items-center justify-center rounded-full bg-emerald-100 text-emerald-600">
                 <Icon name="check" className="h-4 w-4" />
@@ -160,65 +160,47 @@ function Hero() {
   );
 }
 
-/* Un téléphone dessiné en HTML, avec un résultat d'analyse dedans */
+/*
+ * iPhone de l'accueil : vraie photo de l'appareil (public/iphone-mockup.png, écran découpé)
+ * et l'écran de l'appli en HTML, projeté dans la perspective de la photo (matrix3d calculée
+ * à partir des 4 coins de l'écran). La scène fait 386 × 896 px, puis est mise à l'échelle.
+ */
+const PHONE_STAGE = { w: 386, h: 896 };
+const SCREEN = { w: 300, h: 650, transform: "matrix3d(1.21901,0.137143,0,0.000306122,0,1.31692,0,0,0,0,1,0,35,20,0,1)" };
+
 function PhoneMock() {
   return (
-    <div className="relative mx-auto w-[268px] lg:w-[300px]">
-      {/* ombre au sol, détachée comme sur un rendu produit */}
-      <div aria-hidden="true" className="absolute -bottom-14 left-1/2 h-7 w-[78%] -translate-x-1/2 rounded-[50%] bg-black/40 blur-xl" />
+    <div className="relative mx-auto w-[280px] [--s:0.7254] lg:w-[330px] lg:[--s:0.8549]">
+      {/* ombre au sol */}
+      <div aria-hidden="true" className="absolute -bottom-10 left-1/2 h-7 w-[70%] -translate-x-1/2 rounded-[50%] bg-deep/30 blur-xl" />
 
       <Tilt>
-        <div className="float relative" style={{ perspective: "1400px" }}>
-        {/* balancement 3D lent : on voit la tranche en titane accrocher la lumière */}
-        <div className="phone-sway relative">
-          {/* boutons latéraux en titane naturel */}
-          {[
-            { side: "left", top: "17%", h: "h-7" },
-            { side: "left", top: "25%", h: "h-14" },
-            { side: "left", top: "36%", h: "h-14" },
-            { side: "right", top: "28%", h: "h-20" },
-          ].map((b, k) => (
-            <span
-              key={k}
-              aria-hidden="true"
-              style={{ top: b.top }}
-              className={`titanium-button absolute ${b.h} w-[5px] ${b.side === "left" ? "-left-[4px] rounded-l-[3px]" : "-right-[4px] rounded-r-[3px]"}`}
-            />
-          ))}
-
-          {/* cadre en titane naturel brossé, avec un reflet qui glisse sur l'arête */}
-          <div className="titanium-frame rounded-[61px] p-[5px] shadow-[0_60px_90px_-40px_rgba(14,42,71,0.6),0_30px_40px_-30px_rgba(0,0,0,0.35)]">
-            <div className="rounded-[56px] bg-[#0b0b0c] p-[1.5px] shadow-[inset_0_0_0_1px_rgba(255,255,255,0.08)]">
-              {/* bordure noire de l'écran, très fine */}
-              <div className="rounded-[54px] bg-black p-[7px] ring-1 ring-inset ring-white/[0.06]">
-                {/* écran */}
-                <div className="relative overflow-hidden rounded-[47px] bg-salt text-deep">
-                  {/* reflet de la vitre, qui suit le balancement */}
-                  <div aria-hidden="true" className="screen-glare pointer-events-none absolute inset-0 z-20" />
-
-                  {/* barre d'état */}
-                  <div className="relative z-10 flex h-12 items-center justify-between px-8 pt-1 text-[0.74rem] font-semibold">
-                    <span>9:41</span>
-                    <span aria-hidden="true" className="flex items-center gap-1">
-                      <svg viewBox="0 0 18 12" className="h-2.5 w-4" fill="currentColor"><rect x="0" y="8" width="3" height="4" rx="1" /><rect x="5" y="5" width="3" height="7" rx="1" /><rect x="10" y="2.5" width="3" height="9.5" rx="1" /><rect x="15" y="0" width="3" height="12" rx="1" /></svg>
-                      <svg viewBox="0 0 26 12" className="h-2.5 w-5" fill="none" stroke="currentColor"><rect x="0.5" y="0.5" width="22" height="11" rx="3" opacity="0.4" /><rect x="2" y="2" width="16" height="8" rx="1.8" fill="currentColor" stroke="none" /><path d="M24.5 4v4" strokeLinecap="round" opacity="0.4" /></svg>
-                    </span>
-                  </div>
-
-                  <PhoneScreens />
-
-                  {/* barre home */}
-                  <div className="flex justify-center bg-white/90 pb-2">
-                    <span aria-hidden="true" className="h-[5px] w-28 rounded-full bg-deep" />
-                  </div>
-                </div>
+        <div className="float relative" style={{ aspectRatio: `${PHONE_STAGE.w} / ${PHONE_STAGE.h}` }}>
+          <div className="absolute left-0 top-0 origin-top-left" style={{ width: PHONE_STAGE.w, height: PHONE_STAGE.h, transform: "scale(var(--s))" }}>
+            {/* écran de l'appli, dans la perspective de la photo */}
+            <div
+              className="absolute left-0 top-0 overflow-hidden bg-salt text-deep"
+              style={{ width: SCREEN.w, height: SCREEN.h, transformOrigin: "0 0", transform: SCREEN.transform }}
+            >
+              <div className="relative z-10 flex h-12 items-center justify-between px-7 pt-1 text-[0.74rem] font-semibold">
+                <span>9:41</span>
+                <span aria-hidden="true" className="flex items-center gap-1">
+                  <svg viewBox="0 0 18 12" className="h-2.5 w-4" fill="currentColor"><rect x="0" y="8" width="3" height="4" rx="1" /><rect x="5" y="5" width="3" height="7" rx="1" /><rect x="10" y="2.5" width="3" height="9.5" rx="1" /><rect x="15" y="0" width="3" height="12" rx="1" /></svg>
+                  <svg viewBox="0 0 26 12" className="h-2.5 w-5" fill="none" stroke="currentColor"><rect x="0.5" y="0.5" width="22" height="11" rx="3" opacity="0.4" /><rect x="2" y="2" width="16" height="8" rx="1.8" fill="currentColor" stroke="none" /><path d="M24.5 4v4" strokeLinecap="round" opacity="0.4" /></svg>
+                </span>
               </div>
+              <PhoneScreens />
+              <div className="flex justify-center bg-white/90 pb-2">
+                <span aria-hidden="true" className="h-[5px] w-28 rounded-full bg-deep" />
+              </div>
+              {/* reflet de la vitre */}
+              <div aria-hidden="true" className="screen-glare pointer-events-none absolute inset-0 z-20" />
             </div>
+            {/* l'appareil par-dessus : cadre, bordure noire et Dynamic Island */}
+            <Image src="/iphone-mockup.png" alt="" width={PHONE_STAGE.w} height={PHONE_STAGE.h} priority unoptimized className="pointer-events-none absolute inset-0 select-none" />
           </div>
         </div>
-        </div>
       </Tilt>
-
     </div>
   );
 }
