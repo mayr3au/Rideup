@@ -8,6 +8,7 @@ export const SITE_PHOTOS = {
   progression: "/photos/progression.jpg", // rider qui consulte son retour sur la plage
   spots: "/photos/spots.jpg", // vue aérienne d'un spot de kite
   cours: "/photos/cours.jpg", // fenêtre de vent dessinée dans le sable
+  coach: "/photos/coach.jpg", // moniteur qui commente une vidéo sur tablette
 };
 
 export const PHOTOS = {
@@ -34,9 +35,9 @@ export const SPORT_PHOTOS: Record<SportId, string> = {
 
 /** Cadrage des photos dans les cartes verticales (le rider reste au centre). */
 export const SPORT_PHOTO_POS: Record<SportId, string> = {
-  kitesurf: "62% 50%",
+  kitesurf: "48% 50%",
   wingfoil: "50% 50%",
-  foil: "40% 50%",
+  foil: "52% 50%",
   surf: "43% 50%",
   wakeboard: "54% 50%",
 };

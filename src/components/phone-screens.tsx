@@ -133,7 +133,7 @@ function AnalyseScreen() {
   return (
     <div>
       <div className="relative mx-3 h-52 overflow-hidden rounded-[22px] lg:h-60">
-        <Image src="/sports/kite-v1.jpg" alt="" fill sizes="310px" className="object-cover object-[62%_50%]" />
+        <Image src="/sports/kite-v1.jpg" alt="" fill sizes="310px" className="object-cover object-[48%_50%]" />
         <div className="photo-veil absolute inset-0" />
         <div aria-hidden="true" className="sweep absolute inset-x-0 top-0 h-12 bg-gradient-to-b from-transparent via-brand/40 to-transparent" />
         <span aria-hidden="true" className="absolute left-3 top-3 h-4 w-4 rounded-tl-md border-l-2 border-t-2 border-white/80" />

@@ -317,7 +317,11 @@ function Coachs() {
               figures toute l&apos;année, entre deux sessions.
             </p>
           </Reveal>
-          <ul className="mt-8 grid gap-4 sm:grid-cols-2">
+          <Reveal delay={0.1} className="relative mt-8 aspect-[16/9] overflow-hidden rounded-[22px]">
+            <Image src={SITE_PHOTOS.coach} alt="Un moniteur commente la vidéo d'un rider sur une tablette" fill sizes="(min-width: 1024px) 560px, 100vw" className="object-cover object-[55%_40%]" />
+            <span className="tag-glass absolute bottom-3 left-3 rounded-full px-3 py-1 text-xs font-bold">Moniteur diplômé d&apos;État</span>
+          </Reveal>
+          <ul className="mt-4 grid gap-4 sm:grid-cols-2">
             {proofs.map((p, i) => (
               <Reveal as="li" key={p.title} delay={i * 0.08} className="panel p-5">
                 <span aria-hidden="true" className="flex h-9 w-9 items-center justify-center rounded-xl bg-brand-light text-brand">
