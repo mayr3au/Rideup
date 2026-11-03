@@ -37,7 +37,7 @@ export const TEAM: TeamCoach[] = [
     bio: "Kickers, modules et premiers inverts : il te fait progresser à chaque tour de câble.",
     instagram: "endy_beltrame",
     photo: "/coachs/coach-endy.jpg",
-    avatar: "/coachs/avatar-endy.jpg",
+    avatar: "/coachs/avatar-endy-2.jpg",
     pos: "50% 40%",
   },
   {
