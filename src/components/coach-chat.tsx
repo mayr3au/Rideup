@@ -50,6 +50,7 @@ export function CoachChat({
   suggestions,
   remaining: initialRemaining,
   prefill,
+  autoSend = false,
 }: {
   initial: Msg[];
   clearAction: () => Promise<void>;
@@ -61,6 +62,8 @@ export function CoachChat({
   remaining?: number | null;
   /** Question pré-remplie (lien « En parler au coach » depuis une analyse) */
   prefill?: string;
+  /** Envoie tout de suite la question pré-remplie (venue de l'accueil) */
+  autoSend?: boolean;
 }) {
   const [messages, setMessages] = useState<Msg[]>(initial);
   const [input, setInput] = useState(prefill ?? "");
@@ -83,9 +86,17 @@ export function CoachChat({
     el.style.height = `${Math.min(el.scrollHeight, 160)}px`;
   }, [input]);
 
+  const autoSent = useRef(false);
   useEffect(() => {
-    if (prefill) inputRef.current?.focus();
-  }, [prefill]);
+    if (!prefill) return;
+    if (autoSend && !autoSent.current) {
+      autoSent.current = true;
+      // On retire la question de l'adresse pour ne pas la renvoyer en rechargeant la page
+      window.history.replaceState(null, "", "/coach?vue=chat");
+      send(prefill);
+    } else inputRef.current?.focus();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [prefill, autoSend]);
 
   async function send(text: string) {
     const message = text.trim();
@@ -142,15 +153,26 @@ export function CoachChat({
 
   return (
     <div className="panel flex h-[calc(100dvh-15rem)] min-h-[420px] flex-col lg:h-[70dvh]">
-      <div className="flex items-center justify-between border-b border-line px-5 py-3">
-        <div>
-          <h2 className="text-xl font-bold">Questions rapides</h2>
-          <p className="text-xs text-slate">{sportName} · réponse immédiate</p>
-          {remaining != null && (
-            <p className={`text-xs ${remaining <= 5 ? "font-semibold text-danger" : "text-slate"}`}>
-              {remaining} message{remaining > 1 ? "s" : ""} restant{remaining > 1 ? "s" : ""} sur la période
+      <div className="flex items-center justify-between gap-3 border-b border-line px-4 py-3 sm:px-5">
+        <div className="flex min-w-0 items-center gap-3">
+          <span className="relative flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-brand to-lagoon text-white shadow-md" aria-hidden="true">
+            <AiIcon className="h-6 w-6" />
+            <span className="absolute -bottom-0.5 -right-0.5 h-3.5 w-3.5 rounded-full border-2 border-white bg-emerald-500" />
+          </span>
+          <div className="min-w-0">
+            <h2 className="flex items-center gap-2 whitespace-nowrap text-lg font-bold leading-tight">
+              Coach IA<span className="hidden sm:inline"> {sportName.toLowerCase()}</span>
+              <span className="rounded-full bg-emerald-100 px-2 py-0.5 text-[0.7rem] font-bold text-emerald-800">En ligne 24/7</span>
+            </h2>
+            <p className="text-xs text-slate">
+              Répond en quelques secondes
+              {remaining != null && (
+                <span className={remaining <= 5 ? "font-semibold text-danger" : ""}>
+                  {" "}· {remaining} message{remaining > 1 ? "s" : ""} restant{remaining > 1 ? "s" : ""}
+                </span>
+              )}
             </p>
-          )}
+          </div>
         </div>
         {messages.length > 0 && (
           <form action={async () => { await clearAction(); setMessages([]); }}>
@@ -162,14 +184,41 @@ export function CoachChat({
       <div className="flex-1 space-y-4 overflow-y-auto px-5 py-5" aria-live="polite">
         {messages.length === 0 && (
           <div>
-            <p className="text-slate">Pose une question sur une figure, ton matériel ou ta progression.</p>
-            <div className="mt-4 flex flex-col items-start gap-2">
+            <div className="rounded-2xl bg-gradient-to-br from-brand-light to-white p-4 ring-1 ring-brand/15">
+              <p className="font-bold text-deep">Ton coach de poche, jour et nuit.</p>
+              <p className="mt-1 text-sm text-slate">
+                Une IA entraînée pour coacher le {sportName.toLowerCase()} : technique, sécurité, matériel. Elle connaît ton niveau, ta
+                roadmap et les retours de tes coachs.
+              </p>
+              <ul className="mt-3 grid grid-cols-2 gap-2 text-[0.82rem] font-semibold text-deep">
+                {[
+                  ["🎯", "Débloquer une figure"],
+                  ["🪁", "Choisir ta taille d'aile"],
+                  ["🛟", "Rider en sécurité"],
+                  ["📋", "Préparer ta session"],
+                ].map(([e, t]) => (
+                  <li key={t} className="flex items-center gap-1.5 rounded-xl bg-white px-2.5 py-2 shadow-sm">
+                    <span aria-hidden="true">{e}</span>
+                    {t}
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <p className="mt-5 text-sm font-semibold text-slate">Essaie une de ces questions :</p>
+            <div className="mt-2 flex flex-col items-start gap-2">
               {(suggestions?.length ? suggestions : SUGGESTIONS[sport]).map((s) => (
                 <button key={s} onClick={() => send(s)} className="min-h-10 rounded-xl border border-line bg-spray px-4 py-2 text-left text-[0.95rem] hover:border-brand hover:bg-brand-light">
                   {s}
                 </button>
               ))}
             </div>
+            <p className="mt-5 text-xs text-slate">
+              Pour un avis sur ta vraie figure, filmée,{" "}
+              <Link href="/analyse" className="font-semibold text-lagoon">
+                envoie ta vidéo à un coach diplômé
+              </Link>
+              .
+            </p>
           </div>
         )}
         {messages.map((m, i) => {
@@ -184,6 +233,9 @@ export function CoachChat({
           if (!text) return null;
           return (
             <div key={i} className="max-w-[90%]">
+              <p className="mb-1 flex items-center gap-1 text-xs font-semibold text-brand">
+                <AiIcon className="h-3.5 w-3.5" /> Coach IA
+              </p>
               <div className="rounded-lg rounded-bl-md bg-salt px-4 py-3">
                 <RichText text={text} />
               </div>
@@ -249,7 +301,7 @@ export function CoachChat({
           }}
           rows={1}
           maxLength={2000}
-          placeholder="Écris ta question…"
+          placeholder="Pose ta question au coach IA…"
           className="field max-h-40 flex-1 resize-none"
         />
         <button disabled={pending || !input.trim()} className="btn btn-primary self-end">
@@ -257,5 +309,13 @@ export function CoachChat({
         </button>
       </form>
     </div>
+  );
+}
+
+function AiIcon({ className = "h-5 w-5" }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" className={className} fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d="M12 3l1.8 4.7L18.5 9.5l-4.7 1.8L12 16l-1.8-4.7L5.5 9.5l4.7-1.8zM19 15l.8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8z" />
+    </svg>
   );
 }

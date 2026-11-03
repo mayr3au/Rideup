@@ -14,8 +14,8 @@ import { clearChat, setTrickStatus } from "./actions";
 
 export const metadata: Metadata = { title: "Coach" };
 
-export default async function CoachPage({ searchParams }: { searchParams: Promise<{ vue?: string; q?: string }> }) {
-  const { vue, q } = await searchParams;
+export default async function CoachPage({ searchParams }: { searchParams: Promise<{ vue?: string; q?: string; go?: string }> }) {
+  const { vue, q, go } = await searchParams;
   const { supabase, profile } = await requireSession();
   if (!profile.onboarded) redirect("/profil");
 
@@ -162,7 +162,7 @@ export default async function CoachPage({ searchParams }: { searchParams: Promis
           </div>
         </section>
 
-        <section className={`lg:sticky lg:top-32 lg:self-start ${chatFirst ? "" : "hidden lg:block"}`}>
+        <section className={`lg:sticky lg:top-32 lg:self-start ${chatFirst ? "lg:order-first" : "hidden lg:block"}`}>
           <CoachChat
             initial={messages ?? []}
             clearAction={clearChat}
@@ -171,6 +171,7 @@ export default async function CoachPage({ searchParams }: { searchParams: Promis
             suggestions={suggestions.slice(0, 4)}
             remaining={quota.remaining}
             prefill={q?.slice(0, 500)}
+            autoSend={go === "1"}
           />
         </section>
       </div>
