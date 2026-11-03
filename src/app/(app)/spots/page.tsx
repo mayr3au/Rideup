@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { requireSession, effectivePlan } from "@/lib/auth";
 import { hasSpotFinder } from "@/lib/plans";
 import { getConditions } from "@/lib/weather";
+import { FORECAST_ATTRIBUTION, getLiveWinds, LIVE_ATTRIBUTION } from "@/lib/live-wind";
 import { distanceKm, rateHour, summarizeDay, type Rider } from "@/lib/wind";
 import { activeSport, gearSizes, levelFor } from "@/lib/rider";
 import { SPORTS } from "@/lib/sports";
@@ -75,7 +76,11 @@ export default async function SpotsPage({ searchParams }: { searchParams: Promis
   let forecastError = false;
   if (nearby.length) {
     try {
-      const forecasts = await getConditions(nearby, S.spot === "waves");
+      // Prévisions et vent mesuré en direct (sports de vent, spots les plus proches) en parallèle
+      const [forecasts, live] = await Promise.all([
+        getConditions(nearby, S.spot === "waves"),
+        S.spot === "wind" ? getLiveWinds(nearby) : Promise.resolve(new Map()),
+      ]);
       spots = nearby.map((s, i) => {
         const hours = forecasts[i] ?? [];
         const dates = [...new Set(hours.map((h) => h.time.slice(0, 10)))].slice(0, 7);
@@ -83,6 +88,7 @@ export default async function SpotsPage({ searchParams }: { searchParams: Promis
           spot: s,
           distance: Math.round(s.distance),
           favorite: favorites.has(s.id),
+          live: live.get(s.id) ?? null,
           days: dates.map((d) => summarizeDay(hours, d, s, rider)),
           hours: hours
             .filter((h) => {
@@ -177,7 +183,8 @@ export default async function SpotsPage({ searchParams }: { searchParams: Promis
       )}
 
       <p className="mt-8 text-sm text-slate">
-        Prévisions Open-Meteo, indicatives. Vérifie toujours les conditions sur place et l&apos;avis des locaux avant d&apos;y aller.
+        {FORECAST_ATTRIBUTION} {S.spot === "wind" && LIVE_ATTRIBUTION} Vérifie toujours les conditions sur place et
+        l&apos;avis des locaux avant d&apos;y aller.
       </p>
     </div>
   );

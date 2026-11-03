@@ -3,7 +3,8 @@
 import dynamic from "next/dynamic";
 import { useMemo, useState, useTransition } from "react";
 import { toggleFavorite } from "@/app/(app)/spots/actions";
-import { compass, ORIENTATION_LABEL, weatherLabel, type DaySummary, type HourForecast } from "@/lib/wind";
+import { compass, confidenceFor, ORIENTATION_LABEL, weatherLabel, type Confidence, type DaySummary, type HourForecast } from "@/lib/wind";
+import type { LiveWind } from "@/lib/live-wind";
 import type { SpotKind } from "@/lib/sports";
 import type { Spot } from "@/lib/types";
 import { WindArrow } from "./wind-arrow";
@@ -20,6 +21,8 @@ export type SpotData = {
   spot: Spot;
   distance: number;
   favorite: boolean;
+  /** Vent mesuré en direct à la balise la plus proche (sports de vent) */
+  live?: LiveWind | null;
   days: DaySummary[];
   hours: RatedHour[];
 };
@@ -48,30 +51,66 @@ function qualityClass(q: number) {
   return "bg-line";
 }
 
-/** Le chiffre clé affiché à droite d'un spot. */
-function Headline({ d, kind }: { d: DaySummary; kind: SpotKind }) {
-  if (kind === "waves")
-    return (
-      <div className="shrink-0 text-right">
-        <p className="text-2xl font-extrabold">
-          {fr1(d.avgWave)}
-          <span className="text-sm font-semibold text-slate"> m</span>
-        </p>
-        <p className="text-sm font-semibold text-lagoon">{d.period ? `${d.period} s` : ""}</p>
-      </div>
-    );
-  if (kind === "cable")
-    return <span className="shrink-0 rounded-full bg-brand-light px-3 py-1 text-sm font-semibold text-lagoon">Conseillé</span>;
+/* ───────── Verdict en un mot, fiabilité et mesure en direct : ce que le rider lit en premier ───────── */
+
+type Verdict = { key: "top" | "bon" | "juste" | "non"; label: string; className: string };
+
+function verdict(d: DaySummary | undefined, kind: SpotKind): Verdict {
+  const q = quality(d);
+  if (!d || q === 0) return { key: "non", label: kind === "waves" ? "Pas surfable" : kind === "cable" ? "Bof" : "Pas ridable", className: "bg-raised text-slate" };
+  if (kind === "cable") return { key: "bon", label: "Conseillé", className: "bg-brand-light text-lagoon" };
+  if (q >= 0.6) return { key: "top", label: kind === "waves" ? "Ça rentre" : "Ça envoie", className: "bg-brand text-white" };
+  if (q >= 0.3) return { key: "bon", label: "Bon plan", className: "bg-brand/15 text-lagoon" };
+  return { key: "juste", label: "Court créneau", className: "bg-brand-light text-lagoon" };
+}
+
+const CONFIDENCE: Record<Confidence, { label: string; long: string; dot: string }> = {
+  haute: { label: "Prévision sûre", long: "Les modèles météo sont d'accord", dot: "bg-emerald-500" },
+  moyenne: { label: "À confirmer", long: "Les modèles divergent un peu : revérifie la veille", dot: "bg-amber-400" },
+  faible: { label: "Incertain", long: "Les modèles ne sont pas d'accord : revérifie le matin même", dot: "bg-danger" },
+};
+
+function ConfidenceChip({ d, dayIdx }: { d: DaySummary | undefined; dayIdx: number }) {
+  const c = d ? confidenceFor(d.spread, dayIdx, d.avgWind) : null;
+  if (!c) return null;
   return (
-    <div className="shrink-0 text-right">
-      <p className="flex items-center justify-end gap-1 text-2xl font-extrabold">
-        {d.avgWind}
-        <span className="text-sm font-semibold text-slate">nds</span>
-        {d.dir != null && <WindArrow deg={d.dir} />}
-      </p>
-      <p className="text-sm font-semibold text-lagoon">{d.gear ? `${cap(d.gearName ?? "")} ${String(d.gear).replace(".", ",")} m²` : ""}</p>
-    </div>
+    <span className="inline-flex items-center gap-1.5 rounded-full bg-raised px-2 py-0.5 text-xs font-semibold text-deep" title={CONFIDENCE[c].long}>
+      <span aria-hidden="true" className={`h-2 w-2 rounded-full ${CONFIDENCE[c].dot}`} />
+      {CONFIDENCE[c].label}
+    </span>
   );
+}
+
+function LiveChip({ live }: { live: LiveWind | null | undefined }) {
+  if (!live) return null;
+  return (
+    <span
+      className="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-2 py-0.5 text-xs font-semibold text-emerald-700"
+      title={`Balise ${live.station}, à ${live.distanceKm.toFixed(1).replace(".", ",")} km, il y a ${live.minutesAgo} min`}
+    >
+      <span aria-hidden="true" className="relative flex h-2 w-2">
+        <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-500 opacity-60" />
+        <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-500" />
+      </span>
+      {live.wind} nds mesurés{live.dir != null ? ` de ${compass(live.dir)}` : ""}
+    </span>
+  );
+}
+
+/** La journée en une ligne : force, rafales, orientation, créneau, matériel. */
+function oneLiner(d: DaySummary, kind: SpotKind) {
+  if (kind === "waves")
+    return [`${fr1(d.avgWave)} m`, d.period ? `${d.period} s` : null, d.window ? `${d.window.from} – ${d.window.to}` : null].filter(Boolean).join(" · ");
+  if (kind === "cable") return d.window ? `Météo favorable de ${d.window.from} à ${d.window.to}` : "Météo favorable";
+  return [
+    `${d.avgWind} nds`,
+    d.maxGust && d.maxGust > (d.avgWind ?? 0) + 3 ? `rafales ${d.maxGust}` : null,
+    d.orientation ? ORIENTATION_LABEL[d.orientation].toLowerCase() : null,
+    d.window ? `${d.window.from} – ${d.window.to}` : null,
+    d.gear ? `${d.gearName} ${String(d.gear).replace(".", ",")} m²` : null,
+  ]
+    .filter(Boolean)
+    .join(" · ");
 }
 
 /** Ligne de conditions d'un créneau, en clair. */
@@ -165,7 +204,7 @@ export function SpotFinder({
               {` · ${bestPlan.s.distance} km`}
             </span>
             <span className="mt-3 inline-flex items-center gap-2 rounded-full bg-white/20 px-3 py-1 text-sm font-semibold">
-              {conditionsText(bestPlan.s.days[bestPlan.i], kind)}
+              {oneLiner(bestPlan.s.days[bestPlan.i], kind)}
             </span>
             <span aria-hidden="true" className="absolute right-5 top-1/2 -translate-y-1/2 text-3xl opacity-80">→</span>
           </button>
@@ -253,27 +292,36 @@ export function SpotFinder({
                     return (
                       <li key={s.spot.id}>
                         <div className={`panel p-4 ${rank === 0 && good && filter !== "favoris" ? "ring-2 ring-brand" : ""}`}>
-                          <button onClick={() => open(s.spot.id)} className="flex w-full items-center gap-3 text-left">
-                            <div className="min-w-0 flex-1">
-                              <p className="truncate font-semibold">
-                                {favs.has(s.spot.id) && <span aria-label="favori" className="text-brand">★ </span>}
-                                {s.spot.name}
-                              </p>
-                              <p className="text-sm text-slate">
-                                {s.distance} km
-                                {kind !== "cable" && ` · ${WATER[s.spot.water]}`}
-                              </p>
-                              {good && d.window && kind !== "cable" && (
-                                <span className="mt-1 inline-block rounded-lg bg-brand-light px-2 py-0.5 text-xs font-semibold text-lagoon">
-                                  {d.window.from} – {d.window.to}
-                                </span>
-                              )}
-                              {!good && d?.warnings[0] && <p className="text-sm text-slate">{d.warnings[0]}</p>}
+                          <button onClick={() => open(s.spot.id)} className="w-full text-left">
+                            <div className="flex items-start gap-3">
+                              <div className="min-w-0 flex-1">
+                                <p className="truncate text-lg font-bold">
+                                  {favs.has(s.spot.id) && <span aria-label="favori" className="text-brand">★ </span>}
+                                  {s.spot.name}
+                                </p>
+                                <p className="text-sm text-slate">
+                                  {s.distance} km
+                                  {kind !== "cable" && ` · ${WATER[s.spot.water]}`}
+                                </p>
+                              </div>
+                              {(() => {
+                                const v = verdict(d, kind);
+                                return <span className={`shrink-0 rounded-full px-3 py-1 text-sm font-bold ${v.className}`}>{v.label}</span>;
+                              })()}
                             </div>
                             {good ? (
-                              <Headline d={d} kind={kind} />
+                              <p className="mt-2 flex items-center gap-1.5 font-semibold text-deep">
+                                {kind === "wind" && d.dir != null && <WindArrow deg={d.dir} size={16} />}
+                                {oneLiner(d, kind)}
+                              </p>
                             ) : (
-                              <span className="shrink-0 rounded-full bg-raised px-3 py-1 text-sm text-slate">Pas {OK_WORD[kind]}</span>
+                              d?.warnings[0] && <p className="mt-2 text-sm text-slate">{d.warnings[0]}</p>
+                            )}
+                            {(good || (dayIdx === 0 && s.live)) && (
+                              <div className="mt-2 flex flex-wrap gap-1.5">
+                                {good && <ConfidenceChip d={d} dayIdx={dayIdx} />}
+                                {dayIdx === 0 && <LiveChip live={s.live} />}
+                              </div>
                             )}
                           </button>
 
@@ -401,6 +449,8 @@ function SpotDetail({
         </button>
       </div>
 
+      <DayVerdict d={d} dayIdx={dayIdx} date={date} kind={kind} live={dayIdx === 0 ? data.live : null} />
+
       {/* Semaine du spot */}
       {kind !== "cable" && (
         <div className="mt-4 grid grid-cols-7 gap-1.5" role="group" aria-label="Choisir le jour">
@@ -430,47 +480,123 @@ function SpotDetail({
         <Info label="Météo" value={mid ? `${weatherLabel(mid.code)}, ${Math.round(mid.temp)} °C` : "–"} />
       </dl>
 
-      {d && d.goodHours > 0 ? (
-        <div className="mt-5 rounded-2xl bg-brand-light p-4">
-          {kind === "wind" && (
-            <>
-              <p className="font-semibold">
-                Ridable de {d.window!.from} à {d.window!.to} · {d.avgWind} nœuds de {compass(d.dir!)} ({ORIENTATION_LABEL[d.orientation!]})
-              </p>
-              <p className="mt-1">
-                {d.gear && (
-                  <>
-                    Sors ta <span className="font-semibold">{d.gearName} de {String(d.gear).replace(".", ",")} m²</span>.{" "}
-                  </>
-                )}
-                Rafales jusqu&apos;à {d.maxGust} nœuds.
-              </p>
-            </>
-          )}
-          {kind === "waves" && (
-            <>
-              <p className="font-semibold">
-                Surfable de {d.window!.from} à {d.window!.to} · {fr1(d.avgWave)} m, période {d.period} s
-              </p>
-              <p className="mt-1">
-                Vent {d.avgWind} nœuds de {compass(d.dir!)}
-                {d.orientation === "offshore" || d.orientation === "side-off" ? " : offshore, vagues propres." : "."}
-              </p>
-            </>
-          )}
-          {kind === "cable" && <p className="font-semibold">Bonne journée pour rider de {d.window!.from} à {d.window!.to}.</p>}
-          {d.warnings.length > 0 && <p className="mt-1 text-sm">{d.warnings.join(" · ")}</p>}
-        </div>
-      ) : (
-        <p className="mt-5 rounded-2xl bg-raised p-4">
-          Pas de bon créneau pour toi ce jour-là{d?.warnings[0] ? ` : ${d.warnings[0].toLowerCase()}` : ""}.
-        </p>
-      )}
-
       {s.notes && <p className="mt-4 text-slate">{s.notes}</p>}
 
       {kind === "wind" && <WindBars hours={hours} />}
       {kind === "waves" && <WaveBars hours={hours} />}
+    </div>
+  );
+}
+
+/** Le verdict du jour, en clair : y aller ou pas, quand, avec quoi, et à quel point c'est sûr. */
+function DayVerdict({
+  d,
+  dayIdx,
+  date,
+  kind,
+  live,
+}: {
+  d: DaySummary | undefined;
+  dayIdx: number;
+  date: string;
+  kind: SpotKind;
+  live: LiveWind | null | undefined;
+}) {
+  const v = verdict(d, kind);
+  const conf = d ? confidenceFor(d.spread, dayIdx, d.avgWind) : null;
+  const good = d && d.goodHours > 0;
+  const models = d?.models ? Object.entries(d.models) : [];
+  const MODEL_SHORT: Record<string, string> = {
+    meteofrance_seamless: "AROME",
+    icon_seamless: "ICON",
+    ecmwf_ifs025: "ECMWF",
+    gfs_seamless: "GFS",
+  };
+
+  return (
+    <section className={`mt-5 rounded-3xl p-5 ${good ? "bg-brand-light" : "bg-raised"}`} aria-label="Verdict du jour">
+      <div className="flex items-center justify-between gap-3">
+        <p className="text-sm font-semibold text-slate">{cap(dayLabel(date, dayIdx))}</p>
+        <span className={`rounded-full px-3 py-1 text-sm font-bold ${v.className}`}>{v.label}</span>
+      </div>
+
+      {good ? (
+        <>
+          <p className="mt-2 text-2xl font-extrabold leading-tight">
+            {kind === "cable" ? "Bonne journée pour rider" : "Vas-y"} de {d.window!.from} à {d.window!.to}
+          </p>
+          {kind !== "cable" && (
+            <dl className="mt-4 grid grid-cols-3 gap-2 text-center">
+              {kind === "wind" ? (
+                <>
+                  <Tile label="Vent" value={`${d.avgWind} nds`} sub={d.maxGust ? `rafales ${d.maxGust}` : undefined} icon={d.dir != null ? <WindArrow deg={d.dir} size={16} /> : null} />
+                  <Tile label="Direction" value={d.dir != null ? compass(d.dir) : "–"} sub={d.orientation ? ORIENTATION_LABEL[d.orientation] : undefined} />
+                  <Tile label="À sortir" value={d.gear ? `${String(d.gear).replace(".", ",")} m²` : "–"} sub={d.gearName ?? undefined} />
+                </>
+              ) : (
+                <>
+                  <Tile label="Houle" value={`${fr1(d.avgWave)} m`} />
+                  <Tile label="Période" value={d.period ? `${d.period} s` : "–"} />
+                  <Tile label="Vent" value={d.avgWind != null ? `${d.avgWind} nds` : "–"} sub={d.orientation === "offshore" || d.orientation === "side-off" ? "offshore : propre" : d.orientation ? ORIENTATION_LABEL[d.orientation] : undefined} />
+                </>
+              )}
+            </dl>
+          )}
+          {d.warnings.length > 0 && <p className="mt-3 text-sm">⚠ {d.warnings.join(" · ")}</p>}
+        </>
+      ) : (
+        <p className="mt-2 text-lg font-semibold">
+          Pas de bon créneau pour toi{d?.warnings[0] ? ` : ${d.warnings[0].toLowerCase()}` : "."}
+        </p>
+      )}
+
+      {/* Fiabilité : ce que disent les modèles */}
+      {conf && kind !== "cable" && (
+        <div className="mt-4 border-t border-deep/10 pt-3 text-sm">
+          <p className="flex items-center gap-2 font-semibold">
+            <span aria-hidden="true" className={`h-2.5 w-2.5 rounded-full ${CONFIDENCE[conf].dot}`} />
+            {CONFIDENCE[conf].label} · {CONFIDENCE[conf].long.charAt(0).toLowerCase() + CONFIDENCE[conf].long.slice(1)}
+          </p>
+          {models.length > 1 && (
+            <p className="mt-1 text-slate">
+              {models.map(([m, kn]) => `${MODEL_SHORT[m] ?? m} ${kn}`).join(" · ")} nds
+            </p>
+          )}
+        </div>
+      )}
+
+      {/* Vent mesuré en ce moment */}
+      {live && (
+        <div className="mt-3 flex items-center gap-3 rounded-2xl bg-white p-3 text-sm">
+          <span aria-hidden="true" className="relative flex h-2.5 w-2.5 shrink-0">
+            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-500 opacity-60" />
+            <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-emerald-500" />
+          </span>
+          <p className="min-w-0 flex-1">
+            <span className="font-bold">
+              {live.wind} nds mesurés{live.gust != null && live.gust > live.wind ? `, rafales ${live.gust}` : ""}
+              {live.dir != null && ` de ${compass(live.dir)}`}
+            </span>
+            <span className="block text-slate">
+              Balise {live.station} · à {live.distanceKm.toFixed(1).replace(".", ",")} km · il y a {live.minutesAgo} min
+            </span>
+          </p>
+          {live.dir != null && <WindArrow deg={live.dir} />}
+        </div>
+      )}
+    </section>
+  );
+}
+
+function Tile({ label, value, sub, icon }: { label: string; value: string; sub?: string; icon?: React.ReactNode }) {
+  return (
+    <div className="rounded-2xl bg-white px-2 py-3">
+      <dt className="text-xs text-slate">{label}</dt>
+      <dd className="mt-0.5 flex items-center justify-center gap-1 text-lg font-extrabold leading-tight">
+        {value}
+        {icon}
+      </dd>
+      {sub && <dd className="text-xs font-semibold text-lagoon">{sub}</dd>}
     </div>
   );
 }

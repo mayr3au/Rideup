@@ -18,7 +18,24 @@ export type HourForecast = {
   wave?: number | null;
   period?: number | null;
   swellDir?: number | null;
+  /** Écart entre le modèle le plus fort et le plus faible (nœuds) : plus il est petit, plus la prévision est sûre */
+  spread?: number | null;
+  /** Vent prévu par chaque modèle (nœuds arrondis) */
+  models?: Partial<Record<string, number>>;
 };
+
+export type Confidence = "haute" | "moyenne" | "faible";
+
+/** Fiabilité d'une prévision : écart entre modèles (relatif à la force du vent), plus prudente au-delà de 3 jours. */
+export function confidenceFor(spread: number | null, dayIndex: number, wind?: number | null): Confidence | null {
+  if (spread == null) return null;
+  // Écart toléré proportionnel au vent : 5 nœuds d'écart pèsent plus à 12 nœuds qu'à 30
+  const w = wind ?? 15;
+  let c: Confidence = spread <= Math.max(5, w * 0.25) ? "haute" : spread <= Math.max(9, w * 0.45) ? "moyenne" : "faible";
+  if (dayIndex >= 3 && c === "haute") c = "moyenne";
+  if (dayIndex >= 5 && c === "moyenne") c = "faible";
+  return c;
+}
 
 export type Rider = {
   sport: SportId;
@@ -264,6 +281,10 @@ export type DaySummary = {
   gearName: string | null;
   orientation: Orientation | null;
   warnings: string[];
+  /** Écart moyen entre modèles sur le créneau (ou sur la journée s'il n'y en a pas) */
+  spread: number | null;
+  /** Vent par modèle au milieu du créneau */
+  models: Partial<Record<string, number>> | null;
 };
 
 /** Résumé d'une journée (8 h – 20 h, heure locale du spot). */
@@ -303,6 +324,11 @@ export function summarizeDay(hours: HourForecast[], date: string, spot: SpotLike
     gearName: mid?.v.gearName ?? null,
     orientation: mid?.v.orientation ?? null,
     warnings: [...warnings].slice(0, 3),
+    spread: (() => {
+      const vals = (best.length ? best : rated).map((r) => r.h.spread).filter((x): x is number => x != null);
+      return vals.length ? Math.round(vals.reduce((a, b) => a + b, 0) / vals.length) : null;
+    })(),
+    models: (mid ?? rated[Math.floor(rated.length / 2)])?.h.models ?? null,
   };
 }
 
