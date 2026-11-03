@@ -229,10 +229,10 @@ function seed(): Store {
       { user_id: DEMO_ID, trick_id: "wing-decollage", status: "en-cours", updated_at: daysAgo(10) },
     ],
     coach_messages: [
-      { id: "c1", user_id: DEMO_ID, role: "user", content: "Je me fais arracher vers l'avant sur mes kiteloops, je fais quoi ?", created_at: daysAgo(2, 18) },
+      { id: "c1", user_id: DEMO_ID, sport: "kitesurf", role: "user", content: "Je me fais arracher vers l'avant sur mes kiteloops, je fais quoi ?", created_at: daysAgo(2, 18) },
       {
         id: "c2",
-        user_id: DEMO_ID,
+        user_id: DEMO_ID, sport: "kitesurf",
         role: "assistant",
         content:
           "Sur ta dernière analyse, tu lances la boucle après le sommet du saut : le kite tire quand tu redescends déjà, d'où l'arrachement.\n\n1. Tire la barre dès que tu arrives au sommet, pas après.\n2. Garde la barre collée aux hanches pendant toute la boucle.\n3. Avant de reboucler en l'air, fais 5 downloops en navigation pour sentir la traction.\n\nCommence en 15-18 nœuds réguliers avec ton 9 m.",

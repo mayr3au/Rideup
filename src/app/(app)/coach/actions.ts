@@ -4,6 +4,8 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { z } from "zod";
 import { requireSession } from "@/lib/auth";
+import { activeSport } from "@/lib/rider";
+import { clearThread } from "@/lib/coach-thread";
 import { geocode } from "@/lib/weather";
 import { DISCIPLINES, sportDetailsSchema, summarizeQuiver, type RiderDetails } from "@/lib/rider-details";
 import { isSport, LEVEL_ORDER, SPORTS, TRICKS, type Level, type SportId } from "@/lib/sports";
@@ -131,8 +133,9 @@ export async function setTrickStatus(formData: FormData) {
   revalidatePath("/", "layout");
 }
 
-export async function clearChat() {
-  const { supabase, user } = await requireSession();
-  await supabase.from("coach_messages").delete().eq("user_id", user.id);
+/** Efface la discussion du coach IA pour ce sport seulement. */
+export async function clearChat(sport: string) {
+  const { supabase, user, profile } = await requireSession();
+  await clearThread(supabase, user.id, activeSport(profile, sport));
   revalidatePath("/coach");
 }

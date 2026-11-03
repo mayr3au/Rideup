@@ -5,7 +5,7 @@ import { streamCoachReply } from "@/lib/ai";
 import { activeSport } from "@/lib/rider";
 import { getRiderHistory, reserveQuota } from "@/lib/usage";
 import { createAdminClient } from "@/lib/supabase/admin";
-import type { CoachMessage } from "@/lib/types";
+import { loadThread, saveExchange } from "@/lib/coach-thread";
 
 export const maxDuration = 60;
 
@@ -36,23 +36,17 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  const [{ data: past }, history] = await Promise.all([
-    supabase
-      .from("coach_messages")
-      .select("role, content")
-      .order("created_at", { ascending: false })
-      .limit(16)
-      .returns<Pick<CoachMessage, "role" | "content">[]>(),
-    getRiderHistory(supabase, user.id),
-  ]);
+  const sport = activeSport(profile, parsed.data.sport);
+  // Une discussion par sport : le coach ne voit que l'historique du sport en cours
+  const [past, history] = await Promise.all([loadThread(supabase, sport, 16), getRiderHistory(supabase, user.id)]);
 
-  const messages = (past ?? []).reverse();
+  const messages = [...past];
   while (messages.length && messages[0].role !== "user") messages.shift();
   const db = createAdminClient();
 
   const stream = streamCoachReply(
     profile,
-    activeSport(profile, parsed.data.sport),
+    sport,
     history,
     [...messages, { role: "user", content: parsed.data.message }],
     async (reply) => {
@@ -60,11 +54,7 @@ export async function POST(request: NextRequest) {
         await db.from("usage_events").delete().eq("kind", "coach").eq("ref", ref);
         return;
       }
-      const now = Date.now();
-      await db.from("coach_messages").insert([
-        { user_id: user.id, role: "user", content: parsed.data.message, created_at: new Date(now).toISOString() },
-        { user_id: user.id, role: "assistant", content: reply, created_at: new Date(now + 1).toISOString() },
-      ]);
+      await saveExchange(db, user.id, sport, parsed.data.message, reply);
     },
   );
 
