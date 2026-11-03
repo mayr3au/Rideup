@@ -68,7 +68,7 @@ export default async function HistoryPage({ searchParams }: { searchParams: Prom
         <dl className="mt-5 grid grid-cols-3 gap-3">
           {[
             { label: "Analyses", value: String(notes.length) },
-            { label: "Moyenne", value: avg!.toFixed(1).replace(".", ",") },
+            { label: "Note moyenne", value: avg!.toFixed(1).replace(".", ",") },
             { label: "Meilleure", value: `${best}/10` },
           ].map((s) => (
             <div key={s.label} className="panel px-4 py-3">
@@ -134,7 +134,7 @@ export default async function HistoryPage({ searchParams }: { searchParams: Prom
                             {new Date(a.created_at).toLocaleDateString("fr-FR", { weekday: "short", day: "numeric", month: "short" })}
                             {photo ? (a.moment ? ` · ${a.moment}` : " · photo") : ` · vidéo ${(Number(a.seg_end) - Number(a.seg_start)).toFixed(0)} s`}
                           </span>
-                          {a.priorite && <span className="mt-0.5 line-clamp-1 text-sm text-slate">{a.priorite}</span>}
+                          {a.priorite && <span className="mt-0.5 line-clamp-1 block text-sm text-slate">{a.priorite}</span>}
                         </span>
                         <span className={`shrink-0 ${ok ? "text-xl font-extrabold text-brand" : "text-sm font-semibold text-slate"}`}>
                           {ok ? `${Number(a.note)}/10` : a.status === "erreur" ? "Annulée" : a.status === "en-cours" ? "Chez le coach" : "En attente"}
