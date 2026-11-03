@@ -75,5 +75,15 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: `Création de l'analyse impossible (${error.message}).` }, { status: 500 });
   }
 
-  return NextResponse.json({ id, videoPath });
+  // Autorisation d'envoi signée côté serveur : le navigateur dépose la vidéo directement dans le stockage,
+  // sans dépendre des règles d'accès du bucket (qui n'acceptaient pas les analyses au statut « envoi »).
+  const { data: upload, error: uploadError } = await createAdminClient().storage.from("clips").createSignedUploadUrl(videoPath);
+  if (uploadError || !upload) {
+    console.error("url d'envoi", uploadError);
+    await createAdminClient().from("video_analyses").update({ status: "erreur", counted: false, error: "Annulée" }).eq("id", id);
+    await releaseAnalysis(id);
+    return NextResponse.json({ error: `Envoi impossible pour le moment (${uploadError?.message ?? "stockage indisponible"}).` }, { status: 500 });
+  }
+
+  return NextResponse.json({ id, videoPath, uploadToken: upload.token });
 }
