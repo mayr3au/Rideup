@@ -18,6 +18,7 @@ export default function Home() {
       <Sports />
       <Steps />
       <Coachs />
+      <AiCoach />
       <Features />
       <PricingTeaser />
       <Faq />
@@ -445,6 +446,86 @@ function Coachs() {
           </Tilt>
           <p className="mt-3 text-center text-sm text-slate">Exemple de retour, tel que tu le reçois dans l&apos;appli.</p>
         </Reveal>
+      </div>
+    </section>
+  );
+}
+
+/* ───────────── 3 ter. Le coach IA, disponible 24 h/24 ───────────── */
+function AiCoach() {
+  const points = [
+    ["🎯", "Débloque une figure", "Pourquoi tu retombes, quoi changer à ta prochaine tentative."],
+    ["🪁", "Choisis ton matériel", "La taille d'aile ou de planche selon le vent, ton poids et ton niveau."],
+    ["🛟", "Ride en sécurité", "Vent offshore, courant, priorités : les bons réflexes avant d'aller à l'eau."],
+  ];
+  return (
+    <section className="mx-auto max-w-6xl px-5 pt-14 sm:px-6 sm:pt-20">
+      <div className="relative overflow-hidden rounded-[28px] bg-deep px-5 py-8 text-white sm:px-10 sm:py-12">
+        <div aria-hidden="true" className="pointer-events-none absolute -right-24 -top-24 h-80 w-80 rounded-full bg-brand/40 blur-3xl" />
+        <div aria-hidden="true" className="pointer-events-none absolute -bottom-24 left-10 h-64 w-64 rounded-full bg-lagoon/30 blur-3xl" />
+        <div className="relative grid items-center gap-10 lg:grid-cols-[1fr_0.9fr]">
+          <Reveal>
+            <p className="inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1 text-xs font-bold uppercase tracking-wider">
+              <span className="h-2 w-2 rounded-full bg-emerald-400" /> Disponible 24h/24
+            </p>
+            <h2 className="mt-3 text-3xl text-white sm:text-4xl">
+              Et entre deux vidéos, <em className="italic text-sky-300">ton coach IA</em> répond tout de suite
+            </h2>
+            <p className="mt-3 max-w-xl text-lg text-white/80">
+              Une IA entraînée pour coacher la glisse. Elle connaît ton sport, ton niveau, ton matériel et les retours de tes
+              coachs, et te répond en quelques secondes, même à 23 h la veille d&apos;une session.
+            </p>
+            <ul className="mt-6 space-y-3">
+              {points.map(([e, t, d]) => (
+                <li key={t} className="flex gap-3">
+                  <span aria-hidden="true" className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white/10 text-lg">{e}</span>
+                  <div>
+                    <p className="font-bold">{t}</p>
+                    <p className="text-sm text-white/75">{d}</p>
+                  </div>
+                </li>
+              ))}
+            </ul>
+            <Link href="/inscription" className="btn btn-kite mt-7">
+              Poser ma première question
+            </Link>
+          </Reveal>
+
+          {/* Aperçu de la conversation */}
+          <Reveal delay={0.15}>
+            <div className="mx-auto max-w-md rounded-[24px] bg-white p-4 text-deep shadow-2xl">
+              <div className="flex items-center gap-3 border-b border-line pb-3">
+                <span className="relative flex h-10 w-10 items-center justify-center rounded-2xl bg-gradient-to-br from-brand to-lagoon text-white" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M12 3l1.8 4.7L18.5 9.5l-4.7 1.8L12 16l-1.8-4.7L5.5 9.5l4.7-1.8zM19 15l.8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8z" />
+                  </svg>
+                  <span className="absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full border-2 border-white bg-emerald-500" />
+                </span>
+                <div>
+                  <p className="font-bold leading-tight">Coach IA kitesurf</p>
+                  <p className="text-xs text-emerald-700">En ligne · répond en quelques secondes</p>
+                </div>
+              </div>
+              <div className="space-y-3 pt-4 text-[0.92rem]">
+                <p className="ml-auto w-fit max-w-[85%] rounded-2xl rounded-br-md bg-brand px-3.5 py-2 text-white">
+                  Demain 22 nœuds à l&apos;Almanarre, je fais 72 kg. Je sors quelle aile ?
+                </p>
+                <div className="max-w-[90%] rounded-2xl rounded-bl-md bg-salt px-3.5 py-2.5">
+                  <p>
+                    Avec ton <strong>9 m²</strong> tu seras bien. Le vent est side-on l&apos;après-midi : parfait pour bosser ton{" "}
+                    <strong>backroll</strong>.
+                  </p>
+                  <p className="mt-1.5">Rappel de ton coach : regarde l&apos;aile au décollage, pas l&apos;horizon.</p>
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  {["Et si ça monte à 28 nœuds ?", "Un exercice pour le backroll ?"].map((o) => (
+                    <span key={o} className="rounded-full border border-brand px-3 py-1.5 text-xs font-medium text-brand">{o}</span>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </Reveal>
+        </div>
       </div>
     </section>
   );
