@@ -5,8 +5,9 @@ import { requireSession, effectivePlan } from "@/lib/auth";
 import { getQuota } from "@/lib/usage";
 import { normalizeResult } from "@/lib/analysis-result";
 import { errorLabel, LEVEL_LABELS, LEVEL_ORDER, SPORTS, tricksFor } from "@/lib/sports";
-import { activeSport } from "@/lib/rider";
-import type { CoachMessage, TrickProgress, VideoAnalysis } from "@/lib/types";
+import { activeSport, riderSports } from "@/lib/rider";
+import { loadThread } from "@/lib/coach-thread";
+import type { TrickProgress, VideoAnalysis } from "@/lib/types";
 import { courseForTrick } from "@/lib/courses";
 import { CoachChat } from "@/components/coach-chat";
 import { CoachTabs } from "@/components/coach-tabs";
@@ -25,14 +26,9 @@ export default async function CoachPage({ searchParams }: { searchParams: Promis
   const tricks = tricksFor(sport);
   const chatFirst = vue === "chat" || Boolean(q);
 
-  const [{ data: progress }, { data: messages }, { data: lastAnalysis }, quota] = await Promise.all([
+  const [{ data: progress }, messages, { data: lastAnalysis }, quota] = await Promise.all([
     supabase.from("trick_progress").select("*").returns<TrickProgress[]>(),
-    supabase
-      .from("coach_messages")
-      .select("role, content")
-      .order("created_at", { ascending: true })
-      .limit(60)
-      .returns<Pick<CoachMessage, "role" | "content">[]>(),
+    loadThread(supabase, sport, 60),
     supabase
       .from("video_analyses")
       .select("result")
@@ -52,9 +48,9 @@ export default async function CoachPage({ searchParams }: { searchParams: Promis
   const suggestions: string[] = [];
   const last = lastAnalysis?.result ? normalizeResult(lastAnalysis.result) : null;
   if (last?.erreurs[0]) suggestions.push(`Comment je corrige « ${errorLabel(last.erreurs[0].code).toLowerCase()} » ?`);
-  for (const t of tricks.filter((t) => status.get(t.id) === "en-cours").slice(0, 2)) suggestions.push(`Comment je débloque mon ${t.name.toLowerCase()} ?`);
+  for (const t of tricks.filter((t) => status.get(t.id) === "en-cours").slice(0, 2)) suggestions.push(`Je bloque sur « ${t.name} », tu me conseilles quoi ?`);
   const next = tricks.find((t) => t.id === firstOpen);
-  if (next && !suggestions.some((x) => x.includes(next.name.toLowerCase()))) suggestions.push(`Comment je prépare mon ${next.name.toLowerCase()} ?`);
+  if (next && !suggestions.some((x) => x.includes(next.name))) suggestions.push(`Comment je prépare « ${next.name} » ?`);
 
   return (
     <div>
@@ -193,8 +189,10 @@ export default async function CoachPage({ searchParams }: { searchParams: Promis
 
         <section className={`lg:sticky lg:top-32 lg:self-start ${chatFirst ? "lg:order-first" : "hidden lg:block"}`}>
           <CoachChat
-            initial={messages ?? []}
-            clearAction={clearChat}
+            key={sport}
+            initial={messages}
+            clearAction={clearChat.bind(null, sport)}
+            sports={riderSports(profile)}
             sport={sport}
             sportName={SPORTS[sport].name}
             suggestions={suggestions.slice(0, 4)}

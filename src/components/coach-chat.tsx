@@ -1,9 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useTransition } from "react";
 import { RichText } from "./rich-text";
-import type { SportId } from "@/lib/sports";
+import { SPORTS, type SportId } from "@/lib/sports";
+import { switchSport } from "@/app/(app)/coach/actions";
 
 type Msg = { role: "user" | "assistant"; content: string };
 
@@ -45,6 +46,7 @@ function visibleText(content: string, streaming: boolean) {
 export function CoachChat({
   initial,
   clearAction,
+  sports = [],
   sport,
   sportName,
   suggestions,
@@ -54,6 +56,8 @@ export function CoachChat({
 }: {
   initial: Msg[];
   clearAction: () => Promise<void>;
+  /** Sports du rider : une discussion séparée par sport */
+  sports?: SportId[];
   sport: SportId;
   sportName: string;
   /** Questions proposées, adaptées aux figures en cours et à la dernière analyse */
@@ -71,6 +75,7 @@ export function CoachChat({
   const [remaining, setRemaining] = useState(initialRemaining ?? null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const [pending, setPending] = useState(false);
+  const [switching, startSwitch] = useTransition();
   const [error, setError] = useState<{ text: string; upgrade?: boolean } | null>(null);
   const endRef = useRef<HTMLDivElement>(null);
 
@@ -176,9 +181,37 @@ export function CoachChat({
         </div>
         {messages.length > 0 && (
           <form action={async () => { await clearAction(); setMessages([]); }}>
-            <button className="text-sm text-slate hover:text-deep">Effacer</button>
+            <button className="text-sm text-slate hover:text-deep" title={`Effacer la discussion ${sportName.toLowerCase()}`}>Effacer</button>
           </form>
         )}
+      </div>
+
+      {/* Une discussion par sport : le fil de chaque sport est gardé à part */}
+      <div className="flex items-center gap-2 border-b border-line px-4 py-2 sm:px-5">
+        <span className="shrink-0 text-xs font-semibold text-slate">Discussion :</span>
+        <div className="scroll-x flex min-w-0 gap-1.5">
+          {(sports.length ? sports : [sport]).map((id) => {
+            const on = id === sport;
+            return (
+              <form key={id} action={(fd) => startSwitch(() => switchSport(fd))}>
+                <input type="hidden" name="sport" value={id} />
+                <input type="hidden" name="back" value="/coach?vue=chat" />
+                <button
+                  aria-pressed={on}
+                  disabled={on || switching || pending}
+                  className={`whitespace-nowrap rounded-full px-3 py-1.5 text-xs font-semibold transition-colors ${
+                    on ? "bg-brand text-white" : "bg-raised text-deep hover:bg-brand-light disabled:opacity-60"
+                  }`}
+                >
+                  {SPORTS[id].name}
+                </button>
+              </form>
+            );
+          })}
+          <Link href="/profil" className="flex items-center whitespace-nowrap px-1.5 text-xs font-semibold text-lagoon">
+            + Sport
+          </Link>
+        </div>
       </div>
 
       <div className="flex-1 space-y-4 overflow-y-auto px-5 py-5" aria-live="polite">
