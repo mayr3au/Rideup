@@ -26,7 +26,7 @@ export type HourForecast = {
 
 /** Le nom du vent, comme on le dit sur la plage (en nœuds). */
 const WIND_NAMES: [number, string, string][] = [
-  [10, "Pétole", "😴"],
+  [6, "Pétole", "😴"],
   [14, "Petit temps", "🍃"],
   [19, "Ça se lève", "🌬️"],
   [24, "Ça envoie", "💨"],
