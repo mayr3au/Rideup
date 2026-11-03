@@ -3,6 +3,13 @@ import type { SportId } from "./sports";
 /** Photos Unsplash (licence Unsplash : usage commercial libre, sans attribution obligatoire). */
 const u = (id: string) => `https://images.unsplash.com/photo-${id}`;
 
+/** Photos RIDE'UP (générées pour le site, dans /public/photos). */
+export const SITE_PHOTOS = {
+  progression: "/photos/progression.jpg", // rider qui consulte son retour sur la plage
+  spots: "/photos/spots.jpg", // vue aérienne d'un spot de kite
+  cours: "/photos/cours.jpg", // fenêtre de vent dessinée dans le sable
+};
+
 export const PHOTOS = {
   heroJump: u("1667323567346-ea4048f36c58"), // kitesurfeur en l'air, gros plan
   splash: u("1578060124065-41f863eb9ebe"), // kitesurfeur qui envoie une gerbe d'eau

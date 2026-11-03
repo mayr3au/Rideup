@@ -19,7 +19,7 @@ export const metadata: Metadata = {
     description: "Envoie la vidéo de ta figure : un vrai coach te dit exactement quoi corriger. Kite, wing, foil, surf, wake.",
     type: "website",
     locale: "fr_FR",
-    images: [{ url: "/hero-surf.jpg", width: 1199, height: 1495 }],
+    images: [{ url: "/hero-surf.jpg", width: 1376, height: 768 }],
   },
 };
 

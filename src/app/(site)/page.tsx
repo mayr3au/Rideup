@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { DEFAULT_SETTINGS, PLANS } from "@/lib/plans";
-import { PHOTOS, SPORT_PHOTOS, SPORT_PHOTO_POS } from "@/lib/photos";
+import { SITE_PHOTOS, SPORT_PHOTOS, SPORT_PHOTO_POS } from "@/lib/photos";
 import { SPORT_IDS, SPORTS } from "@/lib/sports";
 import { Reveal } from "@/components/reveal";
 import { Tilt } from "@/components/tilt";
@@ -353,13 +353,13 @@ function Features() {
       icon: "chart" as const,
       title: "Suivi de ta progression",
       text: "Tes erreurs qui reviennent, tes figures maîtrisées, et la priorité de ta prochaine session.",
-      photo: PHOTOS.waves,
+      photo: SITE_PHOTOS.progression,
     },
     {
       icon: "pin" as const,
       title: "Spot Finder",
       text: "Le spot où aller selon le vent ou la houle prévus, ton niveau et ton matériel. Avec la taille d'aile à sortir.",
-      photo: PHOTOS.blue,
+      photo: SITE_PHOTOS.spots,
       href: "/week-end",
       link: "Voir les spots du week-end",
     },
@@ -367,7 +367,7 @@ function Features() {
       icon: "book" as const,
       title: "Cours figure par figure",
       text: "Pour chaque sport : les étapes, les erreurs courantes, les exercices. Inclus dans Progress et Elite.",
-      photo: PHOTOS.sunset,
+      photo: SITE_PHOTOS.cours,
       href: "/cours",
       link: "Lire les cours",
     },
@@ -495,7 +495,7 @@ function FinalCta() {
   return (
     <section className="mx-auto max-w-6xl px-3 pb-12 pt-14 sm:px-6 sm:pt-20">
       <div className="photo-card relative overflow-hidden">
-        <Image src="/hero-surf.jpg" alt="" fill sizes="100vw" className="object-cover object-[52%_60%]" />
+        <Image src="/hero-surf.jpg" alt="" fill sizes="100vw" className="object-cover object-[50%_45%]" />
         <div className="absolute inset-0 bg-[#0e2a47]/55" />
         <div className="relative px-6 py-14 text-center text-white sm:py-20">
           <h2 className="text-3xl sm:text-5xl">Ta prochaine session commence ici</h2>
