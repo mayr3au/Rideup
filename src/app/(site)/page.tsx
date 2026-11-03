@@ -163,14 +163,14 @@ function Hero() {
 /*
  * iPhone de l'accueil : vraie photo de l'appareil (public/iphone-mockup.png, écran découpé)
  * et l'écran de l'appli en HTML, projeté dans la perspective de la photo (matrix3d calculée
- * à partir des 4 coins de l'écran). La scène fait 386 × 896 px, puis est mise à l'échelle.
+ * à partir des 4 coins de l'écran). La scène fait 591 × 1314 px, puis est mise à l'échelle.
  */
-const PHONE_STAGE = { w: 386, h: 896 };
-const SCREEN = { w: 300, h: 650, transform: "matrix3d(1.21901,0.137143,0,0.000306122,0,1.31692,0,0,0,0,1,0,35,20,0,1)" };
+const PHONE_STAGE = { w: 591, h: 1314 };
+const SCREEN = { w: 300, h: 650, transform: "matrix3d(1.53435,-0.126206,0,-0.000196392,0,1.80862,0,0,0,0,1,0,30,67.6,0,1)" };
 
 function PhoneMock() {
   return (
-    <div className="relative mx-auto w-[280px] [--s:0.7254] lg:w-[330px] lg:[--s:0.8549]">
+    <div className="relative mx-auto w-[280px] [--s:0.4738] lg:w-[330px] lg:[--s:0.5584]">
       {/* ombre au sol */}
       <div aria-hidden="true" className="absolute -bottom-10 left-1/2 h-7 w-[70%] -translate-x-1/2 rounded-[50%] bg-deep/30 blur-xl" />
 

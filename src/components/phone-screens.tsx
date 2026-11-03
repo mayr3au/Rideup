@@ -57,8 +57,8 @@ export function PhoneScreens() {
       {/* Notification qui sort de la Dynamic Island */}
       <div
         aria-hidden="true"
-        className={`absolute left-1/2 top-3 z-30 flex -translate-x-1/2 items-center gap-2 overflow-hidden rounded-[22px] bg-black text-white transition-all duration-500 ease-[cubic-bezier(0.2,0.8,0.2,1)] ${
-          notif ? "h-12 w-[88%] px-3" : "h-[28px] w-[96px] px-0"
+        className={`absolute left-1/2 top-[6px] z-30 flex -translate-x-1/2 items-center gap-2 overflow-hidden rounded-[22px] bg-black text-white transition-all duration-500 ease-[cubic-bezier(0.2,0.8,0.2,1)] ${
+          notif ? "h-12 w-[88%] px-3" : "h-[34px] w-[98px] px-0"
         }`}
       >
         <span className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-brand text-[0.6rem] font-extrabold transition-opacity ${notif ? "opacity-100 delay-200" : "opacity-0"}`}>
