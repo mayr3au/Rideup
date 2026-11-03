@@ -268,69 +268,118 @@ function Sports() {
 
 /* ───────────── 2. Comment ça marche : 3 étapes illustrées ───────────── */
 function Steps() {
+  const steps = [
+    { n: 1, time: "30 secondes", title: "Envoie ta vidéo", text: "Filmée par un pote depuis la plage. Tu coupes juste le passage de ta figure, l'appli fait le reste." },
+    { n: 2, time: "1 minute", title: "Dis ce qui te bloque", text: "La figure tentée et ta question. Le coach sait exactement quoi regarder." },
+    { n: 3, time: "Sous 24 à 72 h", title: "Reçois le retour du coach", text: "Une note phase par phase, tes erreurs, la correction et les exercices pour ta prochaine session." },
+  ];
   return (
     <section id="analyse" className="mx-auto max-w-6xl scroll-mt-20 px-5 pt-14 sm:px-6 sm:pt-20">
-      <Reveal>
-        <p className="eyebrow">Comment ça marche</p>
-        <h2 className="mt-2 text-3xl sm:text-4xl">Trois étapes, depuis ton téléphone, sur la plage</h2>
+      <Reveal className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+        <div>
+          <p className="eyebrow">Comment ça marche</p>
+          <h2 className="mt-2 text-3xl sm:text-4xl">
+            De la plage au retour du coach, <span className="text-brand">en 3 étapes</span>
+          </h2>
+        </div>
+        <p className="max-w-xs text-[0.95rem] text-slate sm:text-right">Tout se fait depuis ton téléphone. Aucune appli à installer.</p>
       </Reveal>
 
-      <ol className="mt-8 grid gap-4 sm:grid-cols-3">
-        {/* Étape 1 */}
-        <Reveal as="li" delay={0} className="panel overflow-hidden">
-          <div className="flex h-36 items-center justify-center bg-raised">
-            <div className="flex h-20 w-20 items-center justify-center rounded-3xl bg-white text-brand shadow-lg">
-              <Icon name="camera" className="h-10 w-10" />
-            </div>
-          </div>
-          <div className="p-5">
-            <p className="text-sm font-bold text-brand">Étape 1</p>
-            <h3 className="mt-1 text-xl">Importe ta vidéo</h3>
-            <p className="mt-1 text-[0.95rem] text-slate">Filmée par un pote depuis la plage. Tu gardes juste le passage de ta figure.</p>
-          </div>
-        </Reveal>
+      <ol className="relative mt-10 grid gap-5 md:grid-cols-3">
+        {/* Ligne qui relie les étapes (ordinateur) */}
+        <div aria-hidden="true" className="absolute left-[16%] right-[16%] top-[30px] hidden border-t-2 border-dashed border-brand/30 md:block" />
 
-        {/* Étape 2 : mini maquette de la sélection */}
-        <Reveal as="li" delay={0.12} className="panel overflow-hidden">
-          <div className="flex h-36 flex-col justify-center gap-3 bg-raised px-6">
-            <div className="relative h-10 rounded-xl bg-white shadow-inner">
-              <div className="absolute inset-y-0 left-[28%] right-[34%] rounded-lg border-[3px] border-brand bg-brand/15" />
-              <div className="absolute inset-y-[-4px] left-[28%] w-2 -translate-x-1/2 rounded-full bg-brand" />
-              <div className="absolute inset-y-[-4px] right-[34%] w-2 translate-x-1/2 rounded-full bg-brand" />
+        {steps.map((st, i) => (
+          <Reveal key={st.n} as="li" delay={i * 0.12} className="relative flex flex-col">
+            <div className="flex items-center gap-3">
+              <span className="relative z-10 flex h-[60px] w-[60px] shrink-0 items-center justify-center rounded-2xl bg-brand text-2xl font-extrabold text-white shadow-[0_10px_24px_-8px_rgba(24,136,201,0.7)]">
+                {st.n}
+              </span>
+              <span className="rounded-full bg-brand-light px-3 py-1 text-xs font-bold text-brand">⏱ {st.time}</span>
             </div>
-            <p className="text-center text-sm font-semibold text-deep">« Premier saut, en l&apos;air »</p>
-          </div>
-          <div className="p-5">
-            <p className="text-sm font-bold text-brand">Étape 2</p>
-            <h3 className="mt-1 text-xl">Pose ta question</h3>
-            <p className="mt-1 text-[0.95rem] text-slate">Ce que tu as voulu faire, et ce qui te bloque.</p>
-          </div>
-        </Reveal>
-
-        {/* Étape 3 : mini résultat */}
-        <Reveal as="li" delay={0.24} className="panel overflow-hidden">
-          <div className="flex h-36 items-center justify-center bg-raised px-6">
-            <div className="w-full max-w-[220px] rounded-2xl bg-white p-3 shadow-lg">
-              <div className="flex items-center justify-between">
-                <p className="font-bold">Backroll</p>
-                <p className="font-extrabold text-brand">6/10</p>
+            <div className="panel mt-4 flex flex-1 flex-col overflow-hidden">
+              <StepVisual n={st.n} />
+              <div className="p-5">
+                <h3 className="text-xl">{st.title}</h3>
+                <p className="mt-1 text-[0.95rem] text-slate">{st.text}</p>
               </div>
-              <p className="mt-1.5 flex items-center gap-1.5 text-xs text-slate">
-                <span className="h-1.5 w-1.5 rounded-full bg-danger" /> Regard trop tôt vers l&apos;avant
-              </p>
-              <p className="mt-1 flex items-center gap-1.5 text-xs text-slate">
-                <span className="h-1.5 w-1.5 rounded-full bg-brand" /> Bon envoi du kite
-              </p>
             </div>
-          </div>
-          <div className="p-5">
-            <p className="text-sm font-bold text-brand">Étape 3</p>
-            <h3 className="mt-1 text-xl">Reçois le retour du coach</h3>
-            <p className="mt-1 text-[0.95rem] text-slate">Une note, tes erreurs et tes exercices, rédigés par un coach qui a vraiment regardé ta vidéo.</p>
-          </div>
-        </Reveal>
+          </Reveal>
+        ))}
       </ol>
+
+      <Reveal className="mt-8 flex flex-col items-center gap-3 text-center sm:flex-row sm:justify-center">
+        <Link href="/inscription" className="btn btn-primary">
+          Essayer : ta 1ʳᵉ analyse est offerte
+        </Link>
+        <a href="#coachs" className="text-sm font-semibold text-lagoon hover:underline">
+          Voir un vrai retour de coach ↓
+        </a>
+      </Reveal>
     </section>
+  );
+}
+
+/** Illustration de chaque étape : la vidéo à découper, la question, le retour. */
+function StepVisual({ n }: { n: number }) {
+  if (n === 1)
+    return (
+      <div className="relative h-44 overflow-hidden">
+        <Image src={SPORT_PHOTOS.kitesurf} alt="" fill sizes="(min-width: 768px) 360px, 90vw" quality={85} className="object-cover" style={{ objectPosition: SPORT_PHOTO_POS.kitesurf }} />
+        <div className="absolute inset-0 bg-gradient-to-t from-deep/80 via-deep/10 to-transparent" />
+        <span className="absolute left-[22%] top-[36%] flex h-12 w-12 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-white/90 text-brand shadow-lg">
+          <svg viewBox="0 0 24 24" className="ml-0.5 h-5 w-5" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z" /></svg>
+        </span>
+        {/* Frise de la vidéo avec la sélection de la figure */}
+        <div className="absolute inset-x-4 bottom-4">
+          <div className="relative h-7 overflow-hidden rounded-lg bg-white/25 backdrop-blur">
+            <div className="absolute inset-y-0 left-[32%] right-[30%] rounded-md border-2 border-white bg-brand/60" />
+          </div>
+          <div className="mt-1.5 flex justify-between text-[0.7rem] font-semibold text-white/85">
+            <span>0:00</span>
+            <span>Ta figure · 6 s</span>
+            <span>0:48</span>
+          </div>
+        </div>
+      </div>
+    );
+  if (n === 2)
+    return (
+      <div className="flex h-44 flex-col justify-center gap-2 bg-raised px-5">
+        <span className="w-fit rounded-full bg-white px-3 py-1 text-xs font-semibold text-deep shadow-sm">🪁 Figure : Backroll</span>
+        <p className="ml-auto max-w-[85%] rounded-2xl rounded-br-md bg-brand px-3.5 py-2 text-sm text-white shadow-md">
+          Je tourne, mais je retombe toujours sur les fesses. C&apos;est mon regard ?
+        </p>
+        <p className="flex items-center gap-1.5 text-xs text-slate">
+          <span className="flex gap-0.5" aria-hidden="true">
+            <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-brand" />
+            <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-brand [animation-delay:150ms]" />
+            <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-brand [animation-delay:300ms]" />
+          </span>
+          Envoyé au coach
+        </p>
+      </div>
+    );
+  return (
+    <div className="flex h-44 items-center justify-center bg-raised px-5">
+      <div className="w-full max-w-[260px] rounded-2xl bg-white p-3.5 shadow-lg">
+        <div className="flex items-center gap-2.5">
+          <span className="relative h-9 w-9 shrink-0 overflow-hidden rounded-full">
+            <Image src={SITE_PHOTOS.coach} alt="" fill sizes="36px" className="object-cover" />
+          </span>
+          <div className="min-w-0 flex-1">
+            <p className="truncate text-sm font-bold">Backroll</p>
+            <p className="truncate text-[0.7rem] text-slate">Coach diplômé d&apos;État · BPJEPS</p>
+          </div>
+          <p className="text-lg font-extrabold text-brand">6/10</p>
+        </div>
+        <ul className="mt-2.5 space-y-1 text-xs">
+          <li className="flex items-center gap-1.5"><span className="h-1.5 w-1.5 rounded-full bg-emerald-500" /> Bon envoi du kite</li>
+          <li className="flex items-center gap-1.5"><span className="h-1.5 w-1.5 rounded-full bg-danger" /> Regard trop tôt vers l&apos;avant</li>
+          <li className="flex items-center gap-1.5 font-semibold text-brand"><span className="h-1.5 w-1.5 rounded-full bg-brand" /> 2 exercices pour ta session</li>
+        </ul>
+      </div>
+    </div>
   );
 }
 

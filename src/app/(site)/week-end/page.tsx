@@ -21,6 +21,22 @@ const LEVELS: Level[] = ["debutant", "intermediaire", "avance"];
 /** Classement : d'abord le nombre d'heures ridables, puis la qualité du meilleur moment. */
 const quality = (d: DaySummary | null) => (!d || d.goodHours === 0 ? 0 : d.goodHours * 10 + d.bestScore / 10);
 
+const MAX_FORECAST = 60;
+
+/** Choisit jusqu'à `max` spots en alternant les régions, pour couvrir tout le pays plutôt qu'une seule côte. */
+function spread<T extends { spot: Spot }>(list: T[], max: number): T[] {
+  const byRegion = new Map<string, T[]>();
+  for (const c of list) {
+    const k = `${c.spot.country}|${c.spot.region ?? ""}`;
+    byRegion.set(k, [...(byRegion.get(k) ?? []), c]);
+  }
+  const queues = [...byRegion.values()];
+  const out: T[] = [];
+  for (let round = 0; out.length < max && queues.some((q) => q.length > round); round++)
+    for (const q of queues) if (q[round] && out.length < max) out.push(q[round]);
+  return out;
+}
+
 export default async function WeekendPage({
   searchParams,
 }: {
@@ -47,9 +63,13 @@ export default async function WeekendPage({
 
   let rows: { spot: Spot; distance: number | null; sat: DaySummary | null; sun: DaySummary | null; best: number }[] = [];
   let failed = false;
+  // Les prévisions coûtent un appel par spot et par modèle : on interroge au plus MAX_FORECAST spots.
+  // Autour de toi : les plus proches. Sinon : le pays choisi, en répartissant entre les régions.
+  const inScope = candidates.filter((c) => !sp.pays || c.spot.country === sp.pays);
+  const picked = here ? [...inScope].sort((a, b) => (a.distance ?? 0) - (b.distance ?? 0)).slice(0, MAX_FORECAST) : spread(inScope, MAX_FORECAST);
   try {
-    const forecasts = candidates.length ? await getConditions(candidates.map((c) => c.spot), waves) : [];
-    rows = candidates
+    const forecasts = picked.length ? await getConditions(picked.map((c) => c.spot), waves) : [];
+    rows = picked
       .map(({ spot, distance }, i) => {
         const hours = forecasts[i] ?? [];
         const day = (d: string) => (hours.some((h) => h.time.startsWith(d)) ? summarizeDay(hours, d, spot, rider) : null);
@@ -64,7 +84,7 @@ export default async function WeekendPage({
   }
 
   const countries = [...new Set(candidates.map((x) => x.spot.country))].sort((a, b) => a.localeCompare(b, "fr"));
-  const filtered = rows.filter((r) => !sp.pays || r.spot.country === sp.pays);
+  const filtered = rows;
   const shown = filtered.slice(0, 30);
   const okSat = filtered.filter((r) => (r.sat?.goodHours ?? 0) > 0).length;
   const okSun = filtered.filter((r) => (r.sun?.goodHours ?? 0) > 0).length;

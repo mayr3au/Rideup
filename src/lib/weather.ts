@@ -92,13 +92,24 @@ export async function getForecasts(points: Point[]): Promise<HourForecast[][]> {
     { cell: "sea", idx: points.map((p, i) => (p.water === "lac" ? -1 : i)).filter((i) => i >= 0) },
     { cell: "land", idx: points.map((p, i) => (p.water === "lac" ? i : -1)).filter((i) => i >= 0) },
   ];
+  // Un lot qui échoue (limite de débit, coupure) ne doit pas priver les autres spots de prévisions.
+  let ok = 0;
+  let lastError: unknown = null;
   for (const g of groups) {
     for (let i = 0; i < g.idx.length; i += 25) {
       const ids = g.idx.slice(i, i + 25);
-      const res = await fetchBatch(ids.map((k) => points[k]), g.cell);
-      res.forEach((hours, k) => (out[ids[k]] = hours));
+      try {
+        const res = await fetchBatch(ids.map((k) => points[k]), g.cell);
+        res.forEach((hours, k) => (out[ids[k]] = hours));
+        ok++;
+      } catch (e) {
+        lastError = e;
+        console.error("prévisions", e);
+      }
     }
   }
+  if (!ok && lastError) throw lastError;
+  for (let i = 0; i < out.length; i++) out[i] ??= [];
   return out;
 }
 
