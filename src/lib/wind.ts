@@ -131,6 +131,8 @@ export type HourVerdict = {
   gearName: string | null;
   orientation: Orientation | null;
   warnings: string[];
+  /** Ridable, mais avec un risque à connaître (offshore, side-off) */
+  caution?: boolean;
 };
 
 const no = (orientation: Orientation | null, warning: string): HourVerdict => ({
@@ -150,12 +152,14 @@ function rateWind(h: HourForecast, spot: SpotLike, rider: Rider, rule: WindRule)
   const warnings: string[] = [];
   let score = 100;
 
+  let caution = false;
   if (h.code >= 95) return no(o, "Orage prévu");
-  if (o === "offshore") return no(o, "Vent offshore : dangereux");
-  if (o === "side-off") {
-    if (LEVEL_RANK[level] < 2) return no(o, "Side-off : réservé aux riders confirmés");
-    warnings.push("Side-off : prévois une sécurité bateau");
-    score -= 30;
+  // Offshore et side-off : interdits aux débutants, possibles ensuite en connaissant le risque
+  if (o === "offshore" || o === "side-off") {
+    if (LEVEL_RANK[level] < 1) return no(o, `${o === "offshore" ? "Offshore" : "Side-off"} : interdit aux débutants`);
+    warnings.push(o === "offshore" ? "Vent offshore : jamais seul, bateau de sécurité indispensable" : "Side-off : prévois une sécurité bateau");
+    score -= o === "offshore" ? 35 : 20;
+    caution = true;
   }
   if (o === "onshore") {
     warnings.push("Onshore : départs plus difficiles");
@@ -186,7 +190,7 @@ function rateWind(h: HourForecast, spot: SpotLike, rider: Rider, rule: WindRule)
   }
 
   score = Math.max(0, Math.min(100, Math.round(score)));
-  return { ok: score >= 40, score, gear, gearName: rule.gearName, orientation: o, warnings };
+  return { ok: score >= 40, score, gear, gearName: rule.gearName, orientation: o, warnings, caution };
 }
 
 /* ───────────────────────── Surf ───────────────────────── */
@@ -285,6 +289,12 @@ export type DaySummary = {
   spread: number | null;
   /** Vent par modèle au milieu du créneau */
   models: Partial<Record<string, number>> | null;
+  /** Le créneau retenu comporte des heures à risque (offshore, side-off) */
+  caution: boolean;
+  /** Prévision de la journée, même sans créneau ridable : moyenne des 3 heures les plus ventées (8 h – 20 h) */
+  peak: { wind: number; gust: number; dir: number; orientation: Orientation | null; wave: number | null; period: number | null } | null;
+  /** Ce qui empêche de rider (ou le principal point d'attention) */
+  reason: string | null;
 };
 
 /** Résumé d'une journée (8 h – 20 h, heure locale du spot). */
@@ -329,6 +339,29 @@ export function summarizeDay(hours: HourForecast[], date: string, spot: SpotLike
       return vals.length ? Math.round(vals.reduce((a, b) => a + b, 0) / vals.length) : null;
     })(),
     models: (mid ?? rated[Math.floor(rated.length / 2)])?.h.models ?? null,
+    caution: best.some((r) => r.v.caution),
+    peak: (() => {
+      if (!rated.length) return null;
+      const top = [...rated].sort((x, y) => (y.h.wave ?? y.h.wind) - (x.h.wave ?? x.h.wind)).slice(0, 3);
+      const m = top[0];
+      const avgOf = (f: (h: HourForecast) => number) => top.reduce((sum, r) => sum + f(r.h), 0) / top.length;
+      return {
+        wind: Math.round(avgOf((h) => h.wind)),
+        gust: Math.round(Math.max(...top.map((r) => r.h.gust))),
+        dir: m.h.dir,
+        orientation: m.v.orientation,
+        wave: m.h.wave != null ? Math.round(avgOf((h) => h.wave ?? 0) * 10) / 10 : null,
+        period: m.h.period != null ? Math.round(m.h.period) : null,
+      };
+    })(),
+    reason: (() => {
+      // Raison la plus fréquente aux heures où il y a le plus de vent (ou de houle)
+      const top = [...rated].sort((x, y) => (y.h.wave ?? y.h.wind) - (x.h.wave ?? x.h.wind)).slice(0, 4);
+      const pool = best.length ? best : top;
+      const count = new Map<string, number>();
+      pool.forEach((r) => r.v.warnings.forEach((w) => count.set(w, (count.get(w) ?? 0) + 1)));
+      return [...count.entries()].sort((x, y) => y[1] - x[1])[0]?.[0] ?? null;
+    })(),
   };
 }
 

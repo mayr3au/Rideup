@@ -74,7 +74,8 @@ export async function GET(request: NextRequest) {
         for (const sport of sports.filter((sp) => spot.sports?.includes(sp))) {
           const rider = { sport, level: levelFor(user, sport), weightKg: user.weight_kg, gear: gearSizes(user, sport) };
           const day = summarizeDay(hours, date, spot, rider);
-          if (day.goodHours >= 2) {
+          // Pas d'alerte pour un créneau à risque (offshore, side-off)
+          if (day.goodHours >= 2 && !day.caution) {
             hits.push({ spot, day, sport });
             break;
           }

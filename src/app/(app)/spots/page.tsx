@@ -97,7 +97,7 @@ export default async function SpotsPage({ searchParams }: { searchParams: Promis
             })
             .map((h) => {
               const v = rateHour(h, s, rider);
-              return { ...h, score: v.score, ok: v.ok };
+              return { ...h, score: v.score, ok: v.ok, caution: v.caution ?? false };
             }),
         };
       });
