@@ -121,7 +121,7 @@ export function AnalyseUploader({
       const contentType = ext === "mov" ? "video/quicktime" : ext === "webm" ? "video/webm" : "video/mp4";
       const up = await createClient()
         .storage.from("clips")
-        .upload(created.videoPath, upload, { contentType, upsert: false });
+        .uploadToSignedUrl(created.videoPath, created.uploadToken, upload, { contentType });
       if (up.error) {
         console.error("envoi vidéo", up.error);
         throw new Error(`L'envoi de la vidéo a échoué (${up.error.message}). Vérifie ta connexion et réessaie : rien n'est décompté.`);
