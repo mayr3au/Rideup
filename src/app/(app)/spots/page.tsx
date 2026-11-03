@@ -4,11 +4,12 @@ import { redirect } from "next/navigation";
 import { requireSession, effectivePlan } from "@/lib/auth";
 import { hasSpotFinder } from "@/lib/plans";
 import { getConditions } from "@/lib/weather";
-import { distanceKm, summarizeDay, type Rider } from "@/lib/wind";
+import { distanceKm, rateHour, summarizeDay, type Rider } from "@/lib/wind";
 import { activeSport, gearSizes, levelFor } from "@/lib/rider";
 import { SPORTS } from "@/lib/sports";
 import type { Spot } from "@/lib/types";
 import { SpotFinder, type SpotData } from "@/components/spot-finder";
+import { NearMeButton } from "@/components/near-me-button";
 
 export const metadata: Metadata = { title: "Spot Finder" };
 export const dynamic = "force-dynamic";
@@ -60,8 +61,9 @@ export default async function SpotsPage({ searchParams }: { searchParams: Promis
   ]);
   const favorites = new Set((favs ?? []).map((f) => f.spot_id as string));
 
-  const nearby = (allSpots ?? [])
-    .map((s) => ({ ...s, distance: distanceKm(lat, lng, s.lat, s.lng) }))
+  const withDistance = (allSpots ?? []).map((s) => ({ ...s, distance: distanceKm(lat, lng, s.lat, s.lng) }));
+  const closest = withDistance.reduce<(typeof withDistance)[number] | null>((m, s) => (!m || s.distance < m.distance ? s : m), null);
+  const nearby = withDistance
     .filter((s) => s.distance <= radius || favorites.has(s.id))
     .sort((a, b) => a.distance - b.distance)
     .slice(0, MAX_SPOTS);
@@ -82,10 +84,15 @@ export default async function SpotsPage({ searchParams }: { searchParams: Promis
           distance: Math.round(s.distance),
           favorite: favorites.has(s.id),
           days: dates.map((d) => summarizeDay(hours, d, s, rider)),
-          hours: hours.filter((h) => {
-            const hh = Number(h.time.slice(11, 13));
-            return hh >= 7 && hh <= 21;
-          }),
+          hours: hours
+            .filter((h) => {
+              const hh = Number(h.time.slice(11, 13));
+              return hh >= 7 && hh <= 21;
+            })
+            .map((h) => {
+              const v = rateHour(h, s, rider);
+              return { ...h, score: v.score, ok: v.ok };
+            }),
         };
       });
     } catch (e) {
@@ -111,7 +118,10 @@ export default async function SpotsPage({ searchParams }: { searchParams: Promis
             )}
           </p>
         </div>
-        <Link href="/profil" className="text-sm font-semibold text-lagoon">Modifier mes réglages</Link>
+        <div className="flex items-center gap-3">
+          <NearMeButton radius={radius} />
+          <Link href="/profil" className="text-sm font-semibold text-lagoon">Mes réglages</Link>
+        </div>
       </div>
 
       <nav className="-mx-5 mt-4 flex gap-2 overflow-x-auto px-5 pb-1" aria-label="Rayon de recherche">
@@ -146,11 +156,19 @@ export default async function SpotsPage({ searchParams }: { searchParams: Promis
               ? "Aucun téléski nautique référencé autour de toi pour l'instant."
               : "Aucun spot référencé dans ce rayon."}
           </p>
-          {radius < 2000 && (
-            <Link href={`/spots?rayon=${Math.min(2000, radius * 2)}`} className="btn btn-primary mt-4">
-              Chercher à {Math.min(2000, radius * 2)} km
-            </Link>
+          {closest && S.spot !== "cable" && (
+            <p className="mt-1 text-slate">
+              Le plus proche : {closest.name}, à {Math.round(closest.distance)} km.
+            </p>
           )}
+          {radius < 2000 && (() => {
+            const next = closest ? Math.min(2000, [250, 500, 1000, 2000].find((r) => r > radius && r >= closest.distance) ?? 2000) : Math.min(2000, radius * 2);
+            return (
+              <Link href={`/spots?rayon=${next}${sp.lat && sp.lng ? `&lat=${sp.lat}&lng=${sp.lng}` : ""}`} className="btn btn-primary mt-4">
+                Chercher à {next} km
+              </Link>
+            );
+          })()}
         </div>
       ) : (
         <div className="mt-6">

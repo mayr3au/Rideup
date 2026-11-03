@@ -23,9 +23,10 @@ export default function Home() {
 }
 
 /* Icônes simples, trait arrondi */
-function Icon({ name, className = "h-6 w-6" }: { name: "video" | "cut" | "check" | "chart" | "pin" | "book" | "arrow"; className?: string }) {
+function Icon({ name, className = "h-6 w-6" }: { name: "video" | "camera" | "cut" | "check" | "chart" | "pin" | "book" | "arrow"; className?: string }) {
   const paths = {
     video: <path d="M4 7h11v10H4zM15 10.5l5-3v9l-5-3" />,
+    camera: <path d="M4 8h3l2-2.5h6L17 8h3v11H4zM12 16.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7z" />,
     cut: <path d="M4 12h16M8 8v8M16 8v8" />,
     check: <path d="M5 12.5l4.5 4.5L19 7.5" />,
     chart: <path d="M4 19V11M10 19V5M16 19v-6M3 19h18" />,
@@ -62,7 +63,7 @@ function Hero() {
             </span>
           </h1>
           <p className="rise mt-6 max-w-xl text-lg text-slate sm:text-xl" style={{ "--d": "0.4s" } as React.CSSProperties}>
-            Kite, wing, foil, surf, wake. Envoie 10 secondes de ta figure : RIDE&apos;UP te dit exactement quoi corriger, et
+            Kite, wing, foil, surf, wake. Envoie une photo de ta figure : RIDE&apos;UP te dit exactement quoi corriger, et
             quoi bosser à la prochaine session.
           </p>
           <div className="rise mt-8 flex flex-col gap-4 sm:flex-row sm:items-center" style={{ "--d": "0.5s" } as React.CSSProperties}>
@@ -78,7 +79,7 @@ function Hero() {
 
           <dl className="rise mt-10 grid max-w-md grid-cols-3 gap-4 border-t border-line pt-6" style={{ "--d": "0.68s" } as React.CSSProperties}>
             {[
-              ["10 s", "de vidéo suffisent"],
+              ["1 photo", "suffit"],
               ["≈ 1 min", "pour ton retour"],
               ["5", "sports couverts"],
             ].map(([n, l]) => (
@@ -160,7 +161,7 @@ function PhoneMock() {
 
 /* Ruban qui défile : bande bleu nuit légèrement inclinée, mots en capitales italiques */
 function Ribbon() {
-  const items = ["Kitesurf", "Wingfoil", "Foil", "Surf", "Wakeboard", "Analyse vidéo", "Coach IA", "Spot Finder", "Progresse"];
+  const items = ["Kitesurf", "Wingfoil", "Foil", "Surf", "Wakeboard", "Analyse de position", "Coach IA", "Spot Finder", "Progresse"];
   const row = [...items, ...items];
   return (
     <div className="border-y border-line bg-white py-5" aria-hidden="true">
@@ -226,13 +227,13 @@ function Steps() {
         <Reveal as="li" delay={0} className="panel overflow-hidden">
           <div className="flex h-36 items-center justify-center bg-raised">
             <div className="flex h-20 w-20 items-center justify-center rounded-3xl bg-white text-brand shadow-lg">
-              <Icon name="video" className="h-10 w-10" />
+              <Icon name="camera" className="h-10 w-10" />
             </div>
           </div>
           <div className="p-5">
             <p className="text-sm font-bold text-brand">Étape 1</p>
-            <h3 className="mt-1 text-xl">Importe ta vidéo</h3>
-            <p className="mt-1 text-[0.95rem] text-slate">Filmée par un pote depuis la plage, avec n&apos;importe quel téléphone.</p>
+            <h3 className="mt-1 text-xl">Importe ta photo</h3>
+            <p className="mt-1 text-[0.95rem] text-slate">Prise par un pote depuis la plage, ou une capture d&apos;écran de ta vidéo.</p>
           </div>
         </Reveal>
 
@@ -244,12 +245,12 @@ function Steps() {
               <div className="absolute inset-y-[-4px] left-[28%] w-2 -translate-x-1/2 rounded-full bg-brand" />
               <div className="absolute inset-y-[-4px] right-[34%] w-2 translate-x-1/2 rounded-full bg-brand" />
             </div>
-            <p className="text-center text-sm font-semibold text-deep">0:12 → 0:24 · 12 s</p>
+            <p className="text-center text-sm font-semibold text-deep">« Premier saut, en l&apos;air »</p>
           </div>
           <div className="p-5">
             <p className="text-sm font-bold text-brand">Étape 2</p>
-            <h3 className="mt-1 text-xl">Garde ta figure</h3>
-            <p className="mt-1 text-[0.95rem] text-slate">Fais glisser le curseur pour garder le moment de la figure, 10 secondes maximum.</p>
+            <h3 className="mt-1 text-xl">Dis ce que tu fais</h3>
+            <p className="mt-1 text-[0.95rem] text-slate">Une phrase suffit : la figure et le moment de la photo.</p>
           </div>
         </Reveal>
 
@@ -368,7 +369,7 @@ function PricingTeaser() {
               <p className="mt-3 text-[0.95rem] text-slate">
                 {elite
                   ? "Analyse plus poussée, comparaison de tes tentatives, programme personnalisé et alertes conditions sur tes spots."
-                  : "Analyse vidéo, suivi de progression, coach et Spot Finder."}
+                  : "Analyse de position, suivi de progression, coach et Spot Finder."}
               </p>
             </Reveal>
           );
@@ -385,12 +386,12 @@ function PricingTeaser() {
 function Faq() {
   const items = [
     {
-      q: "Il faut quel genre de vidéo ?",
-      a: "Un téléphone suffit. Filme de côté, à une trentaine de mètres, en gardant le rider (et son aile ou son kite) dans le cadre.",
+      q: "Il faut quel genre de photo ?",
+      a: "Un téléphone suffit. Prends-toi de côté, assez près pour bien voir ton corps et ta planche, avec ton aile ou ton kite si possible. Une capture d'écran de vidéo marche aussi.",
     },
     {
-      q: "Pourquoi 10 secondes maximum ?",
-      a: "Une figure dure quelques secondes. En gardant juste l'approche, la figure et la réception, l'analyse regarde 6 images par seconde et ne rate aucun mouvement.",
+      q: "Pourquoi une photo et pas une vidéo ?",
+      a: "Sur une image nette, l'analyse juge précisément ta position : jambes, buste, bras, barre, planche, kite. Choisis le moment qui t'intéresse : l'appel, en l'air ou la réception.",
     },
     {
       q: "Ça remplace un moniteur ?",

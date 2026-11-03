@@ -1,26 +1,28 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { requireSession } from "@/lib/auth";
-import { LEVEL_LABELS, LEVEL_ORDER, SPORTS, tricksFor } from "@/lib/sports";
+import { requireSession, effectivePlan } from "@/lib/auth";
+import { getQuota } from "@/lib/usage";
+import { normalizeResult } from "@/lib/analysis-result";
+import { errorLabel, LEVEL_LABELS, LEVEL_ORDER, SPORTS, tricksFor } from "@/lib/sports";
 import { activeSport } from "@/lib/rider";
-import type { CoachMessage, TrickProgress } from "@/lib/types";
+import type { CoachMessage, TrickProgress, VideoAnalysis } from "@/lib/types";
 import { courseForTrick } from "@/lib/courses";
 import { CoachChat } from "@/components/coach-chat";
 import { clearChat, setTrickStatus } from "./actions";
 
 export const metadata: Metadata = { title: "Coach" };
 
-export default async function CoachPage({ searchParams }: { searchParams: Promise<{ vue?: string }> }) {
-  const { vue } = await searchParams;
+export default async function CoachPage({ searchParams }: { searchParams: Promise<{ vue?: string; q?: string }> }) {
+  const { vue, q } = await searchParams;
   const { supabase, profile } = await requireSession();
   if (!profile.onboarded) redirect("/profil");
 
   const sport = activeSport(profile);
   const tricks = tricksFor(sport);
-  const chatFirst = vue === "chat";
+  const chatFirst = vue === "chat" || Boolean(q);
 
-  const [{ data: progress }, { data: messages }] = await Promise.all([
+  const [{ data: progress }, { data: messages }, { data: lastAnalysis }, quota] = await Promise.all([
     supabase.from("trick_progress").select("*").returns<TrickProgress[]>(),
     supabase
       .from("coach_messages")
@@ -28,11 +30,28 @@ export default async function CoachPage({ searchParams }: { searchParams: Promis
       .order("created_at", { ascending: true })
       .limit(60)
       .returns<Pick<CoachMessage, "role" | "content">[]>(),
+    supabase
+      .from("video_analyses")
+      .select("result")
+      .eq("status", "termine")
+      .eq("sport", sport)
+      .order("created_at", { ascending: false })
+      .limit(1)
+      .maybeSingle<Pick<VideoAnalysis, "result">>(),
+    getQuota(supabase, profile, effectivePlan(profile), "coachMessages"),
   ]);
 
   const status = new Map((progress ?? []).map((p) => [p.trick_id, p.status]));
   const done = tricks.filter((t) => status.get(t.id) === "valide").length;
   const firstOpen = tricks.find((t) => status.get(t.id) !== "valide")?.id;
+
+  // Questions proposées : d'abord ce sur quoi le rider bosse vraiment
+  const suggestions: string[] = [];
+  const last = lastAnalysis?.result ? normalizeResult(lastAnalysis.result) : null;
+  if (last?.erreurs[0]) suggestions.push(`Comment je corrige « ${errorLabel(last.erreurs[0].code).toLowerCase()} » ?`);
+  for (const t of tricks.filter((t) => status.get(t.id) === "en-cours").slice(0, 2)) suggestions.push(`Comment je débloque mon ${t.name.toLowerCase()} ?`);
+  const next = tricks.find((t) => t.id === firstOpen);
+  if (next && !suggestions.some((x) => x.includes(next.name.toLowerCase()))) suggestions.push(`Comment je prépare mon ${next.name.toLowerCase()} ?`);
 
   const tab = (on: boolean) =>
     `flex-1 rounded-xl py-2.5 text-center text-sm font-semibold ${on ? "bg-white text-deep shadow" : "text-slate"}`;
@@ -150,7 +169,15 @@ export default async function CoachPage({ searchParams }: { searchParams: Promis
         </section>
 
         <section className={`lg:sticky lg:top-32 lg:self-start ${chatFirst ? "" : "hidden lg:block"}`}>
-          <CoachChat initial={messages ?? []} clearAction={clearChat} sport={sport} sportName={SPORTS[sport].name} />
+          <CoachChat
+            initial={messages ?? []}
+            clearAction={clearChat}
+            sport={sport}
+            sportName={SPORTS[sport].name}
+            suggestions={suggestions.slice(0, 4)}
+            remaining={quota.remaining}
+            prefill={q?.slice(0, 500)}
+          />
         </section>
       </div>
     </div>

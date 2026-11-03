@@ -2,13 +2,13 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { requireSession, effectivePlan } from "@/lib/auth";
 import { getQuota, sweepStaleAnalyses } from "@/lib/usage";
-import { ANALYSIS_DEPTH } from "@/lib/plans";
-import { trickById } from "@/lib/sports";
 import { activeSport, riderSports } from "@/lib/rider";
 import { redirect } from "next/navigation";
-import { AnalyseUploader } from "@/components/analyse-uploader";
+import { PhotoUploader } from "@/components/photo-uploader";
+import { trickById, tricksFor } from "@/lib/sports";
+import type { TrickProgress } from "@/lib/types";
 
-export const metadata: Metadata = { title: "Analyse vidéo" };
+export const metadata: Metadata = { title: "Analyse de position" };
 
 export default async function AnalysePage({ searchParams }: { searchParams: Promise<{ figure?: string }> }) {
   const { figure } = await searchParams;
@@ -16,25 +16,35 @@ export default async function AnalysePage({ searchParams }: { searchParams: Prom
   if (!profile.onboarded) redirect("/profil");
   const plan = effectivePlan(profile);
   await sweepStaleAnalyses(profile.id);
-  const quota = await getQuota(supabase, profile, plan, "analyses");
-  const deep = ANALYSIS_DEPTH[plan].depth === "approfondie";
+  const sport = activeSport(profile);
+  const [quota, { data: progress }] = await Promise.all([
+    getQuota(supabase, profile, plan, "analyses"),
+    supabase.from("trick_progress").select("trick_id, status").eq("user_id", profile.id).returns<Pick<TrickProgress, "trick_id" | "status">[]>(),
+  ]);
+  // Raccourcis pour « ce que tu fais » : figures en cours, puis la prochaine à débloquer
+  const status = new Map((progress ?? []).map((p) => [p.trick_id, p.status]));
+  const tricks = tricksFor(sport);
+  const working = tricks.filter((t) => status.get(t.id) === "en-cours");
+  const nextTrick = tricks.find((t) => status.get(t.id) !== "valide" && status.get(t.id) !== "en-cours");
+  const shortcuts = [...working, ...(nextTrick ? [nextTrick] : [])].slice(0, 4).map((t) => t.name);
+  const wanted = figure ? trickById(figure)?.name : undefined;
 
   return (
     <div className="mx-auto max-w-2xl">
-      <h1 className="text-3xl font-bold sm:text-4xl">Analyser une figure</h1>
+      <h1 className="text-3xl font-bold sm:text-4xl">Analyse ta position</h1>
       <p className="mt-2 text-slate">
-        Importe ta vidéo, garde le moment de ta figure et reçois tes corrections en une minute environ.
-        {deep && " Ton analyse Elite est approfondie et comparée à tes tentatives précédentes."}
+        Une photo de toi (ou une capture d&apos;écran de ta vidéo), une phrase pour dire ce que tu fais, et tu reçois tes
+        corrections en quelques secondes.
       </p>
 
       <div className="mt-8">
         {quota.allowed ? (
-          <AnalyseUploader
-            defaultTrick={figure && trickById(figure) ? figure : undefined}
+          <PhotoUploader
             remaining={quota.remaining}
-            deep={deep}
             sports={riderSports(profile)}
-            defaultSport={activeSport(profile)}
+            defaultSport={sport}
+            shortcuts={shortcuts}
+            defaultIntention={wanted}
           />
         ) : (
           <div className="panel p-6">

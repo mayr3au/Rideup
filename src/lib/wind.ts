@@ -292,7 +292,8 @@ export function summarizeDay(hours: HourForecast[], date: string, spot: SpotLike
     date,
     goodHours: rated.filter((r) => r.v.ok).length,
     bestScore: rated.reduce((m, r) => Math.max(m, r.v.score), 0),
-    window: best.length ? { from: best[0].h.time.slice(11, 16), to: best.at(-1)!.h.time.slice(11, 16) } : null,
+    // Fin du créneau = fin de la dernière heure ridable (une heure de 17:00 → « 17:00 – 18:00 »)
+    window: best.length ? { from: best[0].h.time.slice(11, 16), to: endOfHour(best.at(-1)!.h.time) } : null,
     avgWind: best.length ? Math.round(mean((h) => h.wind)!) : null,
     maxGust: best.length ? Math.round(Math.max(...best.map((r) => r.h.gust))) : null,
     dir: mid?.h.dir ?? null,
@@ -303,6 +304,11 @@ export function summarizeDay(hours: HourForecast[], date: string, spot: SpotLike
     orientation: mid?.v.orientation ?? null,
     warnings: [...warnings].slice(0, 3),
   };
+}
+
+function endOfHour(time: string) {
+  const h = Number(time.slice(11, 13)) + 1;
+  return `${String(h).padStart(2, "0")}:00`;
 }
 
 function avg(list: { v: HourVerdict }[]) {

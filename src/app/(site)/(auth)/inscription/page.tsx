@@ -9,7 +9,7 @@ export default function SignupPage() {
   return (
     <>
       <h1 className="text-4xl font-bold">Crée ton compte</h1>
-      <p className="mt-2 text-slate">Ta première analyse vidéo est offerte, sans carte bancaire.</p>
+      <p className="mt-2 text-slate">Ta première analyse est offerte, sans carte bancaire.</p>
       <ul className="mt-5 space-y-2 text-[0.95rem]">
         {["Une analyse de ta figure, phase par phase", "Un coach qui connaît ton niveau et ton matériel", "La roadmap de tes prochaines figures"].map((t) => (
           <li key={t} className="flex gap-2.5">

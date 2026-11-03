@@ -9,7 +9,12 @@ type Item = { href: string; label: string; short?: string; icon: React.ReactNode
 
 const I = {
   home: <path d="M3 11 12 4l9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z" />,
-  video: <path d="M3 6h12v12H3zM15 10l6-3v10l-6-3z" />,
+  camera: (
+    <>
+      <path d="M4 8h3l2-3h6l2 3h3v11H4z" />
+      <circle cx="12" cy="13" r="3.5" />
+    </>
+  ),
   coach: <path d="M12 3a4 4 0 1 1 0 8 4 4 0 0 1 0-8zM4 21v-1a6 6 0 0 1 6-6h4a6 6 0 0 1 6 6v1" />,
   chart: <path d="M4 20V10M10 20V4M16 20v-7M22 20H2" />,
   map: <path d="M12 21s-7-6.1-7-11a7 7 0 0 1 14 0c0 4.9-7 11-7 11zm0-8.5a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5z" />,
@@ -31,7 +36,7 @@ function Icon({ children, size = 24 }: { children: React.ReactNode; size?: numbe
 const MAIN: Item[] = [
   { href: "/dashboard", label: "Accueil", icon: <Icon>{I.home}</Icon> },
   { href: "/coach", label: "Coach", icon: <Icon>{I.coach}</Icon> },
-  { href: "/analyse", label: "Analyser", icon: <Icon>{I.video}</Icon> },
+  { href: "/analyse", label: "Analyser", icon: <Icon>{I.camera}</Icon> },
   { href: "/progression", label: "Progression", short: "Progrès", icon: <Icon>{I.chart}</Icon> },
   { href: "/spots", label: "Spots", icon: <Icon>{I.map}</Icon> },
 ];
@@ -118,7 +123,7 @@ export function AppNav({ isAdmin, planLabel }: { isAdmin: boolean; planLabel: st
                     aria-hidden="true"
                     className={`-mt-6 flex h-14 w-14 items-center justify-center rounded-full text-white shadow-[0_12px_24px_-8px_rgba(22,136,200,0.8)] ring-4 ring-spray transition-[transform,background-color] duration-200 group-active:scale-90 ${active(l.href) ? "bg-lagoon-dark" : "bg-brand"}`}
                   >
-                    <Icon size={26}>{I.video}</Icon>
+                    <Icon size={26}>{I.camera}</Icon>
                   </span>
                   {l.label}
                 </Link>

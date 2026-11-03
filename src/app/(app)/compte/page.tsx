@@ -62,7 +62,7 @@ export default async function AccountPage() {
 
         {/* Consommation */}
         <dl className="mt-5 grid gap-3 sm:grid-cols-2">
-          <Usage label={plan === "free" ? "Analyse d'essai" : "Analyses vidéo"} used={analyses.used} limit={analyses.limit} unit="analyse" period={plan === "free" ? "au total" : "sur la période"} />
+          <Usage label={plan === "free" ? "Analyse d'essai" : "Analyses"} used={analyses.used} limit={analyses.limit} unit="analyse" period={plan === "free" ? "au total" : "sur la période"} />
           <Usage label="Messages au coach" used={coach.used} limit={coach.limit} unit="message" period={plan === "free" ? "au total" : "sur la période"} />
         </dl>
         {plan !== "free" && (
@@ -136,7 +136,7 @@ export default async function AccountPage() {
         <details className="text-sm text-slate">
           <summary className="cursor-pointer">Supprimer mon compte</summary>
           <p className="mt-2 max-w-md">
-            Écris-nous depuis {user.email} à l&apos;adresse indiquée dans les mentions légales : ton compte, tes vidéos et tes
+            Écris-nous depuis {user.email} à l&apos;adresse indiquée dans les mentions légales : ton compte, tes photos, vidéos et
             analyses seront effacés sous 30 jours. Pense à résilier ton abonnement avant.
           </p>
         </details>

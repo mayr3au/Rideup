@@ -1,7 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { z } from "zod";
 import { getSession, effectivePlan } from "@/lib/auth";
-import { coachReply } from "@/lib/ai";
+import { streamCoachReply } from "@/lib/ai";
 import { activeSport } from "@/lib/rider";
 import { getRiderHistory, reserveQuota } from "@/lib/usage";
 import { createAdminClient } from "@/lib/supabase/admin";
@@ -11,6 +11,7 @@ export const maxDuration = 60;
 
 const body = z.object({ message: z.string().trim().min(1).max(2000), sport: z.string().optional() });
 
+/** Message au coach : la réponse est envoyée au fil de l'écriture (texte brut en flux). */
 export async function POST(request: NextRequest) {
   const session = await getSession();
   if (!session?.profile) return NextResponse.json({ error: "Connecte-toi pour parler au coach." }, { status: 401 });
@@ -47,21 +48,31 @@ export async function POST(request: NextRequest) {
 
   const messages = (past ?? []).reverse();
   while (messages.length && messages[0].role !== "user") messages.shift();
+  const db = createAdminClient();
 
-  let reply: string;
-  try {
-    reply = await coachReply(profile, activeSport(profile, parsed.data.sport), history, [...messages, { role: "user", content: parsed.data.message }]);
-  } catch (e) {
-    console.error("coach", e);
-    await createAdminClient().from("usage_events").delete().eq("kind", "coach").eq("ref", ref);
-    return NextResponse.json({ error: "Le coach ne répond pas pour le moment. Réessaie dans un instant." }, { status: 502 });
-  }
+  const stream = streamCoachReply(
+    profile,
+    activeSport(profile, parsed.data.sport),
+    history,
+    [...messages, { role: "user", content: parsed.data.message }],
+    async (reply) => {
+      if (!reply) {
+        await db.from("usage_events").delete().eq("kind", "coach").eq("ref", ref);
+        return;
+      }
+      const now = Date.now();
+      await db.from("coach_messages").insert([
+        { user_id: user.id, role: "user", content: parsed.data.message, created_at: new Date(now).toISOString() },
+        { user_id: user.id, role: "assistant", content: reply, created_at: new Date(now + 1).toISOString() },
+      ]);
+    },
+  );
 
-  const now = Date.now();
-  await createAdminClient().from("coach_messages").insert([
-    { user_id: user.id, role: "user", content: parsed.data.message, created_at: new Date(now).toISOString() },
-    { user_id: user.id, role: "assistant", content: reply, created_at: new Date(now + 1).toISOString() },
-  ]);
-
-  return NextResponse.json({ reply });
+  return new Response(stream, {
+    headers: {
+      "Content-Type": "text/plain; charset=utf-8",
+      "Cache-Control": "no-cache, no-transform",
+      "X-Accel-Buffering": "no",
+    },
+  });
 }
