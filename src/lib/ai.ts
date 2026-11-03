@@ -1,7 +1,8 @@
 import "server-only";
 import Anthropic from "@anthropic-ai/sdk";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { errorLabel, LEVEL_LABELS, SPORTS, SPORT_IDS, trickById, type SportId } from "@/lib/sports";
+import { errorLabel, errorsFor, LEVEL_LABELS, SPORTS, SPORT_IDS, trickById, tricksFor, type SportId } from "@/lib/sports";
+import { normalizeDraft, type ReviewDraft } from "@/lib/review-draft";
 import { detailsFor, disciplineFor, gearFor, levelFor, riderSports } from "@/lib/rider";
 import type { Profile, Program, TrickProgress } from "@/lib/types";
 
@@ -13,7 +14,7 @@ function anthropic() {
 
 /* ───────────────────────── Modèles, effort et coûts ───────────────────────── */
 
-type Task = "coach" | "programme";
+type Task = "coach" | "programme" | "compte_rendu";
 type Effort = "low" | "medium" | "high";
 type TaskConfig = { model: string; effort: Effort; thinking: Anthropic.ThinkingConfigParam | null; headroom: number };
 
@@ -28,6 +29,13 @@ const TASKS: Record<Task, TaskConfig> = {
   coach: {
     model: process.env.AI_MODEL_COACH || "claude-haiku-5-5",
     effort: (process.env.AI_EFFORT_COACH as Effort) || "medium",
+    thinking: { type: "disabled" },
+    headroom: 0,
+  },
+  // Mise en forme du compte rendu d'un coach : fidèle et soignée, sans réflexion préalable pour rester rapide.
+  compte_rendu: {
+    model: process.env.AI_MODEL_COMPTE_RENDU || "claude-sonnet-5-5",
+    effort: (process.env.AI_EFFORT_COMPTE_RENDU as Effort) || "medium",
     thinking: { type: "disabled" },
     headroom: 0,
   },
@@ -70,7 +78,8 @@ async function recordUsage(userId: string, kind: Task, model: string, usage: Ant
   const cost = costUsd(usage, model);
   await createAdminClient().from("ai_usage").insert({
     user_id: userId,
-    kind,
+    // La base n'accepte que analyse / coach / programme : la mise en forme d'un retour compte comme « analyse »
+    kind: kind === "compte_rendu" ? "analyse" : kind,
     model,
     input_tokens: usage.input_tokens + (usage.cache_creation_input_tokens ?? 0) + (usage.cache_read_input_tokens ?? 0),
     output_tokens: usage.output_tokens,
@@ -100,7 +109,7 @@ function callParams(task: Task, system: string, maxTokens: number) {
  */
 async function callWithTool(
   userId: string,
-  kind: "programme",
+  kind: "programme" | "compte_rendu",
   params: { system: string; max_tokens: number; tool: Anthropic.Tool; content: string | Anthropic.ContentBlockParam[] },
 ): Promise<{ input: unknown; cost: number }> {
   const required = ((params.tool.input_schema as { required?: string[] }).required ?? []) as string[];
@@ -331,4 +340,94 @@ export async function generateProgram(
         }`,
   });
   return input as Program;
+}
+
+/* ───────────────────────── Mise en forme du retour d'un coach ───────────────────────── */
+
+function reportTool(sport: SportId): Anthropic.Tool {
+  const tricks = tricksFor(sport).map((t) => t.id);
+  const codes = [...Object.keys(errorsFor(sport)), "autre"];
+  const text = (description: string) => ({ type: "string" as const, description });
+  return {
+    name: "retour_coach",
+    description: "Retour structuré envoyé au rider, rédigé à partir du compte rendu du coach.",
+    input_schema: {
+      type: "object",
+      properties: {
+        figure: text("Nom de la figure, tel qu'affiché au rider."),
+        figure_id: { type: "string", enum: ["", ...tricks], description: "Identifiant de la figure dans la roadmap, ou vide si elle n'y est pas." },
+        note: { type: "number", minimum: 0, maximum: 10, description: "Note globale /10 donnée par le coach. S'il n'en donne pas, propose une note cohérente avec son compte rendu." },
+        resume: text("3 à 5 phrases : ce que le coach voit, ce qui marche, ce qui bloque. Tutoiement."),
+        priorite_session: text("La seule chose à travailler à la prochaine session, en une phrase concrète."),
+        visibilite: { type: "string", enum: ["bonne", "partielle", "faible"], description: "Qualité de la vidéo selon le coach (bonne par défaut)." },
+        phases: {
+          type: "array",
+          description: "Seulement les phases dont le coach parle. Ne jamais inventer une phase.",
+          items: {
+            type: "object",
+            properties: {
+              phase: { type: "string", enum: ["approche", "appel", "vol", "reception"] },
+              note: { type: ["number", "null"], minimum: 0, maximum: 10, description: "Note de la phase si le coach en donne une, sinon null." },
+              commentaire: text("Ce que le coach dit de cette phase."),
+            },
+            required: ["phase", "note", "commentaire"],
+          },
+        },
+        erreurs: {
+          type: "array",
+          maxItems: 6,
+          description: "Les erreurs relevées par le coach, de la plus importante à la moins importante.",
+          items: {
+            type: "object",
+            properties: {
+              code: { type: "string", enum: codes },
+              gravite: { type: "string", enum: ["majeure", "moyenne", "mineure"] },
+              probleme: text("Le problème, en une phrase."),
+              correction: text("La correction concrète à appliquer sur l'eau."),
+            },
+            required: ["code", "gravite", "probleme", "correction"],
+          },
+        },
+        points_forts: { type: "array", items: { type: "string" }, maxItems: 5, description: "Ce qui marche déjà, d'après le coach." },
+        drills: { type: "array", items: { type: "string" }, maxItems: 5, description: "Exercices donnés par le coach (ou directement déduits de ses corrections)." },
+        rappels: { type: "array", items: { type: "string" }, maxItems: 4, description: "Points à garder en tête mentionnés par le coach. Vide sinon." },
+        securite: text("Alerte sécurité seulement si le coach en signale une, sinon chaîne vide."),
+        evolution: text("Comparaison avec ses tentatives précédentes si le coach en parle, sinon chaîne vide."),
+      },
+      required: ["figure", "figure_id", "note", "resume", "priorite_session", "visibilite", "phases", "erreurs", "points_forts", "drills", "rappels", "securite", "evolution"],
+    },
+  };
+}
+
+/**
+ * Transforme le compte rendu brut d'un coach (notes en vrac, dictée…) en retour structuré et propre.
+ * Le coach relit et corrige avant publication : l'IA reformule, elle n'ajoute rien.
+ */
+export async function structureCoachReport(
+  coachId: string,
+  sport: SportId,
+  ctx: { figure: string; figureId: string; riderQuestion: string; riderLevel: string | null; previous: string[] },
+  draft: string,
+): Promise<ReviewDraft> {
+  const S = SPORTS[sport];
+  const system = `Tu es l'assistant de rédaction des moniteurs diplômés d'État de RIDE'UP, spécialistes du ${S.name.toLowerCase()}.
+Un moniteur a regardé la vidéo d'un rider et a écrit son compte rendu en vrac. Ta mission : le transformer en retour clair, bien rangé et agréable à lire pour le rider.
+
+Règles :
+- Fidélité absolue : garde le diagnostic, les corrections et les exercices du coach. N'ajoute aucune erreur, aucun conseil ni aucune phase dont il ne parle pas.
+- Tutoie le rider, phrases courtes et concrètes, ton bienveillant et motivant, vocabulaire technique du coach conservé.
+- Corrige l'orthographe et la grammaire, supprime les tics de langage et les répétitions.
+- Classe les erreurs de la plus importante à la moins importante et choisis le code d'erreur le plus proche.
+- Si une information manque (note de phase, rappels, sécurité, évolution), laisse le champ vide ou null : ne l'invente pas.
+- Phases de la figure pour ce sport : approche = « ${S.phases.approche} », appel = « ${S.phases.appel} », vol = « ${S.phases.vol} », reception = « ${S.phases.reception} ».`;
+  const content = `Figure annoncée : ${ctx.figure || "non précisée"}${ctx.figureId ? ` (id ${ctx.figureId})` : ""}
+Niveau du rider : ${ctx.riderLevel ?? "non précisé"}
+Question du rider : « ${ctx.riderQuestion} »
+${ctx.previous.length ? `Ses derniers retours :\n${ctx.previous.map((p) => `- ${p}`).join("\n")}\n` : ""}
+Compte rendu du coach :
+"""
+${draft}
+"""`;
+  const { input } = await callWithTool(coachId, "compte_rendu", { system, max_tokens: 2500, tool: reportTool(sport), content });
+  return normalizeDraft(input, { tricks: tricksFor(sport).map((t) => t.id), codes: [...Object.keys(errorsFor(sport)), "autre"] });
 }

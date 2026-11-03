@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { requireAdmin } from "@/lib/auth";
 
@@ -70,6 +71,24 @@ export default async function AdminOverview() {
   return (
     <div className="space-y-10">
       <h1 className="text-4xl font-bold">Vue d&apos;ensemble</h1>
+
+      {/* Les vidéos envoyées par les riders arrivent dans l'espace coach */}
+      <Link
+        href="/espace-coach"
+        className={`flex flex-wrap items-center justify-between gap-3 rounded-[22px] p-5 ${waiting ? "bg-brand text-white" : "panel"}`}
+      >
+        <div>
+          <p className={`text-sm font-bold uppercase tracking-wider ${waiting ? "text-white/80" : "text-brand"}`}>Vidéos des riders</p>
+          <p className="mt-1 text-xl font-bold">
+            {waiting ? `${waiting} vidéo${waiting > 1 ? "s" : ""} à analyser` : "Aucune vidéo en attente"}
+            {inReview ? ` · ${inReview} en cours` : ""}
+          </p>
+          <p className={`text-sm ${waiting ? "text-white/85" : "text-slate"}`}>
+            Prends une vidéo, écris ton compte rendu en vrac : l&apos;IA le met en forme, tu relis et tu publies au rider.
+          </p>
+        </div>
+        <span className={`btn !min-h-11 !px-5 !py-2 !text-sm ${waiting ? "bg-white text-brand" : "btn-primary"}`}>Ouvrir l&apos;espace coach →</span>
+      </Link>
 
       <dl className="grid grid-cols-2 gap-3 lg:grid-cols-3">
         {stats.map((s) => (

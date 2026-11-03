@@ -5,8 +5,12 @@ import { redirect } from "next/navigation";
 import { z } from "zod";
 import { coachesSport, notifyRider, requireCoach } from "@/lib/coaching";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { errorsFor, trickById } from "@/lib/sports";
-import type { AnalysisResult, VideoAnalysis } from "@/lib/types";
+import { errorsFor, LEVEL_LABELS, trickById } from "@/lib/sports";
+import { levelFor } from "@/lib/rider";
+import { normalizeResult } from "@/lib/analysis-result";
+import { structureCoachReport } from "@/lib/ai";
+import type { ReviewDraft } from "@/lib/review-draft";
+import type { AnalysisResult, Profile, VideoAnalysis } from "@/lib/types";
 
 type Row = Pick<VideoAnalysis, "id" | "user_id" | "sport" | "status" | "coach_id" | "trick">;
 
@@ -156,4 +160,64 @@ export async function submitReview(_: ReviewState, formData: FormData): Promise<
 
   revalidatePath("/espace-coach");
   redirect("/espace-coach?publie=1");
+}
+
+/**
+ * Mise en forme par l'IA : le coach écrit (ou dicte) son compte rendu en vrac,
+ * l'IA le range dans la structure du retour. Rien n'est publié : le coach relit puis publie.
+ */
+export async function structureReview(id: string, draft: string): Promise<{ draft?: ReviewDraft; error?: string }> {
+  const { profile } = await requireCoach();
+  const text = draft.trim();
+  if (text.length < 20) return { error: "Écris au moins quelques phrases : ce que tu vois, ce qu'il faut corriger." };
+  if (text.length > 6000) return { error: "Compte rendu trop long (6 000 caractères max)." };
+
+  const db = createAdminClient();
+  const { data: a } = await db
+    .from("video_analyses")
+    .select("id, user_id, sport, status, coach_id, trick, notes")
+    .eq("id", id)
+    .maybeSingle<Row & { notes: string | null }>();
+  if (!a || a.status !== "en-cours" || (a.coach_id !== profile.id && !profile.is_admin)) {
+    return { error: "Cette vidéo n'est plus à ton nom. Recharge la page." };
+  }
+
+  const [{ data: rider }, { data: previous }] = await Promise.all([
+    db.from("profiles").select("*").eq("id", a.user_id).single<Profile>(),
+    db
+      .from("video_analyses")
+      .select("created_at, result")
+      .eq("user_id", a.user_id)
+      .eq("sport", a.sport)
+      .eq("status", "termine")
+      .order("created_at", { ascending: false })
+      .limit(3)
+      .returns<Pick<VideoAnalysis, "created_at" | "result">[]>(),
+  ]);
+  const trick = a.trick ? trickById(a.trick) : undefined;
+  const level = rider ? levelFor(rider, a.sport) : null;
+
+  try {
+    const result = await structureCoachReport(
+      profile.id,
+      a.sport,
+      {
+        figure: trick?.name ?? "",
+        figureId: trick?.id ?? "",
+        riderQuestion: a.notes ?? "",
+        riderLevel: level ? LEVEL_LABELS[level] : null,
+        previous: (previous ?? [])
+          .filter((p) => p.result)
+          .map((p) => {
+            const r = normalizeResult(p.result);
+            return `${new Date(p.created_at).toLocaleDateString("fr-FR")} ${r.figure} : ${r.note}/10, priorité « ${r.priorite_session} »`;
+          }),
+      },
+      text,
+    );
+    return { draft: result };
+  } catch (e) {
+    console.error("mise en forme IA", e);
+    return { error: "L'IA n'a pas répondu. Réessaie dans un instant, ou remplis le retour à la main." };
+  }
 }

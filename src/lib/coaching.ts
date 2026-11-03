@@ -31,12 +31,17 @@ export async function notifyCoaches(sport: SportId, priority: boolean) {
   const db = createAdminClient();
   const { data } = await db
     .from("profiles")
-    .select("email, coach_sports")
-    .eq("is_coach", true)
-    .returns<Pick<Profile, "email" | "coach_sports">[]>();
-  const to = (data ?? [])
-    .filter((c) => c.email && (!c.coach_sports?.length || c.coach_sports.includes(sport)))
-    .map((c) => c.email!);
+    .select("email, coach_sports, is_admin")
+    .or("is_coach.eq.true,is_admin.eq.true")
+    .returns<Pick<Profile, "email" | "coach_sports" | "is_admin">[]>();
+  // Les admins sont toujours prévenus, les coachs seulement pour leurs sports
+  const to = [
+    ...new Set(
+      (data ?? [])
+        .filter((c) => c.email && (c.is_admin || !c.coach_sports?.length || c.coach_sports.includes(sport)))
+        .map((c) => c.email!),
+    ),
+  ];
   const name = SPORTS[sport].name;
   await Promise.all(
     to.map((email) =>

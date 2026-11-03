@@ -2,6 +2,7 @@
 
 import { startTransition, useActionState, useState } from "react";
 import type { ReviewState } from "@/app/(app)/espace-coach/actions";
+import type { ReviewDraft } from "@/lib/review-draft";
 
 type Option = { value: string; label: string };
 type Phase = { id: "approche" | "appel" | "vol" | "reception"; label: string };
@@ -17,6 +18,7 @@ export function ReviewForm({
   tricks,
   errorCodes,
   phases,
+  initial,
 }: {
   action: (s: ReviewState, f: FormData) => Promise<ReviewState>;
   analysisId: string;
@@ -25,11 +27,15 @@ export function ReviewForm({
   tricks: Option[];
   errorCodes: Option[];
   phases: Phase[];
+  /** Brouillon proposé par l'IA à partir du compte rendu du coach */
+  initial?: ReviewDraft;
 }) {
   const [state, formAction, pending] = useActionState(action, undefined);
-  const [errorRows, setErrorRows] = useState(2);
-  const [figureId, setFigureId] = useState(defaultFigureId);
-  const [figure, setFigure] = useState(defaultFigure);
+  const [errorRows, setErrorRows] = useState(Math.max(2, initial?.erreurs.length ?? 0));
+  const [figureId, setFigureId] = useState(initial?.figure_id || defaultFigureId);
+  const [figure, setFigure] = useState(initial?.figure || defaultFigure);
+  const phase = (id: Phase["id"]) => initial?.phases.find((p) => p.phase === id);
+  const err = (i: number) => initial?.erreurs[i];
 
   return (
     <form
@@ -68,16 +74,16 @@ export function ReviewForm({
           </div>
           <div>
             <label htmlFor="note" className="label">Note /10</label>
-            <input id="note" name="note" type="number" min={0} max={10} step={0.5} required className="field" />
+            <input id="note" name="note" type="number" min={0} max={10} step={0.5} required defaultValue={initial?.note ?? undefined} className="field" />
           </div>
         </div>
         <div>
           <label htmlFor="resume" className="label">Ton retour en quelques phrases</label>
-          <textarea id="resume" name="resume" rows={4} required minLength={10} maxLength={1500} className="field" placeholder="Ce que tu vois, ce qui fonctionne, ce qui bloque." />
+          <textarea id="resume" name="resume" rows={5} required minLength={10} maxLength={1500} defaultValue={initial?.resume} className="field" placeholder="Ce que tu vois, ce qui fonctionne, ce qui bloque." />
         </div>
         <div>
           <label htmlFor="priorite_session" className="label">Priorité pour sa prochaine session</label>
-          <input id="priorite_session" name="priorite_session" required maxLength={400} className="field" placeholder="Ex. Attendre le point haut de l'aile avant de déclencher la rotation." />
+          <input id="priorite_session" name="priorite_session" required maxLength={400} defaultValue={initial?.priorite_session} className="field" placeholder="Ex. Attendre le point haut de l'aile avant de déclencher la rotation." />
         </div>
         <fieldset>
           <legend className="label">Qualité de la vidéo</legend>
@@ -88,7 +94,7 @@ export function ReviewForm({
               ["faible", "Faible"],
             ].map(([v, l]) => (
               <label key={v} className="flex items-center gap-2">
-                <input type="radio" name="visibilite" value={v} defaultChecked={v === "bonne"} /> {l}
+                <input type="radio" name="visibilite" value={v} defaultChecked={v === (initial?.visibilite ?? "bonne")} /> {l}
               </label>
             ))}
           </div>
@@ -102,8 +108,8 @@ export function ReviewForm({
           {phases.map((p) => (
             <div key={p.id} className="grid gap-2 sm:grid-cols-[9rem_5rem_1fr] sm:items-start">
               <span className="pt-2 font-semibold">{p.label}</span>
-              <input name={`phase_${p.id}_note`} type="number" min={0} max={10} step={0.5} aria-label={`Note ${p.label}`} placeholder="/10" className="field" />
-              <textarea name={`phase_${p.id}_commentaire`} rows={2} maxLength={600} aria-label={`Commentaire ${p.label}`} className="field" />
+              <input name={`phase_${p.id}_note`} type="number" min={0} max={10} step={0.5} defaultValue={phase(p.id)?.note ?? undefined} aria-label={`Note ${p.label}`} placeholder="/10" className="field" />
+              <textarea name={`phase_${p.id}_commentaire`} rows={2} maxLength={600} defaultValue={phase(p.id)?.commentaire} aria-label={`Commentaire ${p.label}`} className="field" />
             </div>
           ))}
         </div>
@@ -116,19 +122,19 @@ export function ReviewForm({
             <fieldset key={i} className="panel space-y-2 p-4">
               <legend className="sr-only">Erreur {i + 1}</legend>
               <div className="grid gap-2 sm:grid-cols-[1fr_9rem]">
-                <select name={`erreur_${i}_code`} defaultValue="autre" aria-label={`Type d'erreur ${i + 1}`} className="field">
+                <select name={`erreur_${i}_code`} defaultValue={err(i)?.code ?? "autre"} aria-label={`Type d'erreur ${i + 1}`} className="field">
                   {errorCodes.map((c) => (
                     <option key={c.value} value={c.value}>{c.label}</option>
                   ))}
                 </select>
-                <select name={`erreur_${i}_gravite`} defaultValue="moyenne" aria-label={`Gravité ${i + 1}`} className="field">
+                <select name={`erreur_${i}_gravite`} defaultValue={err(i)?.gravite ?? "moyenne"} aria-label={`Gravité ${i + 1}`} className="field">
                   <option value="majeure">Majeure</option>
                   <option value="moyenne">Moyenne</option>
                   <option value="mineure">Mineure</option>
                 </select>
               </div>
-              <input name={`erreur_${i}_probleme`} maxLength={600} placeholder="Le problème, tel que tu le vois" aria-label={`Problème ${i + 1}`} className="field" />
-              <textarea name={`erreur_${i}_correction`} rows={2} maxLength={800} placeholder="La correction, concrète" aria-label={`Correction ${i + 1}`} className="field" />
+              <input name={`erreur_${i}_probleme`} maxLength={600} defaultValue={err(i)?.probleme} placeholder="Le problème, tel que tu le vois" aria-label={`Problème ${i + 1}`} className="field" />
+              <textarea name={`erreur_${i}_correction`} rows={2} maxLength={800} defaultValue={err(i)?.correction} placeholder="La correction, concrète" aria-label={`Correction ${i + 1}`} className="field" />
             </fieldset>
           ))}
         </div>
@@ -142,23 +148,23 @@ export function ReviewForm({
       <section className="grid gap-4 sm:grid-cols-2">
         <div>
           <label htmlFor="points_forts" className="label">Ce qui marche déjà (une ligne par point)</label>
-          <textarea id="points_forts" name="points_forts" rows={4} className="field" />
+          <textarea id="points_forts" name="points_forts" rows={4} defaultValue={initial?.points_forts.join("\n")} className="field" />
         </div>
         <div>
           <label htmlFor="drills" className="label">Exercices (une ligne par exercice)</label>
-          <textarea id="drills" name="drills" rows={4} className="field" />
+          <textarea id="drills" name="drills" rows={4} defaultValue={initial?.drills.join("\n")} className="field" />
         </div>
         <div>
           <label htmlFor="rappels" className="label">À garder en tête (facultatif)</label>
-          <textarea id="rappels" name="rappels" rows={3} className="field" placeholder="Points clés pas visibles sur la vidéo" />
+          <textarea id="rappels" name="rappels" rows={3} defaultValue={initial?.rappels.join("\n")} className="field" placeholder="Points clés pas visibles sur la vidéo" />
         </div>
         <div>
           <label htmlFor="evolution" className="label">Par rapport à ses tentatives précédentes (facultatif)</label>
-          <textarea id="evolution" name="evolution" rows={3} maxLength={800} className="field" />
+          <textarea id="evolution" name="evolution" rows={3} maxLength={800} defaultValue={initial?.evolution} className="field" />
         </div>
         <div className="sm:col-span-2">
           <label htmlFor="securite" className="label">Alerte sécurité (facultatif)</label>
-          <input id="securite" name="securite" maxLength={600} className="field" placeholder="Seulement s'il y a un vrai risque" />
+          <input id="securite" name="securite" maxLength={600} defaultValue={initial?.securite} className="field" placeholder="Seulement s'il y a un vrai risque" />
         </div>
       </section>
 
