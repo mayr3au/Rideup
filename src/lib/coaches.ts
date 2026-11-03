@@ -28,12 +28,11 @@ export const TEAM: TeamCoach[] = [
     pos: "50% 30%",
   },
   {
-    // Coach wakeboard : prénom et Instagram à compléter (il n'est pas affiché tant que le nom est vide)
-    name: "",
+    name: "Endy Beltrame",
     sports: ["wakeboard"],
     title: "Wakeboard câble",
-    bio: "",
-    instagram: "",
+    bio: "Kickers, modules et premiers inverts : il te fait progresser à chaque tour de câble.",
+    instagram: "endy_beltrame",
     photo: "/coachs/coach-wake.jpg",
     pos: "50% 25%",
   },
