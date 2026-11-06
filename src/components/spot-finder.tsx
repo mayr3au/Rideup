@@ -639,7 +639,7 @@ function SpotDetail({
       <dl className="mt-4 grid grid-cols-2 gap-3 text-[0.95rem]">
         {kind !== "cable" && <Info label="Plan d'eau" value={WATER[s.water]} />}
         <Info label="Niveau" value={s.min_level === "debutant" ? "Tous niveaux" : s.min_level === "intermediaire" ? "Intermédiaire +" : "Confirmé"} />
-        {kind === "wind" && <Info label="Vent idéal" value={`De ${compass((s.sea_bearing + 90) % 360)} ou ${compass((s.sea_bearing + 270) % 360)}`} />}
+        {kind === "wind" && <Info label="Vent idéal" value={s.water === "lac" ? "Toutes directions (plan d'eau)" : `De ${compass((s.sea_bearing + 90) % 360)} ou ${compass((s.sea_bearing + 270) % 360)}`} />}
         {kind === "waves" && <Info label="Houle idéale" value={`De ${compass(s.sea_bearing)}`} />}
         <Info label="Météo" value={mid ? `${weatherLabel(mid.code)}, ${Math.round(mid.temp)} °C` : "–"} />
       </dl>
