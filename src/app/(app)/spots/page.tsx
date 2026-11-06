@@ -233,7 +233,7 @@ export default async function SpotsPage({ searchParams }: { searchParams: Promis
               </p>
             </div>
           )}
-          <SpotFinder spots={spots} origin={{ lat, lng }} canAlert={plan === "elite"} kind={S.spot} />
+          <SpotFinder spots={spots} origin={{ lat, lng }} canAlert={plan === "elite"} kind={S.spot} sport={sport} />
         </div>
       )}
 

@@ -113,6 +113,48 @@ export async function importSpotCatalogue() {
 }
 
 /**
+ * Applique le référentiel Spot Finder (fiches du PDF) : statuts par discipline, règles locales, sources et sports
+ * sur les spots existants, et ajoute les spots documentés qui manquent (position au centre de la commune).
+ * Équivalent de supabase/migrations/0008_spot_finder_referentiel.sql, rejouable.
+ */
+export async function importSpotReferentiel(_: AdminState): Promise<AdminState> {
+  const db = await requireAdmin();
+  const { SPOT_REFERENTIEL, SPOT_REFERENTIEL_NOUVEAUX } = await import("@/lib/spot-referentiel");
+  const { data: existing, error: readError } = await db.from("spots").select("id, notes, ref_id");
+  if (readError) {
+    return { error: readError.message.includes("ref_id") ? "Exécute d'abord la migration 0008 (colonnes ref_id, practice, rules, sources, position_approx)." : readError.message };
+  }
+  const byId = new Map((existing ?? []).map((s) => [s.id as string, s]));
+  let updated = 0;
+  for (const [id, r] of Object.entries(SPOT_REFERENTIEL)) {
+    const cur = byId.get(id);
+    if (!cur) continue;
+    const notes = (cur.notes as string | null) ?? "";
+    const add = r.notes_add ?? "";
+    const newNotes = !add ? notes || null : !notes ? add : notes.includes(add.slice(0, 40)) ? notes : `${notes} — ${add}`;
+    const { error } = await db
+      .from("spots")
+      .update({ ref_id: r.ref_id, practice: r.practice, sports: r.sports, rules: r.rules, sources: r.sources, notes: newNotes })
+      .eq("id", id);
+    if (error) return { error: `${id} : ${error.message}` };
+    updated++;
+  }
+  const fresh = SPOT_REFERENTIEL_NOUVEAUX.filter((n) => !byId.has(n.id)).map((n) => {
+    const row: Record<string, unknown> = { ...n, active: true };
+    delete row.alias_ids;
+    return row;
+  });
+  if (fresh.length) {
+    const { error } = await db.from("spots").insert(fresh);
+    if (error) return { error: `Nouveaux spots : ${error.message}` };
+  }
+  revalidatePath("/admin/spots");
+  revalidatePath("/spots");
+  revalidatePath("/week-end");
+  return { ok: `Référentiel appliqué : ${updated} spots enrichis, ${fresh.length} nouveaux spots ajoutés.` };
+}
+
+/**
  * Ajoute les spots cartographiés dans OpenStreetMap qui manquent (à plus de 1,5 km d'un spot existant).
  * L'orientation est calculée depuis le trait de côte ; le niveau reste « intermédiaire » par prudence.
  */

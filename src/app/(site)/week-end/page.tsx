@@ -218,6 +218,7 @@ export default async function WeekendPage({
                       {r.spot.region ? `${r.spot.region}, ` : ""}
                       {r.spot.country}
                       {r.distance != null && ` · ${Math.round(r.distance)} km`}
+                      {r.spot.rules && <span className="ml-1.5 rounded-full bg-amber-50 px-2 py-0.5 text-xs font-semibold text-amber-800">⚠ règles locales</span>}
                     </p>
                   </div>
                   {[

@@ -122,7 +122,17 @@ export type Spot = {
   min_level: "debutant" | "intermediaire" | "avance";
   notes: string | null;
   active: boolean;
+  /** Référentiel Spot Finder (fiche PDF) : n° de fiche, statut par discipline, règles locales, sources. */
+  ref_id?: number | null;
+  practice?: Partial<Record<SportId, PracticeStatus>> | null;
+  rules?: string | null;
+  sources?: string[] | null;
+  /** Position au centre de la commune, à pointer dans l'admin. */
+  position_approx?: boolean | null;
 };
+
+/** D documenté · T confirmé terrain · P piste · W wing à vérifier · X écarté · ? information insuffisante */
+export type PracticeStatus = "D" | "T" | "P" | "W" | "X" | "?";
 
 export type ProgramDay = { titre: string; objectif: string; exercices: string[] };
 export type Program = {
