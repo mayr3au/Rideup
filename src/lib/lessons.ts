@@ -187,12 +187,12 @@ export const LESSONS: Lesson[] = [
       { type: "schema", id: "self-rescue", caption: "Les quatre temps du self-rescue. Chaque geste se fait calmement : la panique fatigue plus que la nage." },
       { type: "steps", items: [
         { titre: "Tire le largueur", texte: "Pousse le largueur du chicken loop. Le kite part en drapeau sur une seule ligne (le leash) et perd toute sa puissance. Attends qu'il soit à plat sur l'eau. Si ton leash est sur une ligne avant, le kite peut encore bouger : garde une main sur le leash." },
-        { titre: "Enroule les lignes", texte: "Tire-toi vers le kite en enroulant les lignes autour des flotteurs de la barre, main après main, sans jamais passer une ligne autour d'un doigt ou du cou. Prends ton temps : 25 m, ça fait une minute." },
+        { titre: "Enroule les lignes", texte: "Tire-toi vers le kite en enroulant les lignes autour des flotteurs de la barre, main après main, sans jamais passer une ligne autour d'un doigt ou du cou. Pendant tout l'enroulement, seule la ligne de sécurité (celle du leash) doit être en tension : les autres lignes restent molles, sinon le kite se regonfle et repart. Veille aussi à ce que le leash ne repasse pas dans la barre ni dans les lignes enroulées. Prends ton temps : 25 m, ça fait une minute, et un enroulement propre t'évite un sac de nœuds à l'arrivée." },
         { titre: "Attrape le bord d'attaque", texte: "Arrivé au kite, saisis le bord d'attaque gonflé par une oreille (l'extrémité). Retourne-le pour qu'il repose sur le dos, bord d'attaque vers toi." },
         { titre: "Voile vers la plage", texte: "Allonge-toi dans l'eau, tiens l'oreille au vent du kite à bout de bras et laisse l'autre moitié se gonfler. Le kite fait voile et te pousse sous le vent. Oriente-toi en inclinant plus ou moins l'oreille. Si la planche est avec toi, cale-la sous ton bras ou dans le harnais." },
       ] },
       { type: "h", text: "Si ça ne suffit pas : le pack-down" },
-      { type: "p", text: "Loin de la plage, par vent très faible ou pour attendre un bateau : dégonfle le bord d'attaque, roule le kite serré autour de la barre et des lignes, et nage avec le paquet. Le kite fait flotteur. Lève un bras bien droit et agite-le lentement : c'est le signal de détresse reconnu." },
+      { type: "p", text: "Loin de la plage, par vent très faible ou pour attendre un bateau : dégonfle le bord d'attaque seulement, jamais les lattes (elles gardent le kite rigide et flottant), roule le kite serré autour de la barre et des lignes, et nage avec le paquet. Le kite fait flotteur. Lève un bras bien droit et agite-le lentement : c'est le signal de détresse reconnu." },
       { type: "warning", text: "Ne te sépare jamais de ton kite dégonflé ni de ta planche : ils flottent, ils se voient de loin, et ils te sauvent du froid. Un kiteur sans matériel dans l'eau est invisible." },
       { type: "tip", text: "Entraîne-toi en conditions faciles, près du bord, par vent side-on de 12 nds, avec quelqu'un qui te regarde. Le jour où tu en auras besoin, ton corps saura quoi faire." },
       { type: "quiz", items: [
@@ -201,7 +201,7 @@ export const LESSONS: Lesson[] = [
         { q: "Signal de détresse en mer ?", a: "Un bras levé, agité lentement de haut en bas. Reste avec ton matériel." },
       ] },
     ],
-    retenir: ["Largueur → kite en drapeau → calme", "Enrouler autour des flotteurs, jamais autour du corps", "Oreille au vent à bout de bras : le kite fait voile", "Rester avec son matériel ; bras levé = détresse"],
+    retenir: ["Largueur → kite en drapeau → calme", "Enrouler autour des flotteurs, seule la ligne de sécurité tendue", "Oreille au vent à bout de bras : le kite fait voile", "Rester avec son matériel ; bras levé = détresse"],
   },
   {
     slug: "priorites-sur-l-eau",
@@ -213,10 +213,10 @@ export const LESSONS: Lesson[] = [
     intro: "Des lignes de 25 m, des ailes qui se croisent à 40 km/h : sans règles communes, le spot devient un billard. Elles tiennent en cinq points.",
     schema: "priorites",
     blocks: [
-      { type: "schema", id: "priorites", caption: "Le croisement type : chacun écarte son aile de celle de l'autre, et le rider tribord amures (main droite devant) garde son cap." },
+      { type: "schema", id: "priorites", caption: "Le croisement type, vu depuis la plage : le rider au vent lève son aile, celui sous le vent la baisse. Les lignes ne se croisent jamais." },
       { type: "steps", items: [
         { titre: "Main droite devant = priorité", texte: "Le rider tribord amures (main droite vers l'avant, kite sur sa droite) garde sa route. L'autre s'écarte, de préférence en passant sous le vent." },
-        { titre: "Croisement : au vent kite bas, sous le vent kite haut", texte: "Quand vous vous croisez de près, le rider au vent descend son aile, celui sous le vent la monte. Les lignes ne se touchent jamais." },
+        { titre: "Croisement : au vent kite HAUT, sous le vent kite BAS", texte: "Quand vous vous croisez, le rider le plus haut au vent lève son aile (vers le zénith), celui qui est sous le vent la baisse. Ses lignes passent ainsi sous celles de l'autre : elles ne se touchent jamais. Retiens-le dans ce sens : au vent, je lève ; sous le vent, je baisse." },
         { titre: "Celui qui part de la plage a la priorité", texte: "Sur celui qui rentre : il est dans la zone la plus dangereuse (bord, baigneurs) et a besoin de place pour partir." },
         { titre: "Celui qui rattrape s'écarte", texte: "Le plus rapide contourne, par le côté sous le vent. On ne double pas entre un rider et sa vague, ni au vent de quelqu'un qui saute." },
         { titre: "Saut : 50 m libres sous le vent, et on regarde avant", texte: "Avant de sauter, un coup d'œil sous le vent et derrière. Un saut, c'est 20 à 30 m de déplacement latéral." },
@@ -225,12 +225,12 @@ export const LESSONS: Lesson[] = [
       { type: "list", items: ["Surfeurs, nageurs, SUP : toujours prioritaires. Ils ne peuvent pas t'éviter, toi si.", "Bateaux et planches à voile : les règles de navigation classiques s'appliquent. Dans le doute, tu t'écartes.", "Sur un spot à vagues, le rider qui surfe la vague a la priorité sur celui qui remonte."] },
       { type: "tip", text: "Tu te rapproches d'un autre rider et tu hésites ? Monte ton kite au zénith et ralentis. Perdre dix secondes coûte moins cher qu'un emmêlage de lignes." },
       { type: "quiz", items: [
-        { q: "Deux riders se croisent. Lequel monte son kite ?", a: "Celui qui est sous le vent (le plus près de la plage sur un vent side). Celui au vent descend le sien." },
+        { q: "Deux riders se croisent. Lequel monte son kite ?", a: "Celui qui est au vent (le plus loin de la plage sur un vent side-on). Celui sous le vent baisse le sien." },
         { q: "Tu rentres à la plage, un rider décolle devant toi. Qui a la priorité ?", a: "Celui qui part. Tu ralentis et tu le laisses s'éloigner." },
         { q: "Un nageur est sur ta trajectoire.", a: "Tu changes de route, toujours. Il est prioritaire quoi qu'il arrive." },
       ] },
     ],
-    retenir: ["Main droite devant : je garde ma route", "Croisement : au vent kite bas, sous le vent kite haut", "Celui qui part de la plage passe en premier", "Nageurs et surfeurs : prioritaires sans discussion"],
+    retenir: ["Main droite devant : je garde ma route", "Croisement : au vent je lève, sous le vent je baisse", "Celui qui part de la plage passe en premier", "Nageurs et surfeurs : prioritaires sans discussion"],
   },
   {
     slug: "lancer-et-poser-a-deux",

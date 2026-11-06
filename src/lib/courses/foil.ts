@@ -227,7 +227,7 @@ export const COURSES_FOIL: Course[] = [
       {
         titre: "Kite calé, barre près du corps",
         texte:
-          "Kite à 10-11 h, barre bordée à 70 %, mains au centre. Une passe de kite modifie la traction et donc ton assiette : tu ne pilotes plus, tu tiens. Si ça tire trop, remonte le kite d'une demi-heure plutôt que de choquer.",
+          "Kite à 10-11 h, barre bordée à 70 %, mains au centre. Une passe de kite modifie la traction et donc l'assiette (l'inclinaison de la planche, nez haut ou nez bas) : tu ne pilotes plus, tu tiens. Si ça tire trop, remonte le kite d'une demi-heure plutôt que de choquer.",
       },
       {
         titre: "Regard et épaules",
