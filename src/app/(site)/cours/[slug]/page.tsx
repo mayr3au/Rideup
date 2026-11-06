@@ -256,10 +256,20 @@ function CourseView({ c, locked, signedIn }: { c: Course; locked: boolean; signe
   const sport = SPORTS[sportId];
   const tricks = tricksFor(sportId);
   const idx = tricks.findIndex((t) => t.id === c.trickId);
-  const nextTrick = idx >= 0 ? tricks[idx + 1] : undefined;
-  const nextCourse = nextTrick ? courseForTrick(nextTrick.id) : undefined;
-  const prevTrick = idx > 0 ? tricks[idx - 1] : undefined;
-  const prevCourse = prevTrick ? courseForTrick(prevTrick.id) : undefined;
+  // Figure voisine qui a un cours (les figures de la roadmap sans cours sont sautées : pas de lien vide)
+  const withCourse = (from: number, step: 1 | -1) => {
+    for (let i = from; i >= 0 && i < tricks.length; i += step) {
+      const course = courseForTrick(tricks[i].id);
+      if (course) return { trick: tricks[i], course };
+    }
+    return undefined;
+  };
+  const next = idx >= 0 ? withCourse(idx + 1, 1) : undefined;
+  const prev = idx > 0 ? withCourse(idx - 1, -1) : undefined;
+  const nextTrick = next?.trick;
+  const nextCourse = next?.course;
+  const prevTrick = prev?.trick;
+  const prevCourse = prev?.course;
   const lessons = LESSONS.filter((l) => !l.sports.length || l.sports.includes(sportId)).slice(0, 3);
 
   return (
@@ -415,13 +425,13 @@ function CourseView({ c, locked, signedIn }: { c: Course; locked: boolean; signe
 
           <nav className="mt-8 grid gap-3 sm:grid-cols-2" aria-label="Figures voisines">
             {prevTrick && (
-              <Link href={prevCourse ? `/cours/${prevCourse.slug}` : "/cours"} className="panel block p-4 hover:ring-2 hover:ring-brand">
+              <Link href={`/cours/${prevCourse!.slug}`} className="panel block p-4 hover:ring-2 hover:ring-brand">
                 <span className="text-xs font-bold uppercase tracking-wider text-slate">← Figure précédente</span>
                 <span className="mt-1 block font-bold">{prevTrick.name}</span>
               </Link>
             )}
             {nextTrick && (
-              <Link href={nextCourse ? `/cours/${nextCourse.slug}` : "/cours"} className="panel block p-4 text-right hover:ring-2 hover:ring-brand sm:col-start-2">
+              <Link href={`/cours/${nextCourse!.slug}`} className="panel block p-4 text-right hover:ring-2 hover:ring-brand sm:col-start-2">
                 <span className="text-xs font-bold uppercase tracking-wider text-slate">Figure suivante →</span>
                 <span className="mt-1 block font-bold">{nextTrick.name}</span>
               </Link>

@@ -277,42 +277,41 @@ function SelfRescue() {
 
 function Priorites() {
   return (
-    <Frame label="Règles de priorité : le rider tribord amures garde sa route ; en croisement, celui qui remonte au vent garde le kite bas et celui qui descend le monte" viewBox="0 0 400 230">
-      <rect x="0" y="0" width="400" height="230" fill={C.sea} rx="12" />
-      <g transform="translate(200 20)">
-        <line x1="0" y1="-10" x2="0" y2="22" stroke={C.deep} strokeWidth={2.5} markerEnd="url(#arr-deep)" />
-        <text x="14" y="4" fill={C.deep} style={T} fontSize="11">
-          VENT
-        </text>
-      </g>
-      {/* rider A : au vent, kite bas */}
+    <Frame label="Règle de croisement vue depuis la plage : le rider au vent lève son kite, le rider sous le vent le baisse ; les lignes ne se croisent pas" viewBox="0 0 400 230">
+      <rect x="0" y="150" width="400" height="80" fill={C.sea} rx="12" />
+      {/* vent : vient de la gauche */}
+      <path d="M18 30 H88" stroke={C.deep} strokeWidth={2.5} markerEnd="url(#arr-deep)" />
+      <text x="53" y="22" textAnchor="middle" fill={C.deep} fontSize="12" style={T}>
+        VENT
+      </text>
+      {/* rider A : au vent (à gauche), kite haut */}
       <g>
-        <Rider x={120} y={150} />
-        <Kite x={60} y={118} rot={-30} />
-        <line x1="112" y1="140" x2="70" y2="124" stroke={C.slate} strokeWidth={1} />
-        <path d="M135 140 L200 112" stroke={C.deep} strokeWidth={2} markerEnd="url(#arr-deep)" />
-        <text x="120" y="182" textAnchor="middle" fill={C.deep} fontSize="10.5" style={T}>
-          Rider au vent
+        <Kite x={120} y={48} rot={-6} />
+        <line x1="120" y1="56" x2="112" y2="150" stroke={C.slate} strokeWidth={1.2} />
+        <line x1="120" y1="56" x2="118" y2="150" stroke={C.slate} strokeWidth={1.2} />
+        <Rider x={115} y={150} />
+        <text x="115" y="188" textAnchor="middle" fill={C.deep} fontSize="12" style={T}>
+          Rider AU VENT
         </text>
-        <text x="120" y="196" textAnchor="middle" fill={C.lagoon} fontSize="10" style={T}>
-          kite BAS
+        <text x="115" y="204" textAnchor="middle" fill={C.ok} fontSize="12" style={T}>
+          kite HAUT ↑
         </text>
       </g>
-      {/* rider B : sous le vent, kite haut */}
+      {/* rider B : sous le vent (à droite), kite bas */}
       <g>
-        <Rider x={290} y={112} />
-        <Kite x={300} y={44} rot={10} />
-        <line x1="292" y1="100" x2="300" y2="56" stroke={C.slate} strokeWidth={1} />
-        <path d="M275 122 L210 150" stroke={C.deep} strokeWidth={2} markerEnd="url(#arr-deep)" />
-        <text x="290" y="146" textAnchor="middle" fill={C.deep} fontSize="10.5" style={T}>
-          Rider sous le vent
+        <Kite x={352} y={112} rot={40} />
+        <line x1="344" y1="118" x2="282" y2="150" stroke={C.slate} strokeWidth={1.2} />
+        <line x1="344" y1="118" x2="288" y2="150" stroke={C.slate} strokeWidth={1.2} />
+        <Rider x={285} y={150} />
+        <text x="285" y="188" textAnchor="middle" fill={C.deep} fontSize="12" style={T}>
+          Rider SOUS LE VENT
         </text>
-        <text x="290" y="160" textAnchor="middle" fill={C.lagoon} fontSize="10" style={T}>
-          kite HAUT
+        <text x="285" y="204" textAnchor="middle" fill={C.ok} fontSize="12" style={T}>
+          kite BAS ↓
         </text>
       </g>
-      <text x="200" y="218" textAnchor="middle" fill={C.deep} fontSize="10.5" style={T}>
-        Chacun écarte son kite de celui de l&apos;autre.
+      <text x="200" y="224" textAnchor="middle" fill={C.deep} fontSize="11.5" style={T}>
+        Au vent je lève, sous le vent je baisse : les lignes ne se croisent jamais.
       </text>
     </Frame>
   );

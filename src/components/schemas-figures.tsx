@@ -306,63 +306,72 @@ function WingPieds() {
 }
 
 function WingAile() {
-  function WingShape({ x, y, rot, color = C.brand }: { x: number; y: number; rot: number; color?: string }) {
+  /** Aile vue de côté : un croissant orienté par `rot`, avec la poignée (trait) et les deux mains. */
+  function Wing({ x, y, rot, full, color = C.brand }: { x: number; y: number; rot: number; full: boolean; color?: string }) {
     return (
       <g transform={`translate(${x} ${y}) rotate(${rot})`}>
-        <path d="M-34 8 Q0 -18 34 8 Q0 -2 -34 8 Z" fill={color} opacity={0.9} />
-        <line x1="-10" y1="2" x2="12" y2="2" stroke={C.deep} strokeWidth={2.5} strokeLinecap="round" />
+        <path d={full ? "M-40 10 Q0 -26 40 10 Q0 -4 -40 10 Z" : "M-40 6 Q0 -12 40 6 Q0 0 -40 6 Z"} fill={color} opacity={full ? 0.95 : 0.55} />
+        <line x1="-14" y1="4" x2="16" y2="4" stroke={C.deep} strokeWidth={3} strokeLinecap="round" />
       </g>
     );
   }
-  function Person({ x }: { x: number }) {
+  function Person({ x, arms }: { x: number; arms: string }) {
     return (
-      <g transform={`translate(${x} 0)`} fill="none" stroke={C.deep} strokeWidth={2.2} strokeLinecap="round">
-        <circle cx="0" cy="92" r="6" fill={C.deep} stroke="none" />
-        <path d="M0 98 V122 M0 122 L-8 142 M0 122 L8 142" />
-        <path d="M-18 150 H18" strokeWidth={3} />
+      <g transform={`translate(${x} 0)`} fill="none" stroke={C.deep} strokeWidth={2.4} strokeLinecap="round" strokeLinejoin="round">
+        <circle cx="0" cy="104" r="7" fill={C.deep} stroke="none" />
+        <path d="M0 111 V138 M0 138 L-9 160 M0 138 L9 160" />
+        <path d="M-20 168 H20" strokeWidth={3.5} />
+        <path d={arms} />
       </g>
     );
   }
+  const poses = [
+    { x: 68, t: "NEUTRE", s1: "en drapeau", s2: "au-dessus de la tête", rot: 0, wx: 0, wy: 62, full: false, arms: "M0 116 L-4 78 M0 116 L8 78", power: 0, color: C.slate },
+    { x: 200, t: "BORDÉE", s1: "main arrière à la hanche", s2: "aile basse = puissance", rot: -40, wx: -44, wy: 112, full: true, arms: "M0 116 L-22 96 M0 118 L-30 140", power: 3, color: C.brand },
+    { x: 332, t: "CHOQUÉE", s1: "main arrière relâchée", s2: "aile ouverte = tire moins", rot: -8, wx: 6, wy: 68, full: false, arms: "M0 116 L-18 90 M0 118 L34 88", power: 1, color: C.brand },
+  ];
   return (
-    <Frame label="Tenue de l'aile : neutre au-dessus de la tête pour se reposer, bordée avec la main arrière pour avancer, bras souples" viewBox="0 0 400 180">
-      {[
-        { x: 70, t: "Neutre", s: "aile en drapeau au-dessus", rot: 0, wy: 60, arms: "M0 102 L-6 76 M0 102 L8 76" },
-        { x: 200, t: "Bordée", s: "main arrière tire, bras avant tendu", rot: -25, wy: 78, arms: "M0 102 L-16 84 M0 104 L18 96" },
-        { x: 330, t: "Choquée", s: "main arrière relâche, puissance en moins", rot: -8, wy: 68, arms: "M0 102 L-14 80 M0 104 L16 92" },
-      ].map((p) => (
+    <Frame label="Tenue de l'aile : neutre en drapeau au-dessus de la tête pour se reposer, bordée (main arrière tirée, aile basse et proche) pour avancer, choquée (main arrière relâchée, aile ouverte) pour couper la puissance" viewBox="0 0 400 236">
+      <path d="M16 24 H76" stroke={C.deep} strokeWidth={2.5} markerEnd="url(#arr-deep)" />
+      <Note x={46} y={16} color={C.deep} size={12}>
+        VENT
+      </Note>
+      {poses.map((p) => (
         <g key={p.t}>
-          <WingShape x={p.x} y={p.wy} rot={p.rot} color={p.t === "Neutre" ? C.slate : C.brand} />
-          <Person x={p.x} />
-          <path d={p.arms} transform={`translate(${p.x} 0)`} fill="none" stroke={C.deep} strokeWidth={2.2} strokeLinecap="round" />
-          <Note x={p.x} y={168} color={C.deep}>
+          <Wing x={p.x + p.wx} y={p.wy} rot={p.rot} full={p.full} color={p.color} />
+          <Person x={p.x} arms={p.arms} />
+          {/* jauge de puissance */}
+          {[0, 1, 2].map((i) => (
+            <rect key={i} x={p.x - 22 + i * 15} y={176} width="11" height="6" rx="2" fill={i < p.power ? C.brand : C.line} />
+          ))}
+          <Note x={p.x} y={200} color={C.deep} size={13}>
             {p.t}
           </Note>
-          <Note x={p.x} y={179} color={C.slate} size={9}>
-            {p.s}
+          <Note x={p.x} y={215} color={C.slate} size={10.5}>
+            {p.s1}
+          </Note>
+          <Note x={p.x} y={229} color={C.slate} size={10.5}>
+            {p.s2}
           </Note>
         </g>
       ))}
-      <path d="M20 20 H70" stroke={C.deep} strokeWidth={2.5} markerEnd="url(#arr-deep)" />
-      <Note x={45} y={13} color={C.deep} size={10}>
-        VENT
-      </Note>
     </Frame>
   );
 }
 
-function TopTrack({ label, path, notes, wind = "VENT" }: { label: string; path: string; notes: { x: number; y: number; t: string; c?: string }[]; wind?: string }) {
+function TopTrack({ label, path, notes, wind = "VENT" }: { label: string; path: string; notes: { x: number; y: number; t: string; c?: string; a?: "start" | "middle" | "end" }[]; wind?: string }) {
   return (
     <Frame label={label} viewBox="0 0 400 230">
       <rect x="0" y="0" width="400" height="230" rx="12" fill={C.sea} />
-      <g transform="translate(200 18)">
-        <line x1="0" y1="-8" x2="0" y2="22" stroke={C.deep} strokeWidth={2.5} markerEnd="url(#arr-deep)" />
-        <Note x={14} y={6} anchor="start" color={C.deep} size={11}>
+      <g transform="translate(22 14)">
+        <line x1="0" y1="-6" x2="0" y2="26" stroke={C.deep} strokeWidth={2.5} markerEnd="url(#arr-deep)" />
+        <Note x={10} y={10} anchor="start" color={C.deep} size={12}>
           {wind}
         </Note>
       </g>
       <path d={path} fill="none" stroke={C.brand} strokeWidth={3.5} markerEnd="url(#arr-brand)" />
       {notes.map((n) => (
-        <Note key={n.t} x={n.x} y={n.y} color={n.c ?? C.deep} size={10}>
+        <Note key={n.t} x={n.x} y={n.y} color={n.c ?? C.deep} size={11.5} anchor={n.a}>
           {n.t}
         </Note>
       ))}
@@ -374,13 +383,13 @@ function WingJibe() {
   return (
     <TopTrack
       label="Jibe en vol (vue de dessus) : on abat en gardant la vitesse, on passe l'aile devant soi au vent arrière, on change de pieds, on relance sur l'autre bord"
-      path="M40 70 C 150 60, 230 90, 250 140 S 200 200, 120 180"
+      path="M60 70 C 160 60, 240 90, 260 140 S 210 205, 130 185"
       notes={[
-        { x: 70, y: 56, t: "1. Vitesse, vol stable" },
-        { x: 300, y: 120, t: "2. Abats : aile neutre,", c: C.brand },
-        { x: 300, y: 133, t: "passe-la devant toi", c: C.brand },
-        { x: 250, y: 200, t: "3. Vent arrière : change de pieds" },
-        { x: 90, y: 205, t: "4. Reborde, nouveau bord", c: C.lagoon },
+        { x: 100, y: 54, t: "1. Vitesse, vol stable" },
+        { x: 285, y: 112, t: "2. Abats : aile en drapeau", c: C.brand, a: "start" },
+        { x: 285, y: 127, t: "au-dessus de la tête", c: C.brand, a: "start" },
+        { x: 255, y: 212, t: "3. Vent arrière : mains, puis pieds" },
+        { x: 70, y: 212, t: "4. Reborde, nouveau bord", c: C.lagoon },
       ]}
     />
   );
@@ -389,13 +398,15 @@ function WingJibe() {
 function WingTack() {
   return (
     <TopTrack
-      label="Tack en vol (vue de dessus) : on lofe face au vent avec de la vitesse, l'aile passe par-dessus la tête, on relance sur l'autre bord"
-      path="M60 190 C 120 150, 170 90, 200 50 S 250 90, 330 170"
+      label="Tack en vol (vue de dessus, vent venant du haut) : on arrive au près avec de la vitesse, le nez passe face au vent, l'aile passe devant par-dessus la tête, et on repart au près sur l'autre bord"
+      path="M30 215 C 110 170, 180 130, 225 105 C 255 88, 262 62, 240 58 C 222 55, 190 70, 165 55 C 140 40, 125 25, 105 8"
       notes={[
-        { x: 80, y: 212, t: "1. Vitesse, cap au près serré" },
-        { x: 200, y: 36, t: "2. Face au vent : aile par-dessus la tête,", c: C.brand },
-        { x: 200, y: 49, t: "change de pieds, regard sur le nouveau bord", c: C.brand },
-        { x: 320, y: 195, t: "3. Reborde, le foil ne doit pas toucher", c: C.lagoon },
+        { x: 95, y: 214, t: "1. Au près, vitesse max", a: "start" },
+        { x: 270, y: 120, t: "2. Face au vent :", c: C.brand, a: "start" },
+        { x: 270, y: 135, t: "aile devant, par-dessus", c: C.brand, a: "start" },
+        { x: 270, y: 150, t: "la tête, pas de pieds", c: C.brand, a: "start" },
+        { x: 150, y: 90, t: "3. Reborde, abats un peu", c: C.lagoon, a: "end" },
+        { x: 150, y: 105, t: "pour relancer, puis au près", c: C.lagoon, a: "end" },
       ]}
     />
   );
@@ -413,26 +424,26 @@ function FoilAssiette() {
           <circle cx="-22" cy="-10" r="5" fill={C.brand} />
           <circle cx="22" cy="-10" r="5" fill={C.lagoon} />
         </g>
-        <Note x={0} y={60} color={color}>
+        <Note x={0} y={62} color={color} size={12}>
           {label}
         </Note>
-        <Note x={0} y={72} color={C.slate} size={9}>
+        <Note x={0} y={76} color={C.slate} size={10.5}>
           {sub}
         </Note>
       </g>
     );
   }
   return (
-    <Frame label="Assiette en foil : trop de pied arrière fait monter la planche jusqu'à la ventilation, trop de pied avant la fait toucher l'eau ; on vole à 20-30 cm avec des corrections minimes" viewBox="0 0 400 180">
-      <Board x={70} y={50} rot={-14} label="Trop de pied arrière" sub="monte, le foil ventile → chute" color={C.danger} />
-      <Board x={200} y={50} rot={0} label="Équilibre" sub="20-30 cm, corrections minimes" color={C.ok} />
-      <Board x={330} y={50} rot={12} label="Trop de pied avant" sub="touchette, la planche colle" color={C.danger} />
-      <circle cx="120" cy="150" r="5" fill={C.brand} />
-      <Note x={132} y={154} anchor="start" color={C.slate} size={10}>
-        pied avant
+    <Frame label="Assiette en foil (inclinaison de la planche, nez à gauche) : trop de pied arrière fait monter le nez jusqu'à la ventilation, trop de pied avant le fait plonger ; on vole à 20-30 cm avec des corrections minimes" viewBox="0 0 400 184">
+      <Board x={70} y={50} rot={14} label="Trop de pied arrière" sub="nez qui monte → ventile" color={C.danger} />
+      <Board x={200} y={50} rot={0} label="Équilibre" sub="20-30 cm, à plat" color={C.ok} />
+      <Board x={330} y={50} rot={-12} label="Trop de pied avant" sub="nez qui plonge → touchette" color={C.danger} />
+      <circle cx="100" cy="150" r="5" fill={C.brand} />
+      <Note x={112} y={154} anchor="start" color={C.slate} size={11}>
+        pied avant — le nez de la planche est à gauche
       </Note>
-      <circle cx="220" cy="150" r="5" fill={C.lagoon} />
-      <Note x={232} y={154} anchor="start" color={C.slate} size={10}>
+      <circle cx="100" cy="168" r="5" fill={C.lagoon} />
+      <Note x={112} y={172} anchor="start" color={C.slate} size={11}>
         pied arrière
       </Note>
     </Frame>

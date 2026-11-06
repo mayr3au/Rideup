@@ -164,7 +164,7 @@ export const COURSES_WINGFOIL: Course[] = [
     title: "Tenir le vol",
     level: "Intermédiaire",
     minutes: 8,
-    intro: "Voler longtemps, c'est corriger tôt et petit. L'assiette se tient avec les chevilles et les genoux, pas avec les bras ni l'aile.",
+    intro: "Voler longtemps, c'est corriger tôt et petit. Ce qu'on appelle l'assiette, c'est l'inclinaison de la planche : nez qui monte ou nez qui plonge. Elle se tient avec les chevilles et les genoux, pas avec les bras ni l'aile.",
     conditions: "14 à 20 nœuds réguliers, plan d'eau plat ou petit clapot, le même matériel stable qu'au décollage.",
     prerequis: ["Décoller volontairement sur les deux bords", "Reposer la planche à plat sans piquer", "Aile stable en vol, bras fléchis"],
     phases: [
@@ -204,7 +204,7 @@ export const COURSES_WINGFOIL: Course[] = [
     minutes: 8,
     intro: "En vol, la planche remonte au vent presque toute seule : il suffit de border, d'ouvrir les épaules et de laisser le foil faire sa dérive. Ne force pas sur le pied arrière.",
     conditions: "15 à 20 nœuds réguliers, plan d'eau plat, aile bien adaptée (ni sous-toilé, ni surtoilé), foil avec une aile avant à bon allongement.",
-    prerequis: ["Tenir le vol 20 s sur chaque bord", "Reposer à plat en contrôle", "Choquer / border en vol sans déstabiliser l'assiette"],
+    prerequis: ["Tenir le vol 20 s sur chaque bord", "Reposer à plat en contrôle", "Choquer / border en vol sans faire monter ni plonger la planche"],
     phases: [
       { phase: "approche", cle: "En vol stable au travers, bonne vitesse" },
       { phase: "appel", cle: "Border la main arrière, aile basse et près du corps" },
@@ -217,7 +217,7 @@ export const COURSES_WINGFOIL: Course[] = [
       { titre: "Border et rapprocher l'aile", texte: "Tire la main arrière vers la hanche et rapproche l'aile du corps, bord d'attaque un peu plus bas qu'au travers. L'aile tire plus de côté : c'est normal, le foil s'appuie contre." },
       { titre: "Ouvrir les épaules", texte: "Tourne les épaules et la tête vers le vent, regard sur un point situé 45° au vent de ta trajectoire. La planche suit et commence à lofer. Les hanches restent au-dessus de la planche." },
       { titre: "Trouver l'angle limite", texte: "Lofe progressivement jusqu'à sentir la vitesse baisser. Juste avant, abats de 5° pour relancer, puis reprends l'angle. Le bon cap est un équilibre vitesse / angle, pas le maximum de lofing." },
-      { titre: "Gérer l'assiette au près", texte: "Au près, la planche a tendance à monter : un peu plus de pied avant que d'habitude. Ne charge jamais le pied arrière pour « pousser » au vent : tu montes et tu breaches." },
+      { titre: "Garder la planche à plat au près", texte: "Au près, le nez de la planche a tendance à monter : mets un peu plus de poids sur le pied avant que d'habitude pour rester à 20-30 cm. Ne charge jamais le pied arrière pour « pousser » au vent : la planche monte et tu breaches." },
     ],
     erreurs: [
       { erreur: "Tu lofes et tu t'arrêtes", correction: "Angle trop fort pour ta vitesse. Abats, reprends de la vitesse, puis remonte plus progressivement." },
@@ -295,6 +295,7 @@ export const COURSES_WINGFOIL: Course[] = [
       { titre: "Passer l'aile devant toi", texte: "Choque, lève l'aile et fais-la passer devant toi, par-dessus ta tête, bord d'attaque face au vent. La main libre attrape la nouvelle poignée avant, l'ancienne main avant lâche puis prend la nouvelle poignée arrière. Le passage dure une seconde." },
       { titre: "Changer de pieds pendant le passage", texte: "Pendant que l'aile passe, fais le pas de pieds : pied arrière vient devant le mât, pied avant recule. Reste bas, genoux fléchis, poids centré pour ne pas faire monter ni plonger la planche." },
       { titre: "Relancer", texte: "Dès que l'aile est de ton nouveau côté, borde et abats de 20° pour reprendre de la vitesse, avec un ou deux pompages de jambes si tu sens la planche descendre. Puis reviens progressivement au près." },
+      { titre: "Les variantes", texte: "Il n'y a pas qu'une façon de tacker. Tack classique : l'aile passe devant toi par-dessus la tête, pas de pieds pendant le passage (celui décrit ci-dessus). Heli-tack : tu gardes l'aile haute et tu la fais pivoter sur elle-même comme un rotor, bord d'attaque qui tourne face au vent ; tu tournes dessous, c'est le plus stable en vent léger. Tack toeside : tu ne changes pas de pieds, tu sors en toeside et tu fais le pas de pieds plus tard, une fois relancé ; pratique quand le pas de pieds en vol n'est pas encore automatique. Choisis celle qui passe, puis apprends les autres : chacune sert dans des conditions différentes." },
     ],
     erreurs: [
       { erreur: "Tu retombes sur l'eau face au vent", correction: "Pas assez de vitesse à l'entrée ou lofing trop lent. Entre plus vite, pompe une fois avant, et tourne les épaules d'un coup franc." },
@@ -304,7 +305,7 @@ export const COURSES_WINGFOIL: Course[] = [
     exercices: ["10 tacks à plat (sans voler) pour automatiser le passage de l'aile devant et le pas de pieds", "Tacks en vol en acceptant de retoucher l'eau à la sortie, 5 de chaque côté : le but est de sortir sur le bon bord", "Un tack en vol complet sans toucher l'eau, puis enchaîner tack + jibe"],
     filmer: "20 s de côté, cadre large, cadreur placé sous le vent de la zone de virement pour voir la planche traverser le vent et l'aile passer devant toi. L'IA vérifie la vitesse d'entrée, le moment du passage d'aile et le timing du pas de pieds.",
     securite: "Un tack raté te laisse arrêté face au vent avec l'aile qui peut repartir en arrière : garde 30 m de dégagement derrière toi. Protège la tête quand l'aile passe.",
-    retenir: ["Vitesse maximale à l'entrée", "Lofer d'un coup franc, par les épaules", "Aile passée devant, par-dessus la tête", "Pieds pendant le passage, relance en abattant"],
+    retenir: ["Vitesse maximale à l'entrée", "Lofer d'un coup franc, par les épaules", "Aile passée devant, par-dessus la tête", "Pieds pendant le passage, relance en abattant", "Trois variantes : classique, heli-tack, toeside"],
     quiz: [
       { q: "L'aile passe derrière toi ou devant toi dans un tack ?", a: "Devant toi, par-dessus la tête, bord d'attaque face au vent." },
       { q: "Quand faire le pas de pieds ?", a: "Pendant que l'aile passe, quand elle ne tire plus." },
