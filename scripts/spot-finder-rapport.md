@@ -1,0 +1,867 @@
+# Import du référentiel Spot Finder (PDF du 5 novembre 2026)
+
+- 844 fiches lues, 268 avec une pratique documentée (D) ou confirmée (T).
+- 519 fiches rattachées à un spot déjà présent (368 spots enrichis : statuts, règles, sources, sports).
+- 105 nouveaux spots créés (fiches D/T sans équivalent) : 85 placés sur un repère connu du bord de l'eau, 20 au centre de leur commune — tous marqués **position à pointer dans l'admin**.
+- 9 fiches avec une discipline écartée (X) → sport retiré du spot.
+- 219 fiches P / W / ? sans spot existant : non importées (pistes à valider), listées en bas.
+- 0 fiches D/T sans commune trouvée : à créer à la main (liste ci-dessous).
+
+## Fiches D/T à créer à la main (commune introuvable)
+
+
+## Rattachements (fiche → spot existant)
+
+- 1 · Anglet - La Barre → **Anglet – La Barre** (score 100)
+- 2 · Anglet - Les Cavaliers → **Anglet – Les Cavaliers** (score 100)
+- 10 · Anglet - Chambre d'Amour → **Anglet – Chambre d'Amour** (score 100)
+- 11 · Biarritz - Côte des Basques → **Biarritz – Côte des Basques** (score 100)
+- 16 · Bidart - Centre → **Bidart – Uhabia** (score 81)
+- 20 · Guéthary - Parlementia → **Guéthary – Parlementia** (score 100)
+- 27 · Hendaye - Sokoburu → **Hendaye-Plage** (score 81)
+- 30 · Hossegor - La Gravière → **Hossegor – La Gravière** (score 100)
+- 37 · Seignosse - Les Estagnots → **Seignosse – Les Estagnots** (score 100)
+- 38 · Seignosse - Les Bourdaines → **Seignosse – Les Bourdaines** (score 100)
+- 40 · Capbreton - La Piste → **Capbreton – La Piste** (score 100)
+- 46 · Tarnos - Le Métro → **Tarnos** (score 81)
+- 48 · Vieux-Boucau → **Vieux-Boucau – Port d'Albret** (score 81)
+- 50 · Messanges - La Dune → **Messanges** (score 81)
+- 55 · Contis-Plage → **Contis-Plage** (score 100)
+- 56 · Mimizan-Plage → **Mimizan** (score 81)
+- 58 · Biscarrosse - Plage Nord → **Biscarrosse Plage** (score 81)
+- 61 · Lacanau - La Centrale → **Lacanau** (score 81)
+- 72 · Carcans-Plage → **Carcans-Plage** (score 100)
+- 73 · Hourtin-Plage → **Hourtin-Plage** (score 100)
+- 75 · Montalivet → **Montalivet** (score 100)
+- 76 · Le Gurp → **Le Gurp – Grayan-et-l'Hôpital** (score 81)
+- 77 · Soulac-sur-Mer → **Soulac-sur-Mer** (score 100)
+- 78 · Le Verdon-sur-Mer → **Le Verdon – Pointe de Grave** (score 81)
+- 79 · Le Grand Crohot → **Cap Ferret – Le Grand Crohot** (score 82)
+- 80 · Le Truc Vert → **Cap Ferret – Le Truc Vert** (score 82)
+- 82 · La Salie Nord → **La Salie** (score 81)
+- 84 · La Dune du Pilat - secteur océanique → **Dune du Pilat** (score 82)
+- 86 · Royan - Grande Conche → **Royan – La Grande Conche** (score 83)
+- 89 · La Palmyre → **La Palmyre – Les Mathes** (score 81)
+- 90 · Saint-Palais-sur-Mer - Grande Côte → **Saint-Palais-sur-Mer – La Grande Côte** (score 83)
+- 92 · Île d'Oléron - Les Huttes → **Oléron – Les Huttes** (score 82)
+- 93 · Île d'Oléron - Chassiron → **Oléron – Pointe de Chassiron** (score 82)
+- 97 · Île d'Oléron - Saint-Trojan → **Oléron – Saint-Trojan-les-Bains** (score 82)
+- 99 · Île de Ré - La Couarde → **Île de Ré – La Couarde-sur-Mer** (score 83)
+- 101 · Île de Ré - Pointe du Lizay → **Île de Ré – Pointe du Lizay** (score 100)
+- 105 · Châtelaillon-Plage → **Châtelaillon-Plage** (score 100)
+- 512 · Bonne-Anse - La Palmyre → **Bonne-Anse – La Palmyre** (score 100)
+- 513 · La Coubre - Pointe Espagnole → **La Coubre – Pointe Espagnole** (score 100)
+- 514 · Ronce-les-Bains → **Ronce-les-Bains** (score 100)
+- 515 · Île aux Oiseaux - Bassin d'Arcachon → **Bassin d'Arcachon – Île aux Oiseaux** (score 84)
+- 516 · Île d'Aix → **Île d'Aix** (score 100)
+- 518 · Boutillon - Île de Ré → **Île de Ré – Le Boutillon** (score 83)
+- 519 · Rivedoux-Plage → **Île de Ré – Rivedoux-Plage** (score 81)
+- 521 · Le Gros Jonc - Île de Ré → **Île de Ré – Le Gros Jonc** (score 84)
+- 523 · Les Gouillauds - Île de Ré → **Île de Ré – Les Gouillauds** (score 83)
+- 524 · Phare des Baleines - Île de Ré → **Île de Ré – Phare des Baleines** (score 84)
+- 525 · Plage des Prises - Île de Ré → **Île de Ré – Plage des Prises** (score 83)
+- 526 · Pointe de Grignon - Île de Ré → **Île de Ré – Pointe de Grignon** (score 83)
+- 527 · Saint-Clément-des-Baleines → **Île de Ré – Saint-Clément-des-Baleines** (score 81)
+- 528 · La Flotte - Île de Ré → **Île de Ré – La Flotte** (score 83)
+- 529 · Boyardville - Île d'Oléron → **Oléron – Boyardville** (score 82)
+- 530 · La Perroche - Île d'Oléron → **Oléron – La Perroche** (score 82)
+- 531 · Le Douhet - Île d'Oléron → **Oléron – Le Douhet** (score 82)
+- 532 · La Brée-les-Bains - Île d'Oléron → **Oléron – La Brée-les-Bains** (score 82)
+- 533 · Grand-Village-Plage - Île d'Oléron → **Oléron – Grand-Village-Plage** (score 82)
+- 535 · Les Sables Vignier - Île d'Oléron → **Oléron – Les Sables Vignier** (score 83)
+- 536 · Saint-Denis-d'Oléron → **Oléron – Saint-Denis-d'Oléron** (score 82)
+- 537 · Port-des-Barques → **Port-des-Barques** (score 100)
+- 538 · Fouras - Plage de l'Espérance → **Fouras – Plage de l'Espérance** (score 100)
+- 539 · Aytré → **Aytré** (score 100)
+- 541 · Saint-Georges-de-Didonne → **Saint-Georges-de-Didonne** (score 100)
+- 542 · Meschers-sur-Gironde → **Meschers-sur-Gironde** (score 100)
+- 543 · Le Galon d'Or - Ronce-les-Bains → **Ronce-les-Bains – Le Galon d'Or** (score 83)
+- 108 · Brétignolles - La Sauzaie → **Brétignolles-sur-Mer** (score 81)
+- 112 · Longeville-sur-Mer - Les Conches → **Longeville-sur-Mer – Les Conches** (score 100)
+- 114 · La Tranche-sur-Mer - La Terrière → **La Tranche-sur-Mer – La Terrière** (score 100)
+- 115 · La Tranche-sur-Mer - L'Embarcadère → **La Tranche-sur-Mer** (score 81)
+- 119 · Les Sables-d'Olonne - Tanchet → **Les Sables-d'Olonne** (score 82)
+- 121 · Olonne-sur-Mer - Sauveterre → **Olonne-sur-Mer – Sauveterre** (score 100)
+- 122 · Saint-Gilles-Croix-de-Vie - Grande Plage → **Saint-Gilles-Croix-de-Vie – La Grande Plage** (score 82)
+- 123 · Saint-Hilaire-de-Riez - Les Demoiselles → **Saint-Hilaire-de-Riez – Les Demoiselles** (score 100)
+- 125 · Noirmoutier - Luzéronde → **Noirmoutier – Luzéronde** (score 100)
+- 127 · Préfailles → **Pointe Saint-Gildas – Préfailles** (score 81)
+- 129 · Pornic - Noëveillard → **Pornic – La Noëveillard** (score 82)
+- 131 · Pornichet - Plage centrale → **Pornichet** (score 81)
+- 133 · La Baule - L'Ermitage → **La Baule** (score 81)
+- 134 · Batz-sur-Mer - La Govelle → **La Govelle – Batz-sur-Mer** (score 82)
+- 135 · Saint-Brevin - Les Rochelets → **Saint-Brevin – Les Rochelets** (score 100)
+- 137 · La Turballe - Pen Bron → **Pen Bron – La Turballe** (score 83)
+- 138 · Quiberon - Port Maria → **Quiberon – Port Maria** (score 100)
+- 142 · Plouharnel - Sainte-Barbe → **Plouharnel – Sainte-Barbe** (score 100)
+- 146 · Erdeven - Kerhillio → **Kerhillio – Erdeven** (score 82)
+- 149 · Plouhinec - Lines → **Plouhinec – Le Linès** (score 82)
+- 151 · Gâvres → **Gâvres – La Caserne** (score 81)
+- 152 · Larmor-Plage - Toulhars → **Larmor-Plage** (score 81)
+- 154 · Guidel - La Falaise → **Guidel-Plage** (score 81)
+- 161 · La Torche → **La Torche** (score 100)
+- 164 · Penhors → **Penhors** (score 100)
+- 200 · Ploudalmézeau - Tréompan → **Tréompan – Ploudalmézeau** (score 82)
+- 201 · Lampaul-Ploudalmézeau - Trois Moutons → **Les Trois Moutons – Lampaul-Ploudalmézeau** (score 83)
+- 208 · Santec - Le Dossen → **Le Dossen – Santec** (score 82)
+- 226 · Saint-Malo - Le Sillon → **Saint-Malo – Le Sillon** (score 100)
+- 228 · Saint-Briac-sur-Mer → **Saint-Briac-sur-Mer** (score 100)
+- 233 · Siouville-Hague → **Siouville-Hague** (score 100)
+- 234 · Le Rozel → **Le Rozel** (score 100)
+- 235 · Surtainville → **Surtainville** (score 100)
+- 238 · Barneville-Carteret → **Barneville-Carteret** (score 100)
+- 239 · Agon-Coutainville → **Agon-Coutainville** (score 100)
+- 243 · Utah Beach → **Utah Beach** (score 100)
+- 244 · Ravenoville → **Ravenoville** (score 100)
+- 245 · Cabourg → **Cabourg** (score 100)
+- 247 · Trouville-sur-Mer → **Trouville-sur-Mer** (score 100)
+- 249 · Ouistreham → **Ouistreham – Riva-Bella** (score 81)
+- 255 · Luc-sur-Mer → **Luc-sur-Mer** (score 100)
+- 257 · Sainte-Adresse → **Sainte-Adresse** (score 100)
+- 258 · Étretat - L'Aiguille Creuse → **Étretat** (score 81)
+- 260 · Yport - Pointe de Chicard → **Yport** (score 81)
+- 261 · Pourville-sur-Mer → **Pourville-sur-Mer** (score 100)
+- 264 · Veulettes-sur-Mer → **Veulettes-sur-Mer** (score 100)
+- 410 · Houlgate → **Houlgate** (score 100)
+- 411 · Veules-les-Roses → **Veules-les-Roses** (score 100)
+- 412 · Portbail → **Portbail** (score 100)
+- 413 · Hatainville → **Hatainville** (score 100)
+- 414 · Sciotot - Les Pieux → **Sciotot – Les Pieux** (score 100)
+- 415 · Saint-Aubin-sur-Mer → **Saint-Aubin-sur-Mer** (score 100)
+- 416 · Franceville - Merville-Franceville → **Merville-Franceville** (score 100)
+- 417 · Créances → **Créances** (score 100)
+- 418 · Gouville-sur-Mer → **Gouville-sur-Mer** (score 100)
+- 419 · Montmartin-sur-Mer → **Montmartin-sur-Mer** (score 100)
+- 420 · Saint-Laurent-sur-Mer → **Saint-Laurent-sur-Mer – Omaha** (score 81)
+- 423 · Les Petites-Dalles → **Les Petites-Dalles** (score 100)
+- 424 · Fermanville → **Fermanville** (score 100)
+- 425 · Tourlaville → **Tourlaville – Collignon** (score 81)
+- 426 · Beaumont-Hague → **Beaumont-Hague – Vauville** (score 81)
+- 267 · Gravelines - Petit-Fort-Philippe → **Gravelines – Petit-Fort-Philippe** (score 100)
+- 268 · Calais - Les Baraques → **Calais – Plage** (score 81)
+- 269 · Sangatte → **Sangatte – Le Radar** (score 81)
+- 271 · Wissant → **Wissant** (score 100)
+- 273 · Wimereux - Pointe aux Oies → **Wimereux** (score 81)
+- 274 · Le Touquet → **Le Touquet** (score 100)
+- 275 · Berck-sur-Mer → **Berck-sur-Mer** (score 100)
+- 277 · Fort-Mahon-Plage → **Fort-Mahon-Plage** (score 100)
+- 278 · Cayeux-sur-Mer → **Cayeux-sur-Mer** (score 100)
+- 279 · Le Crotoy → **Le Crotoy** (score 100)
+- 280 · Canet-en-Roussillon → **Canet-en-Roussillon** (score 100)
+- 281 · Saint-Cyprien → **Saint-Cyprien** (score 100)
+- 282 · Sainte-Marie-la-Mer → **Sainte-Marie-la-Mer** (score 100)
+- 283 · Le Barcarès → **Le Barcarès** (score 100)
+- 284 · Port-la-Nouvelle → **Port-la-Nouvelle** (score 100)
+- 285 · Gruissan → **Gruissan – La Chicane** (score 81)
+- 287 · Saint-Pierre-la-Mer → **Saint-Pierre-la-Mer** (score 100)
+- 290 · Vias-Plage → **Vias-Plage** (score 100)
+- 291 · Cap d'Agde - Plage du Môle → **Agde – Cap d'Agde** (score 82)
+- 292 · Sète - Plage de la Corniche → **Sète – La Corniche** (score 82)
+- 293 · Frontignan → **Frontignan-Plage** (score 81)
+- 294 · Palavas-les-Flots - Plage Sarrail → **Palavas-les-Flots** (score 81)
+- 295 · Carnon → **Carnon** (score 100)
+- 296 · La Grande-Motte → **La Grande-Motte** (score 100)
+- 297 · Le Grau-du-Roi → **Le Grau-du-Roi** (score 100)
+- 301 · Marseille - Le Prado → **Marseille – Plage du Prado** (score 82)
+- 303 · Les Lecques - Saint-Cyr-sur-Mer → **Saint-Cyr-sur-Mer – Les Lecques** (score 82)
+- 304 · Carro → **Martigues – Carro** (score 81)
+- 306 · Sausset-les-Pins - L'Hermitage → **Sausset-les-Pins** (score 81)
+- 310 · Bonnegrâce / Brutal Beach - Six-Fours → **Six-Fours – Bonnegrâce** (score 82)
+- 311 · Sanary-sur-Mer - Le Lido → **Sanary-sur-Mer** (score 81)
+- 312 · Bandol → **Bandol** (score 100)
+- 315 · Les Esclamandes - Saint-Aygulf (Fréjus) → **Saint-Aygulf** (score 81)
+- 316 · Cannes - Palm Beach → **Cannes – Palm Beach** (score 100)
+- 318 · Mandelieu-la-Napoule → **Mandelieu – La Napoule** (score 100)
+- 327 · Algajola → **Algajola** (score 100)
+- 329 · Calvi → **Calvi – La Pinède** (score 81)
+- 332 · Propriano → **Propriano** (score 100)
+- 333 · Palombaggia → **Porto-Vecchio – Palombaggia** (score 81)
+- 336 · Santa Giulia → **Porto-Vecchio – Santa Giulia** (score 82)
+- 636 · Tonnara - Bonifacio → **Bonifacio – Tonnara** (score 82)
+- 637 · Santa Manza - Bonifacio → **Bonifacio – Santa Manza** (score 100)
+- 638 · Piantarella - Bonifacio → **Bonifacio – Piantarella** (score 82)
+- 639 · Balistra - Bonifacio → **Bonifacio – Balistra** (score 100)
+- 640 · Pinarellu - Sainte-Lucie-de-Porto-Vecchio → **Sainte-Lucie-de-Porto-Vecchio – Pinarellu** (score 82)
+- 643 · Golfo di Sogno - Porto-Vecchio → **Porto-Vecchio – Golfo di Sogno** (score 84)
+- 644 · Saint-Cyprien - Lecci → **Lecci – Saint-Cyprien** (score 82)
+- 646 · Étang de Biguglia → **Étang de Biguglia** (score 100)
+- 647 · Baie de Figari → **Figari – Baie de Figari** (score 81)
+- 648 · Rondinara - Bonifacio (à vérifier) → **Bonifacio – Rondinara** (score 82)
+- 649 · Campomoro - Sartène (à vérifier) → **Sartène – Campomoro** (score 82)
+- 337 · Le Moule - Damencourt → **Le Moule** (score 81)
+- 342 · Anse à la Gourde → **Saint-François – Anse à la Gourde** (score 81)
+- 344 · Sainte-Anne - La Caravelle → **Sainte-Anne** (score 81)
+- 667 · Plage de la Feuillère - Marie-Galante → **Marie-Galante – Plage de la Feuillère** (score 82)
+- 670 · Le Gosier - La Saline → **Le Gosier – La Saline** (score 100)
+- 671 · Pointe de la Verdure → **Le Gosier – Pointe de la Verdure** (score 81)
+- 349 · Tartane → **Tartane – Anse l'Étang** (score 81)
+- 354 · Anse Charpentier → **Sainte-Marie – Anse Charpentier** (score 81)
+- 355 · Anse Trabaud → **Anse Trabaud** (score 100)
+- 674 · Pointe Faula - Le Vauclin → **Le Vauclin – Pointe Faula** (score 100)
+- 675 · Cap Est - Le François → **Le François – Cap Est** (score 83)
+- 676 · Le Robert → **Le Robert** (score 100)
+- 678 · Pointe du Bout - Trois-Îlets → **Trois-Îlets – Pointe du Bout** (score 82)
+- 679 · Le Diamant → **Le Diamant** (score 100)
+- 680 · Petit et Grand Macabou → **Le Vauclin – Petit et Grand Macabou** (score 83)
+- 364 · Étang-Salé → **L'Étang-Salé** (score 81)
+- 366 · Saint-Gilles - Roches Noires → **Saint-Gilles-les-Bains** (score 81)
+- 683 · La Saline-les-Bains → **La Saline-les-Bains** (score 100)
+- 684 · La Ravine Blanche - Saint-Pierre → **Saint-Pierre – La Ravine Blanche** (score 83)
+- 685 · Le Port → **Le Port** (score 100)
+- 374 · Ouano → **La Foa – Ouano** (score 81)
+- 375 · Bourail - Poé → **Bourail – Poé Beach** (score 82)
+- 376 · Nouméa - Anse Vata → **Nouméa – Anse Vata** (score 100)
+- 377 · Îlot Maître → **Nouméa – Îlot Maître** (score 82)
+- 378 · Tenia → **Boulouparis – Îlot Ténia** (score 81)
+- 379 · Lifou - Easo → **Lifou – Easo** (score 100)
+- 380 · Lifou - Baie de Chateaubriand → **Lifou – Baie de Châteaubriand** (score 100)
+- 381 · Lifou - Mou → **Lifou – Mou** (score 100)
+- 382 · Île des Pins - Kuto → **Île des Pins – Baie de Kuto** (score 83)
+- 687 · Passe de Dumbéa → **Dumbéa – La Passe** (score 82)
+- 688 · Plage de Peng - Lifou → **Lifou – Peng** (score 82)
+- 689 · Xodre - Lifou → **Lifou – Xodre** (score 82)
+- 690 · Koumac → **Koumac** (score 100)
+- 691 · Pindaï - Pouembout → **Pouembout – Pindaï** (score 82)
+- 383 · Tahiti - Teahupo'o → **Tahiti – Teahupo'o** (score 100)
+- 384 · Tahiti - Papenoo → **Tahiti – Papenoo** (score 100)
+- 385 · Tahiti - Vairao → **Tahiti – Vairao** (score 100)
+- 386 · Tahiti - Sapinus → **Tahiti – Pirae Sapinus** (score 82)
+- 387 · Tahiti - Maraa → **Tahiti – Maraa** (score 100)
+- 388 · Moorea - Haapiti → **Moorea – Haapiti** (score 100)
+- 389 · Moorea - Temae → **Moorea – Temae** (score 100)
+- 390 · Moorea - Atiha → **Moorea – Atiha** (score 100)
+- 391 · Moorea - Afareaitu → **Moorea – Afareaitu** (score 100)
+- 392 · Bora Bora - Matira → **Bora Bora – Pointe Matira** (score 82)
+- 393 · Huahine - Parea → **Huahine – Parea** (score 100)
+- 394 · Fakarava → **Fakarava – Rotoava** (score 81)
+- 395 · Rangiroa - Passe d'Avatoru → **Rangiroa – Passe d'Avatoru** (score 100)
+- 695 · Moorea - Maharepa → **Moorea – Maharepa** (score 100)
+- 696 · Tahiti - Mahana Beach → **Tahiti – Mahana Beach** (score 100)
+- 697 · Tahiti - Phaeton Bay → **Tahiti – Baie de Phaéton** (score 82)
+- 396 · Hardelot-Plage → **Hardelot-Plage** (score 100)
+- 399 · Sangatte - La Boulangerie → **Sangatte – La Boulangerie** (score 100)
+- 400 · Escalles → **Escalles** (score 100)
+- 401 · Ambleteuse → **Ambleteuse** (score 100)
+- 402 · Audresselles → **Audresselles** (score 100)
+- 404 · Dunkerque - Malo-les-Bains → **Malo-les-Bains** (score 81)
+- 405 · Bray-Dunes → **Bray-Dunes** (score 100)
+- 406 · Quend-Plage → **Quend-Plage** (score 100)
+- 408 · Oye-Plage → **Oye-Plage** (score 100)
+- 409 · Le Fort-Vert → **Le Fort-Vert – Marck** (score 81)
+- 427 · Beg-Meil - Fouesnant → **Beg-Meil – Fouesnant** (score 100)
+- 428 · Brignogan-Plages → **Brignogan-Plages** (score 100)
+- 432 · Penmarc'h - Saint-Guénolé → **Penmarc'h – Saint-Guénolé** (score 100)
+- 433 · Penthièvre - Quiberon → **Penthièvre – Quiberon** (score 100)
+- 434 · Plouescat - Pors Meur → **Plouescat – Pors Meur** (score 100)
+- 435 · Étel - Ria d'Étel → **Étel – Ria d'Étel** (score 100)
+- 436 · Baie du Kernic → **Baie du Kernic** (score 100)
+- 440 · Mousterlin - Fouesnant → **Mousterlin – Fouesnant** (score 100)
+- 441 · Saint-Michel-en-Grève → **Saint-Michel-en-Grève** (score 100)
+- 443 · Lancieux - Les Briantais → **Lancieux – Les Briantais** (score 100)
+- 444 · Île de Houat → **Île de Houat – Treac'h Goured** (score 82)
+- 445 · Île de Hoëdic → **Île de Hoëdic** (score 100)
+- 446 · Penvins - Sarzeau → **Penvins – Sarzeau** (score 100)
+- 447 · Keremma → **Keremma** (score 100)
+- 448 · Sainte-Marguerite - Landéda → **Sainte-Marguerite – Landéda** (score 100)
+- 449 · Aber Wrac'h - Landéda → **Aber Wrac'h – Landéda** (score 100)
+- 450 · Le Vougot - Guissény → **Le Vougot – Guissény** (score 100)
+- 451 · Plage du Ris - Douarnenez → **Plage du Ris – Douarnenez** (score 100)
+- 452 · Kervel - Plonévez-Porzay → **Kervel – Plonévez-Porzay** (score 100)
+- 453 · Pentrez → **Pentrez** (score 100)
+- 454 · Plage de l'Aber - Crozon → **Plage de l'Aber – Crozon** (score 100)
+- 455 · Île-Tudy → **Île-Tudy** (score 100)
+- 456 · Île d'Arz → **Île d'Arz** (score 100)
+- 457 · Les Glénan - Saint-Nicolas → **Les Glénan – Saint-Nicolas** (score 100)
+- 458 · Les Glénan - Penfret → **Les Glénan – Penfret** (score 100)
+- 459 · Les Glénan - Guiriden → **Les Glénan – Guiriden** (score 100)
+- 462 · Le Pouliguen → **Le Pouliguen** (score 100)
+- 463 · La Turballe → **La Turballe** (score 100)
+- 464 · Piriac-sur-Mer → **Piriac-sur-Mer** (score 100)
+- 465 · Assérac - Pont-Mahé → **Assérac – Pont-Mahé** (score 100)
+- 466 · Damgan → **Damgan** (score 100)
+- 467 · Carnac - Saint-Colomban → **Carnac – Saint-Colomban** (score 100)
+- 471 · Le Fort-Bloqué → **Le Fort-Bloqué** (score 100)
+- 473 · Riantec - Kerner → **Riantec – Kerner** (score 100)
+- 474 · Locmariaquer - Saint-Pierre → **Locmariaquer – Saint-Pierre** (score 100)
+- 475 · La Bernerie-en-Retz → **La Bernerie-en-Retz** (score 100)
+- 476 · Le Pointeau - Saint-Brevin → **Saint-Brevin – Le Pointeau** (score 82)
+- 478 · Les Dunes - Saint-Brevin → **Saint-Brevin – Les Dunes** (score 82)
+- 479 · Les Moutiers-en-Retz → **Les Moutiers-en-Retz** (score 100)
+- 484 · Saint-Marc-sur-Mer → **Saint-Marc-sur-Mer** (score 100)
+- 485 · Tharon-Plage → **Tharon-Plage** (score 100)
+- 488 · Sorlock - Mesquer → **Sorlock – Mesquer** (score 100)
+- 489 · Kerlede - Saint-Nazaire → **Kerlédé – Saint-Nazaire** (score 100)
+- 490 · Le Cormier → **Le Cormier – La Plaine-sur-Mer** (score 81)
+- 492 · Barbâtre - Plage de la Linière → **Barbâtre – La Linière** (score 82)
+- 494 · Bouin - Le Polder → **Bouin – Le Polder** (score 100)
+- 496 · Fromentine - La Barre-de-Monts → **Fromentine – La Barre-de-Monts** (score 100)
+- 497 · La Faute-sur-Mer → **La Faute-sur-Mer** (score 100)
+- 498 · La Guérinière - Noirmoutier → **La Guérinière – Noirmoutier** (score 100)
+- 500 · Notre-Dame-de-Monts → **Notre-Dame-de-Monts** (score 100)
+- 501 · Saint-Jean-de-Monts → **Saint-Jean-de-Monts** (score 100)
+- 509 · Les Générales - La Tranche-sur-Mer → **La Tranche-sur-Mer – Les Générales** (score 82)
+- 510 · La Faute-sur-Mer - secteur de l'Aiguillon → **La Faute-sur-Mer – Pointe de l'Aiguillon** (score 82)
+- 511 · La Barre-de-Monts - secteur du Pey de la Blet → **La Barre-de-Monts – Le Pey de la Blet** (score 83)
+- 546 · Bassin d'Arcachon - Andernos-les-Bains → **Bassin d'Arcachon – Andernos-les-Bains** (score 100)
+- 547 · Bassin d'Arcachon - Les Arbousiers → **Bassin d'Arcachon – Les Arbousiers** (score 100)
+- 548 · Bassin d'Arcachon - Claouey → **Bassin d'Arcachon – Claouey** (score 100)
+- 549 · Cap Ferret - L'Horizon → **Cap Ferret – L'Horizon** (score 100)
+- 554 · Lac de Carcans-Hourtin → **Lac de Carcans-Hourtin – Maubuisson** (score 81)
+- 559 · Lac de Cazaux → **Lac de Cazaux** (score 100)
+- 560 · Lac de Sanguinet → **Lac de Sanguinet** (score 100)
+- 565 · Moliets-et-Maa → **Moliets-et-Maa** (score 100)
+- 567 · Ondres → **Ondres** (score 100)
+- 574 · Marseillan-Plage → **Marseillan-Plage** (score 100)
+- 575 · Mèze - Étang de Thau → **Mèze – Étang de Thau** (score 100)
+- 576 · Bouzigues - Étang de Thau → **Bouzigues – Étang de Thau** (score 100)
+- 579 · Carnon - Grand Travers → **Carnon – Le Grand Travers** (score 83)
+- 580 · Plage de l'Espiguette → **Le Grau-du-Roi – L'Espiguette** (score 81)
+- 581 · Sète - secteur de la plage → **Sète – Lido** (score 81)
+- 586 · Gruissan - Les Chalets → **Gruissan – Les Chalets** (score 100)
+- 587 · Gruissan - Plage Mateille → **Gruissan – Mateille** (score 82)
+- 588 · Gruissan - La Vieille Nouvelle → **Gruissan – La Vieille Nouvelle** (score 100)
+- 589 · Gruissan - Étang de l'Ayrolle → **Gruissan – Étang de l'Ayrolle** (score 100)
+- 590 · La Franqui → **Leucate – La Franqui** (score 81)
+- 592 · Leucate - La Mine → **Leucate – La Mine** (score 100)
+- 593 · Leucate - Le Goulet → **Leucate – Le Goulet** (score 100)
+- 594 · Étang de La Palme → **Étang de La Palme** (score 100)
+- 596 · Étang de Bages-Sigean → **Étang de Bages-Sigean** (score 100)
+- 598 · Saint-Laurent-de-la-Salanque → **Saint-Laurent-de-la-Salanque – Plage** (score 81)
+- 600 · Port-Vendres → **Port-Vendres** (score 100)
+- 601 · Cerbère - secteur côtier (à vérifier) → **Cerbère** (score 81)
+- 602 · Beauduc → **Beauduc** (score 100)
+- 604 · Plage Napoléon - Port-Saint-Louis → **Plage Napoléon** (score 81)
+- 605 · Piémanson - Salin-de-Giraud → **Salin-de-Giraud – Piémanson** (score 82)
+- 606 · Les Saintes-Maries-de-la-Mer → **Les Saintes-Maries-de-la-Mer** (score 100)
+- 607 · Le Jaï - Marignane → **Marignane – Le Jaï** (score 82)
+- 608 · Étang de Berre - Saint-Chamas → **Étang de Berre – Saint-Chamas** (score 100)
+- 609 · Étang de Berre - secteur de Martigues → **Étang de Berre – Martigues Ferrières** (score 82)
+- 612 · Carry-le-Rouet → **Carry-le-Rouet** (score 100)
+- 613 · Méjean - Ensuès-la-Redonne → **Ensuès-la-Redonne – Méjean** (score 82)
+- 614 · La Ciotat → **La Ciotat** (score 100)
+- 615 · Cassis (à vérifier) → **Cassis** (score 100)
+- 617 · L'Almanarre - Hyères → **L'Almanarre** (score 81)
+- 618 · Almanarre - secteur nord → **L'Almanarre – Secteur nord** (score 82)
+- 619 · La Madrague de Giens → **Giens – La Madrague** (score 82)
+- 620 · La Capte - Hyères → **Hyères – La Capte** (score 82)
+- 621 · La Badine - Hyères → **Hyères – La Badine** (score 82)
+- 622 · Les Salins - Hyères → **Hyères – Les Salins** (score 82)
+- 624 · Les Sablettes - La Seyne-sur-Mer → **La Seyne-sur-Mer – Les Sablettes** (score 82)
+- 625 · Six-Fours-les-Plages → **Six-Fours – Le Brusc** (score 81)
+- 627 · Saint-Tropez - Les Salins → **Saint-Tropez – Les Salins** (score 100)
+- 628 · Sainte-Maxime - La Nartelle → **Sainte-Maxime – La Nartelle** (score 100)
+- 630 · Saint-Raphaël - secteur de Boulouris (à vérifier) → **Saint-Raphaël – Boulouris** (score 82)
+- 631 · Agay - Saint-Raphaël → **Agay** (score 81)
+- 633 · Théoule-sur-Mer (à vérifier) → **Théoule-sur-Mer** (score 100)
+- 634 · Antibes - secteur de la Salis (à vérifier) → **Antibes – La Salis** (score 100)
+- 635 · Nice - Baie des Anges (à vérifier) → **Nice – Baie des Anges** (score 100)
+- 763 · Fréjus - Base Nature / chenal kite I → **Fréjus – Base Nature** (score 82)
+- 652 · Lac de Serre-Ponçon - Hautes-Alpes → **Lac de Serre-Ponçon** (score 81)
+- 653 · Lac de Monteynard - Isère → **Lac de Monteynard** (score 81)
+- 654 · Lac du Bourget - Savoie → **Lac du Bourget** (score 81)
+- 655 · Lac d'Annecy - Haute-Savoie → **Lac d'Annecy – Saint-Jorioz** (score 81)
+- 656 · Lac de Madine - Meuse → **Lac de Madine** (score 100)
+- 657 · Lac de Naussac - Lozère → **Lac de Naussac** (score 81)
+- 698 · Grand Cul-de-Sac - Saint-Barthélemy → **Saint-Barthélemy – Grand Cul-de-Sac** (score 83)
+- 699 · Anse Marcel - Saint-Martin (à vérifier) → **Saint-Martin – Anse Marcel** (score 82)
+- 700 · Baie Orientale - Saint-Martin (à vérifier) → **Saint-Martin – Baie Orientale** (score 82)
+- 704 · Légénèse - Carnac → **Carnac – Légenèse** (score 82)
+- 705 · La Grande Plage - Carnac → **Carnac – La Grande Plage** (score 82)
+- 706 · Le Roaliguen - Sarzeau → **Le Roaliguen – Sarzeau** (score 100)
+- 707 · Landrezac - Sarzeau → **Landrezac – Sarzeau** (score 100)
+- 708 · Suscinio - Sarzeau → **Suscinio – Sarzeau** (score 100)
+- 709 · Plage des Govelins - Saint-Gildas-de-Rhuys → **Plage des Govelins – Saint-Gildas-de-Rhuys** (score 100)
+- 712 · Pointe Saint-Gilles - Bénodet → **Pointe Saint-Gilles – Bénodet** (score 100)
+- 719 · Saint-Pierre-Quiberon - Portivy → **Saint-Pierre-Quiberon – Portivy** (score 100)
+- 724 · Clemenceau - Saint-Vincent-sur-Jard → **Saint-Vincent-sur-Jard – Clemenceau** (score 82)
+- 725 · La Conche - Île d'Yeu → **Île d'Yeu – La Conche** (score 83)
+- 730 · Les Trois Pierres - Île d'Oléron → **Oléron – Les Trois Pierres** (score 83)
+- 744 · Marégau - Saint-Mandrier-sur-Mer → **Saint-Mandrier – Marégau** (score 82)
+- 748 · La Seyne-sur-Mer - Mar Vivo → **La Seyne-sur-Mer – Mar Vivo** (score 100)
+- 751 · Cannes - secteur de la Croisette (à vérifier) → **Cannes – La Croisette** (score 82)
+- 816 · La Trinité-sur-Mer - Le Men Du → **La Trinité-sur-Mer – Men Du** (score 82)
+
+## Plusieurs fiches sur le même spot
+
+- fiche 17 « Bidart - Uhabia » → Bidart – Uhabia (déjà fiche 16)
+- fiche 28 « Hendaye - Le Casino » → Hendaye-Plage (déjà fiche 27)
+- fiche 59 « Biscarrosse - Plage Sud » → Biscarrosse Plage (déjà fiche 58)
+- fiche 60 « Biscarrosse - Le Vivier » → Biscarrosse Plage (déjà fiche 58)
+- fiche 786 « Mimizan - La Garluche » → Mimizan (déjà fiche 56)
+- fiche 787 « Mimizan - Remember » → Mimizan (déjà fiche 56)
+- fiche 788 « Mimizan - Côté Sud » → Mimizan (déjà fiche 56)
+- fiche 62 « Lacanau - La Nord » → Lacanau (déjà fiche 61)
+- fiche 63 « Lacanau - La Sud » → Lacanau (déjà fiche 61)
+- fiche 64 « Lacanau - Super Sud » → Lacanau (déjà fiche 61)
+- fiche 65 « Lacanau - Le Lion » → Lacanau (déjà fiche 61)
+- fiche 66 « Lacanau - L'Alexandre » → Lacanau (déjà fiche 61)
+- fiche 67 « Lacanau - La Barrière » → Lacanau (déjà fiche 61)
+- fiche 68 « Lacanau - L'Écureuil » → Lacanau (déjà fiche 61)
+- fiche 81 « Cap Ferret » → Cap Ferret – Le Grand Crohot (déjà fiche 79)
+- fiche 83 « La Salie Sud » → La Salie (déjà fiche 82)
+- fiche 102 « Île de Ré - Le Lizay » → Île de Ré – Pointe du Lizay (déjà fiche 101)
+- fiche 520 « La Couarde-sur-Mer - Île de Ré » → Île de Ré – La Couarde-sur-Mer (déjà fiche 99)
+- fiche 540 « Royan » → Royan – La Grande Conche (déjà fiche 86)
+- fiche 109 « Brétignolles - Les Dunes » → Brétignolles-sur-Mer (déjà fiche 108)
+- fiche 110 « Brétignolles - La Normandelière » → Brétignolles-sur-Mer (déjà fiche 108)
+- fiche 116 « La Tranche-sur-Mer - L'Aunis » → La Tranche-sur-Mer (déjà fiche 115)
+- fiche 117 « La Tranche-sur-Mer - Les Généralles » → La Tranche-sur-Mer (déjà fiche 115)
+- fiche 118 « La Tranche-sur-Mer - Le Phare » → La Tranche-sur-Mer (déjà fiche 115)
+- fiche 120 « Les Sables-d'Olonne - Grande Plage » → Les Sables-d'Olonne (déjà fiche 119)
+- fiche 132 « Pornichet - La Courance » → Pornichet (déjà fiche 131)
+- fiche 136 « Préfailles - Pointe Saint-Gildas » → Pointe Saint-Gildas – Préfailles (déjà fiche 127)
+- fiche 153 « Larmor-Plage - Anse de Kerguélen » → Larmor-Plage (déjà fiche 152)
+- fiche 155 « Guidel - Plage du Loch » → Guidel-Plage (déjà fiche 154)
+- fiche 180 « Pointe de la Torche - secteur sud » → La Torche (déjà fiche 161)
+- fiche 259 « Étretat - secteur des falaises » → Étretat (déjà fiche 258)
+- fiche 421 « Étretat » → Étretat (déjà fiche 258)
+- fiche 422 « Yport » → Yport (déjà fiche 260)
+- fiche 307 « Sausset-les-Pins - La Corniche » → Sausset-les-Pins (déjà fiche 306)
+- fiche 641 « Santa Giulia - Porto-Vecchio » → Porto-Vecchio – Santa Giulia (déjà fiche 336)
+- fiche 642 « Palombaggia - Porto-Vecchio » → Porto-Vecchio – Palombaggia (déjà fiche 333)
+- fiche 645 « Calvi - Plage de la Pinède » → Calvi – La Pinède (déjà fiche 329)
+- fiche 650 « Propriano - secteur du golfe (à vérifier) » → Propriano (déjà fiche 332)
+- fiche 651 « Algajola - Balagne (à vérifier) » → Algajola (déjà fiche 327)
+- fiche 338 « Le Moule - Anse Salabouelle » → Le Moule (déjà fiche 337)
+- fiche 343 « Saint-François » → Saint-François – Anse à la Gourde (déjà fiche 342)
+- fiche 668 « Anse à la Gourde - Saint-François » → Saint-François – Anse à la Gourde (déjà fiche 342)
+- fiche 669 « Le Moule » → Le Moule (déjà fiche 337)
+- fiche 672 « Sainte-Anne » → Sainte-Anne (déjà fiche 344)
+- fiche 785 « Sainte-Anne - base ANASA » → Sainte-Anne (déjà fiche 344)
+- fiche 677 « Anse l'Étang - Tartane » → Tartane – Anse l'Étang (déjà fiche 349)
+- fiche 686 « Saint-Gilles-les-Bains (à vérifier) » → Saint-Gilles-les-Bains (déjà fiche 366)
+- fiche 783 « La Saline-les-Bains - Trou d’Eau » → La Saline-les-Bains (déjà fiche 683)
+- fiche 692 « Bora Bora - Pointe Matira » → Bora Bora – Pointe Matira (déjà fiche 392)
+- fiche 397 « Wimereux » → Wimereux (déjà fiche 273)
+- fiche 398 « Sangatte - Le Radar » → Sangatte – Le Radar (déjà fiche 269)
+- fiche 403 « Gravelines » → Gravelines – Petit-Fort-Philippe (déjà fiche 267)
+- fiche 407 « Calais - Plage » → Calais – Plage (déjà fiche 268)
+- fiche 429 « Kerhillio - Erdeven » → Kerhillio – Erdeven (déjà fiche 146)
+- fiche 430 « La Pointe de la Torche » → La Torche (déjà fiche 161)
+- fiche 431 « Larmor-Plage » → Larmor-Plage (déjà fiche 152)
+- fiche 437 « Le Dossen - Santec » → Le Dossen – Santec (déjà fiche 208)
+- fiche 438 « Tréompan - Ploudalmézeau » → Tréompan – Ploudalmézeau (déjà fiche 200)
+- fiche 439 « Les Trois Moutons » → Les Trois Moutons – Lampaul-Ploudalmézeau (déjà fiche 201)
+- fiche 442 « Saint-Malo » → Saint-Malo – Le Sillon (déjà fiche 226)
+- fiche 460 « La Govelle - Batz-sur-Mer » → La Govelle – Batz-sur-Mer (déjà fiche 134)
+- fiche 461 « La Baule » → La Baule (déjà fiche 133)
+- fiche 469 « Plouhinec - Le Linès » → Plouhinec – Le Linès (déjà fiche 149)
+- fiche 470 « Guidel-Plage » → Guidel-Plage (déjà fiche 154)
+- fiche 472 « Gâvres - La Caserne » → Gâvres – La Caserne (déjà fiche 151)
+- fiche 477 « Les Rochelets - Saint-Brevin » → Saint-Brevin – Les Rochelets (déjà fiche 135)
+- fiche 480 « Pointe Saint-Gildas - Préfailles » → Pointe Saint-Gildas – Préfailles (déjà fiche 127)
+- fiche 481 « Pornic - La Noëveillard » → Pornic – La Noëveillard (déjà fiche 129)
+- fiche 482 « Pornichet » → Pornichet (déjà fiche 131)
+- fiche 483 « Saint-Brevin-les-Pins » → Saint-Brevin – Le Pointeau (déjà fiche 476)
+- fiche 486 « Pen Bron - La Turballe » → Pen Bron – La Turballe (déjà fiche 137)
+- fiche 495 « Brétignolles-sur-Mer » → Brétignolles-sur-Mer (déjà fiche 108)
+- fiche 499 « La Tranche-sur-Mer » → La Tranche-sur-Mer (déjà fiche 115)
+- fiche 505 « La Grande Plage - Saint-Gilles-Croix-de-Vie » → Saint-Gilles-Croix-de-Vie – La Grande Plage (déjà fiche 122)
+- fiche 506 « Les Sables-d'Olonne » → Les Sables-d'Olonne (déjà fiche 119)
+- fiche 544 « Lacanau-Océan » → Lacanau (déjà fiche 61)
+- fiche 545 « Le Verdon - Pointe de Grave » → Le Verdon – Pointe de Grave (déjà fiche 78)
+- fiche 550 « Cap Ferret - Grand Crohot » → Cap Ferret – Le Grand Crohot (déjà fiche 79)
+- fiche 551 « Cap Ferret - Le Truc Vert » → Cap Ferret – Le Truc Vert (déjà fiche 80)
+- fiche 552 « Dune du Pilat » → Dune du Pilat (déjà fiche 84)
+- fiche 553 « La Salie » → La Salie (déjà fiche 82)
+- fiche 555 « Lac de Lacanau » → Lacanau (déjà fiche 61)
+- fiche 556 « Le Gurp - Grayan-et-l'Hôpital » → Le Gurp – Grayan-et-l'Hôpital (déjà fiche 76)
+- fiche 558 « Lacanau - Étang de Cousseau (à vérifier) » → Lacanau (déjà fiche 61)
+- fiche 561 « Biscarrosse - lac et océan » → Biscarrosse Plage (déjà fiche 58)
+- fiche 562 « Capbreton » → Capbreton – La Piste (déjà fiche 40)
+- fiche 563 « Vieux-Boucau - Port d'Albret » → Vieux-Boucau – Port d'Albret (déjà fiche 48)
+- fiche 564 « Biscarrosse-Plage » → Biscarrosse Plage (déjà fiche 58)
+- fiche 566 « Messanges » → Messanges (déjà fiche 50)
+- fiche 568 « Tarnos » → Tarnos (déjà fiche 46)
+- fiche 569 « Biarritz - Côte des Basques (à vérifier) » → Biarritz – Côte des Basques (déjà fiche 11)
+- fiche 570 « Bidart - Uhabia (à vérifier) » → Bidart – Uhabia (déjà fiche 16)
+- fiche 571 « Guéthary (à vérifier) » → Guéthary – Parlementia (déjà fiche 20)
+- fiche 572 « Hendaye-Plage » → Hendaye-Plage (déjà fiche 27)
+- fiche 573 « Frontignan-Plage » → Frontignan-Plage (déjà fiche 293)
+- fiche 577 « Palavas-les-Flots » → Palavas-les-Flots (déjà fiche 294)
+- fiche 578 « Carnon - Petit Travers » → Carnon (déjà fiche 295)
+- fiche 582 « Agde - Cap d'Agde » → Agde – Cap d'Agde (déjà fiche 291)
+- fiche 591 « Parc des Dosses - Le Barcarès » → Le Barcarès (déjà fiche 283)
+- fiche 597 « Étang de Pissevaches - Saint-Pierre-la-Mer » → Saint-Pierre-la-Mer (déjà fiche 287)
+- fiche 599 « Plage de la Coudalère - Le Barcarès » → Le Barcarès (déjà fiche 283)
+- fiche 610 « Carro - Martigues » → Martigues – Carro (déjà fiche 304)
+- fiche 611 « Sausset-les-Pins » → Sausset-les-Pins (déjà fiche 306)
+- fiche 616 « Plage du Prado - Marseille (à vérifier) » → Marseille – Plage du Prado (déjà fiche 301)
+- fiche 626 « Sanary-sur-Mer » → Sanary-sur-Mer (déjà fiche 311)
+- fiche 765 « Le Brusc - Six-Fours-les-Plages » → Six-Fours – Le Brusc (déjà fiche 625)
+- fiche 658 « Lac de Cazaux - Gironde » → Lac de Cazaux (déjà fiche 559)
+- fiche 659 « Lac de Sanguinet - Landes » → Lac de Sanguinet (déjà fiche 560)
+- fiche 660 « Lac de Biscarrosse - Landes » → Biscarrosse Plage (déjà fiche 58)
+- fiche 661 « Lac de Hourtin - Gironde » → Hourtin-Plage (déjà fiche 73)
+- fiche 662 « Lac de Lacanau - Gironde » → Lacanau (déjà fiche 61)
+- fiche 666 « Étang de La Palme - Aude » → Étang de La Palme (déjà fiche 594)
+- fiche 701 « Sainte-Barbe - Plouharnel » → Plouharnel – Sainte-Barbe (déjà fiche 142)
+- fiche 710 « Pointe de Penvins » → Penvins – Sarzeau (déjà fiche 446)
+- fiche 713 « La Caserne - Gâvres » → Gâvres – La Caserne (déjà fiche 151)
+- fiche 714 « Le Pouldu - Guidel » → Guidel-Plage (déjà fiche 154)
+- fiche 716 « Kerner - Riantec » → Riantec – Kerner (déjà fiche 473)
+- fiche 717 « L'Île de Kerner - Riantec » → Riantec – Kerner (déjà fiche 473)
+- fiche 720 « La Baie de Quiberon - Port Maria » → Quiberon – Port Maria (déjà fiche 138)
+- fiche 722 « Le Cormier - La Plaine-sur-Mer » → Le Cormier – La Plaine-sur-Mer (déjà fiche 490)
+- fiche 723 « La Grande Côte - Saint-Gilles-Croix-de-Vie » → Saint-Gilles-Croix-de-Vie – La Grande Plage (déjà fiche 122)
+- fiche 727 « La Grande Plage - Les Sables-d'Olonne » → Les Sables-d'Olonne (déjà fiche 119)
+- fiche 728 « Saint-Trojan-les-Bains - Île d'Oléron » → Oléron – Saint-Trojan-les-Bains (déjà fiche 97)
+- fiche 729 « La Boirie - Saint-Denis-d'Oléron » → Oléron – Saint-Denis-d'Oléron (déjà fiche 536)
+- fiche 731 « Pointe de Chassiron - Île d'Oléron » → Oléron – Pointe de Chassiron (déjà fiche 93)
+- fiche 732 « Les Mathes - La Palmyre » → La Palmyre – Les Mathes (déjà fiche 89)
+- fiche 733 « Soulac-sur-Mer - plage centrale » → Soulac-sur-Mer (déjà fiche 77)
+- fiche 737 « Bassin d'Arcachon - Andernos » → Bassin d'Arcachon – Andernos-les-Bains (déjà fiche 546)
+- fiche 741 « Port-la-Nouvelle - plage sud » → Port-la-Nouvelle (déjà fiche 284)
+- fiche 742 « Canet-en-Roussillon - plage centrale » → Canet-en-Roussillon (déjà fiche 280)
+- fiche 743 « Vias - plage ouest » → Vias-Plage (déjà fiche 290)
+- fiche 745 « Bandol - plage centrale » → Bandol (déjà fiche 312)
+- fiche 746 « Sausset-les-Pins - plage centrale » → Sausset-les-Pins (déjà fiche 306)
+- fiche 747 « Cassis - secteur des plages (à vérifier) » → Cassis (déjà fiche 615)
+- fiche 749 « Saint-Cyr-sur-Mer - secteur des Lecques » → Saint-Cyr-sur-Mer – Les Lecques (déjà fiche 303)
+- fiche 753 « Île de Houat - Treac'h Ar Goured » → Île de Houat – Treac'h Goured (déjà fiche 444)
+- fiche 755 « Île de Ré - secteur des Baleines » → Île de Ré – Phare des Baleines (déjà fiche 524)
+- fiche 756 « Île d'Oléron - secteur de la Perroche » → Oléron – La Perroche (déjà fiche 530)
+- fiche 757 « Île Lifou - plage de Xodre » → Lifou – Xodre (déjà fiche 689)
+- fiche 790 « Sausset-les-Pins - Le Menhir » → Sausset-les-Pins (déjà fiche 306)
+- fiche 792 « Carry-le-Rouet - Big Rock / Le Rouet » → Carry-le-Rouet (déjà fiche 612)
+- fiche 802 « Hourtin - Lachanau » → Hourtin-Plage (déjà fiche 73)
+- fiche 803 « Carcans - Maubuisson » → Carcans-Plage (déjà fiche 72)
+- fiche 808 « Cayeux-sur-Mer - Pointe du Hourdel » → Cayeux-sur-Mer (déjà fiche 278)
+- fiche 822 « Frontignan - Aresquiers / Saint-Eugène (mer) » → Frontignan-Plage (déjà fiche 293)
+- fiche 823 « Frontignan - Ingril / Aresquiers (étang) » → Frontignan-Plage (déjà fiche 293)
+- fiche 825 « Cap d’Agde - Richelieu » → Agde – Cap d'Agde (déjà fiche 291)
+- fiche 827 « Gruissan - Étang de Mateille / base nautique » → Gruissan – Mateille (déjà fiche 587)
+- fiche 831 « Marseillan - Étang de Thau » → Marseillan-Plage (déjà fiche 574)
+- fiche 833 « Les Sables-d’Olonne - La Ch’noue » → Les Sables-d'Olonne (déjà fiche 119)
+- fiche 837 « Aix-les-Bains - Club nautique / lac du Bourget » → Lac du Bourget (déjà fiche 654)
+- fiche 665 « Étang de Salses-Leucate - Aude/Pyrénées-Orientales » → Étang de Salses-Leucate (déjà fiche 595)
+
+## Nouveaux spots
+
+- 4 · Anglet – Les Sables d'Or · Pyrénées-Atlantiques · surf
+- 5 · Anglet – Marinella · Pyrénées-Atlantiques · surf
+- 6 · Anglet – Les Corsaires · Pyrénées-Atlantiques · surf
+- 7 · Anglet – La Madrague · Pyrénées-Atlantiques · surf
+- 12 · Biarritz – Grande Plage · Pays basque · surf
+- 13 · Biarritz – Miramar · Pays basque · surf
+- 14 · Biarritz – Marbella · Pays basque · surf
+- 15 · Biarritz – La Milady · Pays basque · surf
+- 18 · Bidart – Ilbarritz · Pyrénées-Atlantiques · surf
+- 19 · Bidart – Erretegia · Pyrénées-Atlantiques · surf
+- 21 · Guéthary – Les Alcyons · Pays basque · surf
+- 22 · Guéthary – Cenitz · Pays basque · surf
+- 23 · Saint-Jean-de-Luz – Lafiténia · Pays basque · surf
+- 25 · Saint-Jean-de-Luz – Sainte-Barbe · Pays basque · surf
+- 29 · Belharra – grande vague au large · Pyrénées-Atlantiques · surf
+- 31 · Hossegor – La Nord · Landes · surf
+- 32 · Hossegor – La Sud · Landes · surf
+- 33 · Hossegor – La Centrale · Landes · surf
+- 34 · Hossegor – Les Culs Nus · Landes · surf
+- 35 · Capbreton – Notre-Dame · Landes · surf
+- 36 · Seignosse – Le Penon · Landes · surf
+- 41 · Capbreton – Santocha · Landes · surf
+- 43 · Capbreton – Le Prévent · Landes · surf
+- 45 · Labenne-Océan – La Centrale · Landes · surf
+- 51 · Moliets – La Centrale · Landes · surf
+- 52 · Moliets – Les Chênes Lièges · Landes · surf
+- 57 · Lespecier · Landes · surf
+- 69 · Le Trencat – La Teste-de-Buch · Gironde · surf
+- 98 · Île de Ré – Les Grenettes · Charente-Maritime · surf
+- 100 · Île de Ré – Le Petit Bec · Charente-Maritime · surf
+- 139 · Quiberon – Port Blanc · Morbihan · surf
+- 145 · Plouharnel – La Guérite / Le Mentor · Morbihan · foil, kitesurf, wingfoil
+- 159 · Belle-Île – Donnant · Morbihan · surf
+- 162 · Pors Carn · Finistère · surf
+- 163 · Tronoën · Finistère · surf
+- 179 · Audierne · Finistère · surf
+- 181 · Crozon – La Palue · Finistère · surf
+- 182 · Crozon – Lostmarc'h · Finistère · surf
+- 187 · Plouzané – Le Petit Minou · Finistère · surf
+- 221 · Perros-Guirec – Trestraou · Côtes-d'Armor · surf
+- 223 · Saint-Lunaire – Longchamp · Ille-et-Vilaine · foil, kitesurf
+- 224 · Dinard – Saint-Enogat · Ille-et-Vilaine · foil, kitesurf
+- 241 · Carolles-Plage · Manche · surf
+- 254 · Villers-sur-Mer · Calvados · foil, wingfoil
+- 256 · Le Havre · Seine-Maritime · surf
+- 289 · Sérignan-Plage · Hérault · foil, kitesurf
+- 305 · La Couronne – Plage du Verdon · Bouches-du-Rhône · surf
+- 308 · Martigues – L’Arquet (La Couronne) · Bouches-du-Rhône · surf
+- 309 · Saint-Cyr-sur-Mer – Cap Saint-Louis · Var · surf
+- 324 · Ajaccio – Capo di Feno · Corse-du-Sud · surf
+- 339 · Anse-Bertrand – Plage de la Chapelle · Guadeloupe · surf
+- 341 · Le Souffleur · Guadeloupe · surf
+- 345 · Le Helleux · Guadeloupe · surf
+- 595 · Étang de Salses-Leucate · Aude · foil, kitesurf, wingfoil
+- 603 · Anse de Carteau – Port-Saint-Louis-du-Rhône · Bouches-du-Rhône · foil, kitesurf, wingfoil
+- 623 · Hyères – Le Mérou · Var · foil, kitesurf, wingfoil
+- 761 · Antibes – La Tour Carrée · Alpes-Maritimes · surf
+- 762 · Saint-Raphaël – baie / secteur Port Santa Lucia · Var · foil, wingfoil
+- 764 · Les Issambres – base IKS · Var · foil, kitesurf, wingfoil
+- 766 · Port-Camargue – plage Sud · Gard · foil, kitesurf, wingfoil
+- 768 · Lac du Der – Giffaumont · Lacs et plans d'eau intérieurs · foil, wingfoil
+- 769 · Les Salles-sur-Verdon – Base nautique · Var · foil, wingfoil
+- 770 · Lac de Vassivière – Vauveix · Lacs et plans d'eau intérieurs · foil, wingfoil
+- 771 · Lac de la Ganguise – base de voile · Lacs et plans d'eau intérieurs · foil, wingfoil
+- 772 · Lac de Laffrey – base de Cholonge · Isère · foil, wingfoil
+- 774 · Lac du Salagou – base de plein air · Hérault · foil, wingfoil
+- 781 · Port Leucate – La Marina / CVCL · Aude · foil, wingfoil
+- 784 · Anglet – Plage de l’Océan · Pays basque · surf
+- 789 · Martigues – Les Laurons / Centrale EDF · Bouches-du-Rhône · surf
+- 791 · Martigues – Couronne-Vieille · Bouches-du-Rhône · surf
+- 794 · Marseille – Huveaune / Épluchures Beach · Bouches-du-Rhône · surf
+- 796 · Fos-sur-Mer – Plage du Cavaou · Bouches-du-Rhône · foil, kitesurf, surf, wingfoil
+- 797 · Réville – Pont de Saire · Manche · foil, kitesurf, wingfoil
+- 798 · Barfleur – Plage de l’Église · Manche · foil, kitesurf, wingfoil
+- 799 · Saint-Jacut-de-la-Mer – Baie de Lancieux · Côtes-d'Armor · foil, kitesurf
+- 800 · Plouharnel – Mané Guen / Les Crevettes · Morbihan · foil, kitesurf, wingfoil
+- 801 · Saint-Brevin – Le Billard · Loire-Atlantique · foil, kitesurf
+- 804 · Canet – Pont des Basses · Pyrénées-Orientales · foil, kitesurf
+- 805 · Canet – Port Cipriano · Pyrénées-Orientales · foil, kitesurf
+- 806 · Villeneuve-lès-Maguelone – Départ mer · Hérault · foil, kitesurf
+- 807 · Leffrinckoucke – Front de mer · Nord · foil, kitesurf
+- 809 · Réville – Pointe de Saire / base CNPS · Manche · foil, kitesurf, wingfoil
+- 810 · Réville – Plage de Dranguet · Manche · foil, kitesurf, wingfoil
+- 811 · Saint-Vaast-la-Hougue – La Hougue · Manche · foil, kitesurf, wingfoil
+- 812 · Quinéville – Grande plage · Manche · foil, kitesurf, wingfoil
+- 813 · Le Vicq – Val de Saire · Manche · foil, kitesurf, wingfoil
+- 814 · Saint-Pierre-Quiberon – Les Palissades · Morbihan · foil, kitesurf, wingfoil
+- 815 · Saint-Pierre-Quiberon – Le Fort · Morbihan · foil, kitesurf, wingfoil
+- 817 · Saint-Georges-d’Oléron – La Gautrelle · Charente-Maritime · foil, wingfoil
+- 818 · Saint-Georges-d’Oléron – Plaisance · Charente-Maritime · foil, wingfoil
+- 819 · Gujan-Mestras – La Hume · Gironde · foil, kitesurf, wingfoil
+- 820 · Sète – Les Trois Digues · Hérault · foil, kitesurf
+- 821 · Sète – Pont-Levis / lagune de Thau · Hérault · foil, kitesurf
+- 824 · Agde – La Tamarissière · Hérault · foil, wingfoil
+- 830 · Balaruc-les-Bains – Centre Manuréva · Hérault · foil, wingfoil
+- 832 · Brest – Moulin Blanc · Finistère · foil, wingfoil
+- 834 · Saint-Pierre-Quiberon – Le Pouladen · Morbihan · foil, kitesurf, wingfoil
+- 835 · Saint-Pierre-Quiberon – Camping / Isthme · Morbihan · foil, kitesurf, wingfoil
+- 836 · Bauduen – Centre nautique / lac de Sainte-Croix · Lacs du Sud-Est et des Alpes · foil, wingfoil
+- 838 · Annecy-le-Vieux – Petit Port · Haute-Savoie · foil, wingfoil
+- 839 · Lac de Jouarres – Base ASPTT · Aude · foil, wingfoil
+- 840 · Salagou – Baie des Vailhés · Hérault · foil, wingfoil
+- 841 · Moisson – Île de loisirs des Boucles de Seine · Occitanie, Grand Est et Île-de-France · foil, wingfoil
+- 843 · Carantec – Base du Kelenn · Finistère · foil, wingfoil
+- 844 · Pornic – Club nautique / secteur école · Loire-Atlantique · foil, wingfoil
+
+## Pistes non importées (P / W / ?)
+
+- 3 · Anglet - Les Dunes · K? W? SP
+- 8 · Anglet - Le Club · K? W? SP
+- 9 · Anglet - VVF · K? W? SP
+- 24 · Saint-Jean-de-Luz - Erromardie · K? WX SP
+- 26 · Saint-Jean-de-Luz - Mayarco · K? WX SP
+- 39 · Seignosse - Les Casernes · K? W? SP
+- 42 · Capbreton - VVF · K? W? S?
+- 44 · Capbreton - L'Estacade · K? W? SP
+- 47 · Boucau · K? W? S?
+- 49 · Soustons · K? W? S?
+- 53 · Saint-Girons-Plage · K? W? SP
+- 54 · Lit-et-Mixe - Cap de l'Homy · K? W? SP
+- 70 · Le Porge · K? W? SP
+- 71 · Le Porge - La Jenny · K? W? S?
+- 74 · Naujac-sur-Mer - Le Pin Sec · K? W? SP
+- 85 · Royan - Pontaillac · K? W? SP
+- 87 · La Tremblade - Côte Sauvage · K? W? SP
+- 88 · La Tremblade - Pointe de la Coubre · K? W? S?
+- 91 · Île d'Oléron - Vert Bois · K? W? SP
+- 94 · Île d'Oléron - Les Boulassiers · K? W? SP
+- 95 · Île d'Oléron - La Cotinière · K? W? SP
+- 96 · Île d'Oléron - Domino · K? W? SP
+- 103 · Île de Ré - Conche des Baleines · K? W? SP
+- 104 · Île de Ré - Trousse-Chemise · K? W? S?
+- 106 · La Rochelle - Les Minimes · K? W? SP
+- 107 · La Rochelle - Chef de Baie · K? W? SP
+- 111 · Longeville-sur-Mer - Bud Bud · K? W? SP
+- 113 · Longeville-sur-Mer - Le Rocher · K? W? SP
+- 124 · Noirmoutier - Barbâtre · KP WP SP
+- 126 · Île d'Yeu - Les Vieilles · K? W? SP
+- 128 · Saint-Michel-Chef-Chef - Gohaud · K? W? SP
+- 130 · Pornic - La Source · K? W? SP
+- 140 · Quiberon - Port Bara · K? W? SP
+- 141 · Quiberon - Port Rhu · K? W? SP
+- 143 · Plouharnel - Ty Hoche · K? W? SP
+- 144 · Plouharnel - Mané Gwen · K? W? SP
+- 147 · Erdeven - La Roche Sèche · K? W? SP
+- 148 · Plouhinec - Kervégan · K? W? S?
+- 150 · Plouhinec - Barre d'Étel · K? W? SP
+- 156 · Ploemeur - Les Kaolins · K? W? SP
+- 157 · Clohars-Carnoët - Le Kérou · K? W? SP
+- 158 · Île de Groix - Port Mélite · K? W? S?
+- 160 · Belle-Île - Goulphar · K? W? S?
+- 165 · Palud Gourinet · K? W? SP
+- 166 · Palud Keristenvet · K? W? SP
+- 167 · Kermabec · K? W? SP
+- 168 · Ru Vein · K? W? SP
+- 169 · Plage du Gored · K? W? SP
+- 170 · Kerziny · K? W? SP
+- 171 · Mesperleuc · K? W? SP
+- 172 · Gwendrez · K? WP SP
+- 173 · Saint-Tugen · KP WP SP
+- 174 · Pointe de Lervily · K? W? SP
+- 175 · Trescadec · K? W? SP
+- 176 · La Gamelle · K? W? SP
+- 177 · Île aux Vaches · KP WP SP
+- 178 · Baie des Trépassés · K? W? SP
+- 183 · Crozon - Goulien · K? WP SP
+- 184 · Crozon - Kerloc'h · K? W? SP
+- 185 · Crozon - Trez Rouz · K? W? SP
+- 186 · Camaret - Pen Hat · K? W? SP
+- 188 · Locmaria-Plouzané - Dalbosc · K? W? SP
+- 189 · Locmaria-Plouzané - Trégana · K? W? SP
+- 190 · Le Conquet - Blancs Sablons · KP WP SP
+- 191 · Le Conquet - Porz Liogan · K? W? SP
+- 192 · Plouarzel - Corsen · K? W? SP
+- 193 · Plouarzel - Les Charrettes · K? W? SP
+- 194 · Plouarzel - Porz Tévigné · K? W? SP
+- 195 · Lampaul-Plouarzel - Porz Gwen · K? W? SP
+- 196 · Lampaul-Plouarzel - Gouérou · K? W? SP
+- 197 · Porspoder · K? W? SP
+- 198 · Landunvez - Gwentraez · K? W? SP
+- 199 · Landunvez - Penfoul · K? W? SP
+- 202 · Saint-Pabu - Coulouarn · K? W? SP
+- 203 · Saint-Pabu - Erleac'h · K? W? SP
+- 204 · Kerlouan - Le Fanal · K? W? SP
+- 205 · Kerlouan - Roc'h ar Gonc · K? W? SP
+- 206 · Kerlouan - Boutrouilles · K? W? SP
+- 207 · Sibiril - La Mauvaise Grève · K? W? SP
+- 209 · Locquirec - Les Sables Blancs · K? W? SP
+- 210 · Locquirec - Porz ar Villiec · K? W? SP
+- 211 · Trébeurden - Tresmeur · KP WP SP
+- 212 · Trédrez-Locquémeau - Saint-Michel · K? W? SP
+- 213 · Lannion - Goas Lagorn · K? W? SP
+- 214 · Lannion - Maez-an-Aod · K? W? SP
+- 215 · Pléneuf-Val-André - La Ville Berneuf · K? WP SP
+- 216 · Erquy - Caroual · KP WP SP
+- 217 · Fréhel - Grève des Fosses · K? W? SP
+- 218 · Fréhel - Anse du Croc · K? W? SP
+- 219 · Fréhel - Grèves d'en Bas · K? W? SP
+- 220 · Fréhel - La Fosse · K? W? SP
+- 222 · Perros-Guirec - Trestrignel · K? W? SP
+- 225 · Dinard - L'Écluse · K? W? SP
+- 227 · Saint-Malo - Anse du Guesclin · K? W? S?
+- 229 · Saint-Cast-le-Guildo · K? WP SP
+- 230 · Cancale · K? W? S?
+- 231 · Sables-d'Or-les-Pins · K? WP SP
+- 232 · Erquy - Plage du Centre · K? W? S?
+- 236 · Diélette · K? WP SP
+- 237 · Hattainville · K? W? SP
+- 240 · Anneville-sur-Mer · KP WP SP
+- 242 · Collignon - Cherbourg · KP WP SP
+- 246 · Deauville · K? W? SP
+- 248 · Langrune-sur-Mer · K? W? SP
+- 250 · Asnelles - La Belle Plage · K? W? SP
+- 251 · Arromanches · K? W? SP
+- 252 · Omaha Beach · KP WW SP
+- 253 · Sword Beach · K? W? SP
+- 262 · Dieppe · K? W? SP
+- 263 · Criel-sur-Mer · K? W? SP
+- 265 · Cap d'Antifer · K? W? SP
+- 266 · Dunkerque - Les Dunes · K? W? SP
+- 270 · Blériot-Plage · K? W? SP
+- 272 · Cap Gris-Nez · K? W? SP
+- 276 · Équihen-Plage - Plage Sud · K? W? SP
+- 286 · Narbonne-Plage · K? W? SP
+- 288 · Valras-Plage · KP WW SP
+- 298 · Banyuls-sur-Mer · K? W? SP
+- 299 · Argelès-sur-Mer · KP WP SP
+- 300 · Collioure · K? W? SP
+- 302 · Marseille - Pointe du Roucas-Blanc · K? W? SP
+- 313 · Le Lavandou · KP WW SP
+- 314 · Sainte-Maxime - La Madrague · K? W? SP
+- 317 · Cannes - Long Beach · K? W? SP
+- 319 · Saint-Laurent-du-Var · KP WP SP
+- 320 · Nice - Promenade des Anglais Est · KP WP SP
+- 321 · Nice - Promenade des Anglais Ouest · KP WP SP
+- 322 · Villefranche-sur-Mer · K? W? SP
+- 323 · Antibes - secteurs côtiers exposés · K? W? S?
+- 325 · Ajaccio - Les CRS · K? W? S?
+- 326 · Appietto - Plage de Lava · K? W? SP
+- 328 · Farinole · K? W? SP
+- 330 · Île-Rousse · K? WP SP
+- 331 · Saleccia · KP WW SP
+- 334 · Cala Rossa · K? W? SP
+- 335 · Pinarello · K? W? SP
+- 340 · Port-Louis · K? W? SP
+- 346 · Petit-Havre · K? W? SP
+- 347 · Deshaies - Grande Anse · K? W? S?
+- 348 · Bananiers · K? W? S?
+- 350 · Anse Bonneville - Angoisse · K? W? S?
+- 351 · Anse Bonneville - Garde-Côte · K? W? S?
+- 352 · Anse Bonneville - Pelle à Tarte · K? W? S?
+- 353 · Anse Bonneville - Tite Plage · K? W? S?
+- 356 · Anse Couleuvre · K? W? SP
+- 357 · Anse l'Étang - Cocoa · K? W? S?
+- 358 · Anse l'Étang - Entre-Deux · K? W? S?
+- 359 · Anse l'Étang - VVF · K? W? SP
+- 360 · Saint-Leu - La Tortue · K? W? S?
+- 361 · Saint-Leu - Inside · K? W? SP
+- 362 · Trois-Bassins · K? W? SP
+- 363 · Boucan Canot · KP WP SP
+- 365 · Souris Blanche · K? W? S?
+- 367 · L'Hermitage · K? W? SP
+- 368 · Le Port - La Digue · K? W? S?
+- 369 · Le Port - La Folette · K? W? S?
+- 370 · Saint-Pierre - La Jetée · K? W? SP
+- 371 · Saint-Pierre - Pointe du Diable · K? W? S?
+- 372 · Saint-Pierre - Les Archers · K? W? S?
+- 373 · Les Aigrettes · K? W? SP
+- 468 · La Trinité-sur-Mer - Mendu · K? W? S?
+- 487 · Plage de Guérande · KP WP S?
+- 491 · Pointe de l'Île de Noirmoutier · KP WW S?
+- 493 · Barbâtre - Les Sableaux · K? W? S?
+- 502 · Le Fort Larron - Noirmoutier · KP WW S?
+- 503 · Les Boucholeurs - Barbâtre · KP WW S?
+- 504 · Pointe de la Fosse - Noirmoutier · KP WW S?
+- 507 · Port Bourgenay - Talmont-Saint-Hilaire · K? W? S?
+- 508 · Le Veillon - Talmont-Saint-Hilaire · KP WP S?
+- 517 · Les Palles · K? W? S?
+- 522 · Le Matray - Île de Ré · KP WW S?
+- 534 · Baie de Gatseau - Saint-Trojan · K? W? S?
+- 557 · Le Verdon-sur-Mer - secteur océan · K? W? S?
+- 583 · Île de Brescou (secteur maritime, accès à vérifier) · K? W? S?
+- 584 · Pérols · K? W? S?
+- 585 · L'Ermitage - secteur du Petit Travers · K? W? S?
+- 629 · Fréjus - secteur côtier (à vérifier) · K? W? S?
+- 632 · Cannes - Plage des Dauphins · K? W? S?
+- 663 · Étang de Thau - Hérault · K? W? S?
+- 664 · Étang de Berre - Bouches-du-Rhône · K? W? S?
+- 673 · Anse du Belley · KP WW S?
+- 681 · Kourou - secteur côtier (à vérifier) · K? W? S?
+- 682 · Cayenne - secteur côtier (à vérifier) · K? W? S?
+- 693 · Bora Bora - Mulu Mute · KP WP S?
+- 694 · Bora Bora - Aéroport · K? W? S?
+- 702 · Les Sables Blancs - Plouharnel · K? WP S?
+- 703 · Mane Gwen - Plouharnel · K? W? SP
+- 711 · Le Loc'h - Îles des Glénan · K? W? S?
+- 715 · Le Chel - Riantec · K? W? S?
+- 718 · Kersidan - secteur de Trégunc · K? W? SP
+- 721 · Plage de Carnac - secteur de Beaumer Loire-Atlantique et Vendée · K? W? S?
+- 726 · Pointe du Bout - secteur vendéen (à vérifier) · K? W? S?
+- 734 · Le Paisty-Vert - secteur littoral (à vérifier) · K? W? S?
+- 735 · Le Chemin Vert - secteur littoral (à vérifier) · K? W? S?
+- 736 · Le Verdon-sur-Mer - plage océanique · K? W? S?
+- 738 · Bassin d'Arcachon - Lège-Cap-Ferret · K? W? S?
+- 739 · Plage de la Rivière - secteur littoral (à vérifier) · K? W? S?
+- 740 · Plage du Midi - secteur méditerranéen (à vérifier) · K? W? S?
+- 750 · Antibes - secteur côtier (à vérifier) · K? W? S?
+- 752 · Île de Houat - Pointe d'En Tal · K? W? S?
+- 754 · Île de Houat - Treac'h Ar Salus · KP WW S?
+- 758 · Nouvelle-Calédonie - Îlot Goéland · K? W? S?
+- 759 · Polynésie - Motu Nono · K? W? S?
+- 760 · Polynésie - Mahana Beach Mayotte · K? W? S?
+- 767 · Cherrueix - baie du Mont-Saint-Michel · KP WP S?
+- 773 · Lac d’Orient - Mesnil-Saint-Père · KP WP S?
+- 775 · Lac de Pareloup - secteur base nautique · KP WP S?
+- 776 · Sakouli - Bandrélé · KP WW S?
+- 777 · N’Gouja - Kani-Kéli · KP WW S?
+- 778 · Savoyard - Saint-Pierre · KP WW S?
+- 779 · Kourou - Kitebeach · KP WP S?
+- 780 · Rémire-Montjoly - plage de Montjoly · KP WW S?
+- 782 · Kourou - Pointe des Roches Saint-Martin et Saint-Barthélemy · K? W? SP
+- 793 · Capbreton - Plage Centrale · K? W? SP
+- 795 · Cannes - Port du Béal · K? WP S?
+- 826 · Gruissan - Étang du Grazel · KP WP S?
+- 828 · Hyères - Plage de la Bergerie · KP WP S?
+- 829 · Antibes - Plage du Ponteil · KP W? S?
+- 842 · Jablines-Annet - Île de loisirs · K? WP S?

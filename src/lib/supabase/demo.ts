@@ -2,6 +2,8 @@ import "server-only";
 import fs from "node:fs";
 import path from "node:path";
 import type { AnalysisResult } from "@/lib/types";
+import { SPOT_CATALOGUE } from "@/lib/spot-catalogue";
+import { SPOT_REFERENTIEL, SPOT_REFERENTIEL_NOUVEAUX } from "@/lib/spot-referentiel";
 
 /**
  * MODE DÉMO (développement local sans Supabase uniquement).
@@ -331,6 +333,26 @@ function loadSpots(): Row[] {
     const sports = surf[1].split(",");
     const ids = [...surf[2].matchAll(/'([^']+)'/g)].map((x) => x[1]);
     for (const s of spots) if (ids.includes(s.id as string)) s.sports = sports;
+  }
+  // Catalogue livré avec le site + référentiel Spot Finder (comme après « Importer » et la migration 0008 dans l'admin)
+  const known = new Set(spots.map((s) => s.id));
+  for (const c of SPOT_CATALOGUE) {
+    if (known.has(c.id)) continue;
+    known.add(c.id);
+    spots.push({ ...c, sports: c.sports ?? ["kitesurf", "wingfoil", "foil"], active: true });
+  }
+  for (const s of spots) {
+    const r = SPOT_REFERENTIEL[s.id as string];
+    if (!r) continue;
+    const notes = (s.notes as string | null) ?? "";
+    Object.assign(s, { ref_id: r.ref_id, practice: r.practice, sports: r.sports, rules: r.rules, sources: r.sources, notes: r.notes_add ? (notes ? `${notes} — ${r.notes_add}` : r.notes_add) : notes || null });
+  }
+  for (const n of SPOT_REFERENTIEL_NOUVEAUX) {
+    if (known.has(n.id)) continue;
+    known.add(n.id);
+    const rest: Record<string, unknown> = { ...n, active: true };
+    delete rest.alias_ids;
+    spots.push(rest);
   }
   // Un téléski d'exemple pour voir le wakeboard dans le Spot Finder
   spots.push({

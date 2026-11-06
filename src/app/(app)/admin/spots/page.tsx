@@ -4,8 +4,10 @@ import { requireAdmin } from "@/lib/auth";
 import type { Spot } from "@/lib/types";
 import { SPORT_IDS, SPORTS } from "@/lib/sports";
 import { AdminForm } from "@/components/admin-form";
-import { importOsmSpots, importSpotCatalogue, saveSpot, toggleSpot } from "../actions";
+import { importOsmSpots, importSpotCatalogue, importSpotReferentiel, saveSpot, toggleSpot } from "../actions";
 import { SPOT_CATALOGUE } from "@/lib/spot-catalogue";
+import { SPOT_REFERENTIEL, SPOT_REFERENTIEL_NOUVEAUX } from "@/lib/spot-referentiel";
+import { PRACTICE_LABEL } from "@/lib/practice";
 
 export const metadata: Metadata = { title: "Admin · Spots" };
 // L'import OpenStreetMap peut prendre jusqu'à une minute
@@ -19,6 +21,9 @@ export default async function AdminSpots({ searchParams }: { searchParams: Promi
   const current = spots?.find((s) => s.id === edit);
   const known = new Set((spots ?? []).map((s) => s.id));
   const missing = SPOT_CATALOGUE.filter((s) => !known.has(s.id));
+  const refApplied = (spots ?? []).filter((s) => s.ref_id != null).length;
+  const refMissing = SPOT_REFERENTIEL_NOUVEAUX.filter((s) => !known.has(s.id)).length;
+  const refPending = Object.keys(SPOT_REFERENTIEL).filter((id) => known.has(id) && spots?.find((s) => s.id === id)?.ref_id == null).length;
 
   return (
     <div className="grid gap-10 lg:grid-cols-[1fr_1.1fr]">
@@ -93,6 +98,16 @@ export default async function AdminSpots({ searchParams }: { searchParams: Promi
             <button className="btn btn-primary mt-3 !min-h-10 !px-4 !py-2 !text-sm">Importer ces {missing.length} spots</button>
           </form>
         )}
+        {(refMissing > 0 || refPending > 0) && (
+          <AdminForm action={importSpotReferentiel} submitLabel="Appliquer le référentiel" className="mt-3 rounded-2xl border border-brand bg-brand-light/60 p-4">
+            <p className="font-semibold">Référentiel Spot Finder (fiches du 5 novembre 2026)</p>
+            <p className="mt-1 text-sm text-slate">
+              {refPending} spots à enrichir (pratique documentée par discipline, règles locales, sources) et {refMissing} spots
+              documentés à ajouter, placés au centre de leur commune : pense à pointer leur position ensuite.
+              {refApplied > 0 && ` Déjà appliqué sur ${refApplied} spots.`} Nécessite la migration 0008.
+            </p>
+          </AdminForm>
+        )}
         <AdminForm action={importOsmSpots} submitLabel="Chercher les spots manquants" className="mt-3 rounded-2xl border border-line p-4">
           <p className="font-semibold">Compléter depuis OpenStreetMap</p>
           <p className="mt-1 text-sm text-slate">
@@ -115,6 +130,13 @@ export default async function AdminSpots({ searchParams }: { searchParams: Promi
               <div className={`min-w-0 ${s.active ? "" : "opacity-50"}`}>
                 <p className="truncate font-semibold">{s.name}</p>
                 <p className="text-sm text-slate">{s.country} · {(s.sports ?? []).map((sp) => SPORTS[sp]?.short ?? sp).join(", ")} · large {s.sea_bearing}° · {s.lat.toFixed(3)}, {s.lng.toFixed(3)}</p>
+                {(s.ref_id != null || s.position_approx) && (
+                  <p className="text-xs text-slate">
+                    {s.ref_id != null && `Fiche ${s.ref_id}`}
+                    {s.practice && ` · ${Object.entries(s.practice).map(([sp, st]) => `${SPORTS[sp as keyof typeof SPORTS]?.short ?? sp} ${PRACTICE_LABEL[st!].short}`).join(", ")}`}
+                    {s.position_approx && <span className="font-semibold text-amber-700"> · position à pointer</span>}
+                  </p>
+                )}
               </div>
               <div className="flex shrink-0 gap-2">
                 <a href={`/admin/spots?edit=${s.id}`} className="btn btn-ghost !px-3 !py-1.5 text-sm">Modifier</a>

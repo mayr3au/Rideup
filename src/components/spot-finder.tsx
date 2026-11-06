@@ -5,8 +5,9 @@ import { useMemo, useState, useTransition } from "react";
 import { toggleFavorite } from "@/app/(app)/spots/actions";
 import { compass, confidenceFor, ORIENTATION_LABEL, weatherLabel, windName, type Confidence, type DaySummary, type HourForecast } from "@/lib/wind";
 import type { LiveWind } from "@/lib/live-wind";
-import type { SpotKind } from "@/lib/sports";
-import type { Spot } from "@/lib/types";
+import type { SpotKind, SportId } from "@/lib/sports";
+import type { PracticeStatus, Spot } from "@/lib/types";
+import { PRACTICE_LABEL } from "@/lib/practice";
 import { WindArrow } from "./wind-arrow";
 
 const SpotMap = dynamic(() => import("./spot-map"), {
@@ -28,6 +29,35 @@ export type SpotData = {
 };
 
 const WATER = { flat: "Eau plate", chop: "Clapot", vagues: "Vagues", lac: "Lac" } as const;
+
+/** Statut de pratique du référentiel pour le sport actif (le foil reprend le meilleur statut kite / wing). */
+export function practiceFor(spot: Spot, sport: SportId): PracticeStatus | null {
+  const p = spot.practice;
+  if (!p) return null;
+  if (sport === "foil") {
+    const order: PracticeStatus[] = ["T", "D", "W", "P", "?", "X"];
+    const both = [p.kitesurf, p.wingfoil].filter(Boolean) as PracticeStatus[];
+    return both.sort((a, b) => order.indexOf(a) - order.indexOf(b))[0] ?? null;
+  }
+  return p[sport] ?? null;
+}
+
+const TONE = {
+  ok: "bg-emerald-50 text-emerald-800",
+  warn: "bg-amber-50 text-amber-800",
+  off: "bg-rose-50 text-rose-800",
+  mute: "bg-raised text-slate",
+} as const;
+
+function PracticeChip({ status, className = "" }: { status: PracticeStatus | null; className?: string }) {
+  if (!status) return null;
+  const l = PRACTICE_LABEL[status];
+  return (
+    <span title={l.label} className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-semibold ${TONE[l.tone]} ${className}`}>
+      {l.tone === "ok" ? "✓" : l.tone === "warn" ? "?" : l.tone === "off" ? "✕" : "·"} {l.short}
+    </span>
+  );
+}
 const OK_WORD: Record<SpotKind, string> = { wind: "ridable", waves: "surfable", cable: "conseillé" };
 
 function dayLabel(date: string, i: number) {
@@ -188,11 +218,13 @@ export function SpotFinder({
   origin,
   canAlert,
   kind,
+  sport,
 }: {
   spots: SpotData[];
   origin: { lat: number; lng: number };
   canAlert: boolean;
   kind: SpotKind;
+  sport: SportId;
 }) {
   const dates = useMemo(() => spots[0]?.days.map((d) => d.date) ?? [], [spots]);
   const [dayIdx, setDayIdx] = useState(0);
@@ -330,6 +362,7 @@ export function SpotFinder({
               onDay={setDayIdx}
               dates={dates}
               canAlert={canAlert}
+              sport={sport}
             />
           ) : (
             <>
@@ -377,9 +410,13 @@ export function SpotFinder({
                                   {favs.has(s.spot.id) && <span aria-label="favori" className="text-brand">★ </span>}
                                   {s.spot.name}
                                 </p>
-                                <p className="text-sm text-slate">
-                                  {s.distance} km
-                                  {kind !== "cable" && ` · ${WATER[s.spot.water]}`}
+                                <p className="flex flex-wrap items-center gap-x-1.5 gap-y-1 text-sm text-slate">
+                                  <span>
+                                    {s.distance} km
+                                    {kind !== "cable" && ` · ${WATER[s.spot.water]}`}
+                                  </span>
+                                  <PracticeChip status={practiceFor(s.spot, sport)} />
+                                  {s.spot.rules && <span title="Règles locales : voir la fiche" className="rounded-full bg-amber-50 px-2 py-0.5 text-xs font-semibold text-amber-800">⚠ règles</span>}
                                 </p>
                               </div>
                               {(() => {
@@ -467,6 +504,36 @@ export function SpotFinder({
   );
 }
 
+/** Ce que dit le référentiel sur ce spot : pratique attestée ou à vérifier, règles locales, position. */
+function PracticeBox({ spot, sport }: { spot: Spot; sport: SportId }) {
+  const status = practiceFor(spot, sport);
+  if (!status && !spot.rules && !spot.position_approx) return null;
+  const l = status ? PRACTICE_LABEL[status] : null;
+  return (
+    <div className="mt-4 space-y-2 text-[0.95rem]">
+      {l && (
+        <p className={`rounded-2xl px-4 py-3 ${TONE[l.tone]}`}>
+          <span className="font-bold">{l.tone === "ok" ? "✓ " : l.tone === "warn" ? "? " : l.tone === "off" ? "✕ " : ""}{l.label}.</span>
+          {l.tone === "warn" && " Les prévisions restent indicatives : vérifie le départ, le zonage et la profondeur sur place."}
+          {l.tone === "mute" && " Les prévisions restent indicatives."}
+        </p>
+      )}
+      {spot.rules && (
+        <div className="rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-amber-900">
+          <p className="font-bold">⚠ Règles locales — elles priment sur la météo</p>
+          <p className="mt-1">{spot.rules}</p>
+        </div>
+      )}
+      {spot.position_approx && (
+        <p className="text-sm text-slate">📍 Position approximative (centre de la commune) : repère le départ exact sur place.</p>
+      )}
+      {spot.sources && spot.sources.length > 0 && (
+        <p className="text-xs text-slate">Sources : {[...new Set(spot.sources)].slice(0, 4).join(" · ")}</p>
+      )}
+    </div>
+  );
+}
+
 function SpotDetail({
   data,
   dayIdx,
@@ -478,6 +545,7 @@ function SpotDetail({
   onBack,
   onDay,
   canAlert,
+  sport,
 }: {
   data: SpotData;
   dayIdx: number;
@@ -489,6 +557,7 @@ function SpotDetail({
   onBack: () => void;
   onDay: (i: number) => void;
   canAlert: boolean;
+  sport: SportId;
 }) {
   const s = data.spot;
   const d = data.days[dayIdx];
@@ -574,6 +643,8 @@ function SpotDetail({
         {kind === "waves" && <Info label="Houle idéale" value={`De ${compass(s.sea_bearing)}`} />}
         <Info label="Météo" value={mid ? `${weatherLabel(mid.code)}, ${Math.round(mid.temp)} °C` : "–"} />
       </dl>
+
+      <PracticeBox spot={s} sport={sport} />
 
       {s.notes && <p className="mt-4 text-slate">{s.notes}</p>}
 
