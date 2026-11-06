@@ -61,7 +61,7 @@ export type Rider = {
   gear: number[]; // tailles d'aile ou de kite (m²)
 };
 
-export type SpotLike = { sea_bearing: number; min_level: "debutant" | "intermediaire" | "avance" };
+export type SpotLike = { sea_bearing: number; min_level: "debutant" | "intermediaire" | "avance"; water?: "flat" | "chop" | "vagues" | "lac" };
 
 const COMPASS = ["N", "NNE", "NE", "ENE", "E", "ESE", "SE", "SSE", "S", "SSO", "SO", "OSO", "O", "ONO", "NO", "NNO"];
 export function compass(deg: number) {
@@ -165,7 +165,8 @@ function rateWind(h: HourForecast, spot: SpotLike, rider: Rider, rule: WindRule)
   const level = rider.level ?? "intermediaire";
   const lim = rule.limits[level];
   const weight = rider.weightKg ?? 75;
-  const o = orientation(h.dir, spot.sea_bearing);
+  // Sur un lac ou un étang, il n'y a pas de « large » : aucune direction n'est offshore, on navigue sur toutes
+  const o: Orientation = spot.water === "lac" ? "side" : orientation(h.dir, spot.sea_bearing);
   const warnings: string[] = [];
   let score = 100;
 
