@@ -86,6 +86,12 @@ textarea {
   scroll-snap-align: start;
 }
 
+/* Filet de sécurité : un élément trop large ne doit jamais faire dézoomer la page sur téléphone */
+html,
+body {
+  overflow-x: clip;
+}
+
 body {
   font-family: var(--font-main), system-ui, sans-serif;
   font-size: 1rem;
@@ -500,6 +506,127 @@ p {
   font-family: inherit;
 }
 
+/* ───────── Carte du Spot Finder ───────── */
+.spot-map {
+  background: #e8eef0;
+}
+.spot-map .leaflet-control-zoom {
+  border: 0 !important;
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: 0 6px 18px -8px rgb(11 52 66 / 0.45);
+}
+.spot-map .leaflet-control-zoom a {
+  width: 36px;
+  height: 36px;
+  line-height: 36px;
+  color: var(--color-deep);
+  border-color: var(--color-line, #e3eaed);
+}
+.spot-map .leaflet-control-attribution {
+  border-radius: 8px 0 0 0;
+  background: rgb(255 255 255 / 0.75);
+  font-size: 9px;
+}
+.spot-map .leaflet-tooltip {
+  border: 0;
+  border-radius: 10px;
+  padding: 4px 9px;
+  font-size: 12px;
+  color: var(--color-deep);
+  box-shadow: 0 6px 18px -8px rgb(11 52 66 / 0.5);
+}
+.spot-pin-wrap {
+  background: none;
+  border: 0;
+}
+.spot-pin {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  background: var(--pin);
+  border: 2.5px solid #fff;
+  box-shadow:
+    0 0 0 1.5px var(--pin-ring),
+    0 6px 14px -4px rgb(11 52 66 / 0.55);
+  transition: transform 0.15s;
+}
+.spot-pin:hover {
+  transform: scale(1.1);
+}
+.spot-pin.is-selected {
+  box-shadow:
+    0 0 0 2.5px var(--pin-ring),
+    0 0 0 8px rgb(22 136 200 / 0.18),
+    0 10px 22px -6px rgb(11 52 66 / 0.6);
+}
+.spot-pin-value {
+  color: var(--pin-text);
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+}
+.spot-pin.is-selected .spot-pin-value {
+  font-size: 15px;
+}
+.spot-pin-arrow {
+  position: absolute;
+  inset: -11px;
+  display: flex;
+  justify-content: center;
+  pointer-events: none;
+}
+.spot-pin-label {
+  position: absolute;
+  left: 50%;
+  top: calc(100% + 6px);
+  transform: translateX(-50%);
+  white-space: nowrap;
+  border-radius: 999px;
+  background: var(--color-deep);
+  color: #fff;
+  padding: 3px 10px;
+  font-size: 12px;
+  font-weight: 700;
+  box-shadow: 0 6px 16px -6px rgb(11 52 66 / 0.6);
+}
+.origin-pin {
+  position: relative;
+  display: block;
+  width: 22px;
+  height: 22px;
+  border-radius: 999px;
+  background: #1688c8;
+  border: 4px solid #fff;
+  box-shadow: 0 3px 10px rgb(11 52 66 / 0.45);
+}
+.origin-pulse {
+  position: absolute;
+  inset: -12px;
+  border-radius: 999px;
+  background: rgb(22 136 200 / 0.25);
+  animation: origin-pulse 2s ease-out infinite;
+}
+@keyframes origin-pulse {
+  from {
+    transform: scale(0.4);
+    opacity: 1;
+  }
+  to {
+    transform: scale(1.4);
+    opacity: 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .origin-pulse {
+    animation: none;
+    opacity: 0.4;
+  }
+}
+
 /* ───────── Accroche de l'accueil : vagues et notifications animées ───────── */
 @keyframes wave-drift {
   from {
@@ -556,4 +683,54 @@ p {
   .screen-glare {
     animation: none;
   }
+}
+
+/* Curseur du rayon de recherche (Spot Finder) */
+.radius-range {
+  -webkit-appearance: none;
+  appearance: none;
+  height: 2.25rem;
+  background: transparent;
+  cursor: pointer;
+  touch-action: pan-y;
+}
+.radius-range::-webkit-slider-runnable-track {
+  height: 0.5rem;
+  border-radius: 999px;
+  background: linear-gradient(to right, var(--color-brand) var(--fill, 0%), var(--color-raised) var(--fill, 0%));
+}
+.radius-range::-moz-range-track {
+  height: 0.5rem;
+  border-radius: 999px;
+  background: var(--color-raised);
+}
+.radius-range::-moz-range-progress {
+  height: 0.5rem;
+  border-radius: 999px;
+  background: var(--color-brand);
+}
+.radius-range::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  margin-top: -0.625rem;
+  height: 1.75rem;
+  width: 1.75rem;
+  border-radius: 999px;
+  background: #fff;
+  border: 3px solid var(--color-brand);
+  box-shadow: 0 4px 12px -4px rgb(11 52 66 / 0.45);
+}
+.radius-range::-moz-range-thumb {
+  height: 1.4rem;
+  width: 1.4rem;
+  border-radius: 999px;
+  background: #fff;
+  border: 3px solid var(--color-brand);
+  box-shadow: 0 4px 12px -4px rgb(11 52 66 / 0.45);
+}
+.radius-range:focus-visible {
+  outline: none;
+}
+.radius-range:focus-visible::-webkit-slider-thumb {
+  outline: 3px solid var(--color-brand-light);
+  outline-offset: 2px;
 }

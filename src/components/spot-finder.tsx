@@ -1,7 +1,7 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import { useMemo, useState, useTransition } from "react";
+import { useMemo, useRef, useState, useTransition } from "react";
 import { toggleFavorite } from "@/app/(app)/spots/actions";
 import { compass, confidenceFor, ORIENTATION_LABEL, weatherLabel, windName, type Confidence, type DaySummary, type HourForecast } from "@/lib/wind";
 import type { LiveWind } from "@/lib/live-wind";
@@ -219,9 +219,11 @@ export function SpotFinder({
   canAlert,
   kind,
   sport,
+  radiusKm,
 }: {
   spots: SpotData[];
   origin: { lat: number; lng: number };
+  radiusKm: number;
   canAlert: boolean;
   kind: SpotKind;
   sport: SportId;
@@ -230,8 +232,11 @@ export function SpotFinder({
   const [dayIdx, setDayIdx] = useState(0);
   const [selected, setSelected] = useState<string | null>(null);
   const [filter, setFilter] = useState<Filter>("tous");
+  // Par défaut, du plus proche au plus loin ; « Conditions » met les spots ridables en tête
+  const [sortBy, setSortBy] = useState<"distance" | "conditions">("distance");
   const [favs, setFavs] = useState(() => new Set(spots.filter((s) => s.favorite).map((s) => s.spot.id)));
   const [, startTransition] = useTransition();
+  const grid = useRef<HTMLDivElement>(null);
 
   // Nombre de spots ridables par jour (pastille sur les onglets)
   const goodPerDay = useMemo(() => dates.map((_, i) => spots.filter((s) => (s.days[i]?.goodHours ?? 0) > 0).length), [dates, spots]);
@@ -243,7 +248,8 @@ export function SpotFinder({
       s.days.forEach((d, i) => {
         // Le meilleur plan est toujours un « oui » franc : pas d'offshore ni de prévision incertaine
         if (verdict(d, kind, i).status !== "go") return;
-        const q = quality(d) - s.distance / 5000;
+        // La distance compte vraiment : 30 km de plus doivent être justifiés par de bien meilleures conditions
+        const q = quality(d) - s.distance / 150;
         if (!best || q > best.q) best = { s, i, q };
       });
     return best as { s: SpotData; i: number; q: number } | null;
@@ -254,7 +260,7 @@ export function SpotFinder({
       filter === "favoris" ? favs.has(s.spot.id) : filter === "bons" ? (s.days[dayIdx]?.goodHours ?? 0) > 0 : true,
     );
     return list.sort((a, b) => {
-      if (kind === "cable") return a.distance - b.distance;
+      if (kind === "cable" || sortBy === "distance") return a.distance - b.distance;
       const da = a.days[dayIdx];
       const db = b.days[dayIdx];
       // Vert d'abord, puis orange, rouge et gris ; à couleur égale, le plus long créneau
@@ -265,7 +271,7 @@ export function SpotFinder({
         a.distance - b.distance
       );
     });
-  }, [spots, dayIdx, kind, filter, favs]);
+  }, [spots, dayIdx, kind, filter, favs, sortBy]);
 
   const current = spots.find((s) => s.spot.id === selected) ?? null;
   const date = dates[dayIdx];
@@ -284,7 +290,11 @@ export function SpotFinder({
   function open(id: string, day?: number) {
     if (day != null) setDayIdx(day);
     setSelected(id);
-    if (typeof window !== "undefined" && window.innerWidth < 1024) window.scrollTo({ top: 0, behavior: "smooth" });
+    // Sur téléphone : on remonte jusqu'à la carte, la fiche du spot est juste en dessous
+    if (typeof window !== "undefined" && window.innerWidth < 1024) {
+      const top = (grid.current?.getBoundingClientRect().top ?? 0) + window.scrollY - 140;
+      window.scrollTo({ top: Math.max(0, top), behavior: "smooth" });
+    }
   }
 
   return (
@@ -348,8 +358,8 @@ export function SpotFinder({
         ))}
       </nav>
 
-      <div className="grid gap-5 lg:grid-cols-[1.1fr_1fr]">
-        <div className="order-2 lg:order-1">
+      <div ref={grid} className="grid gap-5 lg:grid-cols-[1.1fr_1fr]">
+        <div className="order-2 min-w-0 lg:order-1">
           {current ? (
             <SpotDetail
               data={current}
@@ -386,6 +396,28 @@ export function SpotFinder({
                 ))}
               </div>
 
+              {kind !== "cable" && (
+                <div className="mb-3 flex items-center gap-2 text-sm" role="group" aria-label="Trier les spots">
+                  <span className="text-slate">Trier par</span>
+                  {(
+                    [
+                      ["distance", "Plus proches"],
+                      ["conditions", "Conditions"],
+                    ] as const
+                  ).map(([k, label]) => (
+                    <button
+                      key={k}
+                      type="button"
+                      aria-pressed={sortBy === k}
+                      onClick={() => setSortBy(k)}
+                      className={`min-h-9 rounded-full px-3.5 font-semibold ${sortBy === k ? "bg-brand-light text-brand ring-1 ring-brand/40" : "text-deep hover:bg-raised"}`}
+                    >
+                      {label}
+                    </button>
+                  ))}
+                </div>
+              )}
+
               <div className="mb-3">
                 <Legend />
               </div>
@@ -402,7 +434,7 @@ export function SpotFinder({
                     const good = d && d.goodHours > 0;
                     return (
                       <li key={s.spot.id}>
-                        <div className={`panel p-4 ${rank === 0 && verdict(d, kind, dayIdx).status === "go" && filter !== "favoris" ? "ring-2 ring-emerald-500" : ""}`}>
+                        <div className={`panel p-4 ${rank === 0 && sortBy === "conditions" && verdict(d, kind, dayIdx).status === "go" && filter !== "favoris" ? "ring-2 ring-emerald-500" : ""}`}>
                           <button onClick={() => open(s.spot.id)} className="w-full text-left">
                             <div className="flex items-start gap-3">
                               <div className="min-w-0 flex-1">
@@ -484,19 +516,27 @@ export function SpotFinder({
           )}
         </div>
 
-        <div className="photo-card order-1 h-[38dvh] min-h-[260px] overflow-hidden lg:sticky lg:top-32 lg:order-2 lg:h-[70dvh]">
+        <div className="photo-card order-1 min-w-0 h-[38dvh] min-h-[260px] overflow-hidden lg:sticky lg:top-32 lg:order-2 lg:h-[70dvh]">
           <SpotMap
             origin={origin}
+            radiusKm={radiusKm}
             selected={selected}
-            onSelect={setSelected}
-            spots={spots.map((s) => ({
-              id: s.spot.id,
-              name: s.spot.name,
-              lat: s.spot.lat,
-              lng: s.spot.lng,
-              score: s.days[dayIdx]?.bestScore ?? 0,
-              goodHours: s.days[dayIdx]?.goodHours ?? 0,
-            }))}
+            onSelect={(id) => open(id)}
+            spots={spots.map((s) => {
+              const d = s.days[dayIdx];
+              const wind = d ? (d.goodHours > 0 ? d.avgWind : d.peak?.wind ?? null) : null;
+              const wave = d ? (d.goodHours > 0 ? d.avgWave : d.peak?.wave ?? null) : null;
+              return {
+                id: s.spot.id,
+                name: s.spot.name,
+                lat: s.spot.lat,
+                lng: s.spot.lng,
+                distance: s.distance,
+                status: verdict(d, kind, dayIdx).status,
+                value: kind === "wind" ? (wind != null ? String(Math.round(wind)) : null) : kind === "waves" ? (wave != null ? fr1(wave) : null) : null,
+                dir: kind === "wind" ? (d?.goodHours ? d.dir : d?.peak?.dir) ?? null : null,
+              };
+            })}
           />
         </div>
       </div>
