@@ -35,15 +35,34 @@ export function CoachReviewWorkspace({
     } catch {}
   }, [text, storageKey]);
 
+  const scrollToForm = () => requestAnimationFrame(() => document.getElementById("relecture")?.scrollIntoView({ behavior: "smooth", block: "start" }));
+
+  /** Quand l'IA ne répond pas : on ouvre le formulaire avec le compte rendu déjà dans le résumé, rien n'est perdu. */
+  function fallback(message: string) {
+    setError(message);
+    if (!draft) {
+      setDraft(null);
+      setManual(true);
+      setVersion((v) => v + 1);
+      scrollToForm();
+    }
+  }
+
   function run() {
     setError(null);
     start(async () => {
-      const res = await structure(form.analysisId, text);
-      if (res.error || !res.draft) return setError(res.error ?? "Mise en forme impossible.");
-      setDraft(res.draft);
-      setVersion((v) => v + 1);
-      setManual(false);
-      requestAnimationFrame(() => document.getElementById("relecture")?.scrollIntoView({ behavior: "smooth", block: "start" }));
+      try {
+        const res = await structure(form.analysisId, text);
+        if (res.error || !res.draft) return fallback(res.error ?? "Mise en forme impossible. Continue à la main : ton texte est repris dans le résumé.");
+        setDraft(res.draft);
+        setVersion((v) => v + 1);
+        setManual(false);
+        scrollToForm();
+      } catch (e) {
+        // Coupure réseau ou délai dépassé côté serveur : l'action n'a rien renvoyé
+        console.error(e);
+        fallback("La mise en forme a été coupée (connexion ou délai dépassé). Réessaie, ou continue à la main : ton texte est repris dans le résumé.");
+      }
     });
   }
 
@@ -102,10 +121,29 @@ export function CoachReviewWorkspace({
             <p className="mt-2 text-sm text-slate">Remplis le retour tel que le rider le recevra.</p>
           )}
           <div className="mt-6">
-            <ReviewForm key={version} {...form} initial={draft ?? undefined} />
+            <ReviewForm key={version} {...form} initial={draft ?? (text.trim() ? manualDraft(text) : undefined)} />
           </div>
         </section>
       )}
     </div>
   );
+}
+
+/** Formulaire rempli à la main : le compte rendu du coach sert de point de départ au résumé. */
+function manualDraft(text: string): ReviewDraft {
+  return {
+    figure: "",
+    figure_id: "",
+    note: null,
+    resume: text.trim().slice(0, 1500),
+    priorite_session: "",
+    visibilite: "bonne",
+    phases: [],
+    erreurs: [],
+    points_forts: [],
+    drills: [],
+    rappels: [],
+    securite: "",
+    evolution: "",
+  };
 }

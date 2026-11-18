@@ -12,6 +12,8 @@ import { claimAnalysis, structureReview, submitReview, unclaimAnalysis } from ".
 
 export const metadata: Metadata = { title: "Analyse coach" };
 export const dynamic = "force-dynamic";
+// La mise en forme IA du compte rendu passe par une action de cette page : on lui laisse le temps de répondre.
+export const maxDuration = 60;
 
 export default async function CoachAnalysis({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -89,7 +91,7 @@ export default async function CoachAnalysis({ params }: { params: Promise<{ id: 
               <h2 className="font-bold">{rider.full_name || "Rider"}</h2>
               <dl className="mt-2 grid grid-cols-[7rem_1fr] gap-x-3 gap-y-1 text-[0.95rem]">
                 {level && (<><dt className="text-slate">Niveau</dt><dd>{LEVEL_LABELS[level]}</dd></>)}
-                {disciplineFor(rider, a.sport) && (<><dt className="text-slate">Discipline</dt><dd>{disciplineFor(rider, a.sport)}</dd></>)}
+                {disciplineFor(rider, a.sport) && (<><dt className="text-slate">Disciplines</dt><dd>{disciplineFor(rider, a.sport)}</dd></>)}
                 {rider.stance && (<><dt className="text-slate">Stance</dt><dd>{rider.stance}</dd></>)}
                 {rider.weight_kg && (<><dt className="text-slate">Poids</dt><dd>{rider.weight_kg} kg</dd></>)}
                 {gearFor(rider, a.sport) && (<><dt className="text-slate">Matériel</dt><dd>{gearFor(rider, a.sport)}</dd></>)}

@@ -45,6 +45,12 @@ export function disciplineName(sport: SportId, id?: string | null) {
   return DISCIPLINES[sport].find((d) => d.id === id)?.name ?? null;
 }
 
+/** Disciplines pratiquées dans un sport (plusieurs possibles) ; reprend l'ancien champ unique s'il est seul. */
+export function disciplineIds(sport: SportId, d: { discipline?: string; disciplines?: string[] } | undefined): string[] {
+  const ids = d?.disciplines?.length ? d.disciplines : d?.discipline ? [d.discipline] : [];
+  return [...new Set(ids)].filter((id) => DISCIPLINES[sport].some((x) => x.id === id));
+}
+
 /* ───────────────────────── Quiver ───────────────────────── */
 
 const num = (min: number, max: number) => z.number().min(min).max(max);
@@ -86,7 +92,10 @@ export const assessmentSchema = z.object({
 export type Assessment = z.infer<typeof assessmentSchema>;
 
 export const sportDetailsSchema = z.object({
+  /** Ancien champ (une seule discipline) : gardé pour les profils existants, = la première des disciplines. */
   discipline: str(30).optional(),
+  /** Disciplines pratiquées : on peut en cocher plusieurs (big air + freestyle…). */
+  disciplines: z.array(str(30)).max(8).optional(),
   quiver: quiverSchema.optional(),
   evaluation: assessmentSchema.optional(),
 });
