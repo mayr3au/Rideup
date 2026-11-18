@@ -11,6 +11,7 @@ import { Sparkline } from "@/components/sparkline";
 import { ProgressRing } from "@/components/progress-ring";
 import { ProgramButton } from "@/components/program-button";
 import { validateBelowDeclaredLevel } from "./actions";
+import { RIcon } from "@/components/rideup-icons";
 
 export const metadata: Metadata = { title: "Progression" };
 // La génération du programme Elite (action serveur) peut prendre plus d'une minute.
@@ -140,7 +141,20 @@ async function renderProgression({ supabase, user, profile }: Awaited<ReturnType
             <Kpi label="Analyses" value={String(data.analysesCount)} />
             <Kpi label="Moyenne" value={g.moyenne != null ? g.moyenne.toFixed(1) : "–"} hint="10 dernières" />
             <Kpi label="Meilleure" value={g.meilleure != null ? `${g.meilleure}/10` : "–"} />
-            <Kpi label="Série" value={g.serie >= 2 ? `🔥 ${g.serie}` : "–"} hint="sans baisse" />
+            <Kpi
+            label="Série"
+            value={
+              g.serie >= 2 ? (
+                <>
+                  <RIcon name="fire" className="mr-1 h-5 w-5 text-amber-300" />
+                  {g.serie}
+                </>
+              ) : (
+                "–"
+              )
+            }
+            hint="sans baisse"
+          />
           </dl>
         </div>
       </section>
@@ -294,8 +308,8 @@ async function renderProgression({ supabase, user, profile }: Awaited<ReturnType
           {g.badges.map((b) => (
             <li key={b.id} className={`rounded-2xl border p-3.5 ${b.obtenu ? "border-brand/40 bg-brand-light" : "border-line bg-spray"}`}>
               <div className="flex items-start gap-3">
-                <span aria-hidden="true" className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl text-xl ${b.obtenu ? "bg-white" : "bg-raised grayscale"}`}>
-                  {b.icone}
+                <span aria-hidden="true" className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${b.obtenu ? "bg-white text-brand" : "bg-raised text-slate/60"}`}>
+                  <RIcon name={b.icone} className="h-5 w-5" />
                 </span>
                 <div className="min-w-0">
                   <p className={`font-bold leading-tight ${b.obtenu ? "" : "text-slate"}`}>{b.titre}</p>
@@ -458,7 +472,7 @@ async function renderProgression({ supabase, user, profile }: Awaited<ReturnType
   );
 }
 
-function Kpi({ label, value, hint }: { label: string; value: string; hint?: string }) {
+function Kpi({ label, value, hint }: { label: string; value: React.ReactNode; hint?: string }) {
   return (
     <div className="rounded-2xl bg-white/10 px-3 py-2.5">
       <dt className="text-[0.7rem] font-semibold uppercase tracking-wider text-white/70">{label}</dt>
@@ -503,7 +517,7 @@ function PalierCard({ p }: { p: PalierState }) {
           ))}
         </ul>
         <p className="mt-3 text-xs font-semibold">
-          {p.etat === "termine" && <span className="text-brand">✓ Palier terminé</span>}
+          {p.etat === "termine" && <span className="text-brand"><RIcon name="check" className="mr-1 h-4 w-4" />Palier terminé</span>}
           {p.etat === "actuel" && <span className="text-brand">● Tu es ici{p.enCours ? ` · ${p.enCours} en cours` : ""}</span>}
           {p.etat === "a-venir" && <span className="text-slate">À débloquer</span>}
         </p>

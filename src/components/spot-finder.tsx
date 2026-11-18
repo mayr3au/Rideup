@@ -9,6 +9,7 @@ import type { SpotKind, SportId } from "@/lib/sports";
 import type { PracticeStatus, Spot } from "@/lib/types";
 import { PRACTICE_LABEL } from "@/lib/practice";
 import { WindArrow } from "./wind-arrow";
+import { RIcon } from "@/components/rideup-icons";
 
 const SpotMap = dynamic(() => import("./spot-map"), {
   ssr: false,
@@ -54,7 +55,7 @@ function PracticeChip({ status, className = "" }: { status: PracticeStatus | nul
   const l = PRACTICE_LABEL[status];
   return (
     <span title={l.label} className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-semibold ${TONE[l.tone]} ${className}`}>
-      {l.tone === "ok" ? "✓" : l.tone === "warn" ? "?" : l.tone === "off" ? "✕" : "·"} {l.short}
+      {l.tone === "ok" ? <RIcon name="check" className="h-3 w-3" /> : l.tone === "warn" ? "?" : l.tone === "off" ? <RIcon name="cross" className="h-3 w-3" /> : "·"} {l.short}
     </span>
   );
 }
@@ -129,7 +130,7 @@ function WindName({ knots, className = "" }: { knots: number; className?: string
   const n = windName(knots);
   return (
     <span className={`inline-flex shrink-0 items-center gap-1 rounded-full bg-deep px-2 py-0.5 text-xs font-bold text-white ${className}`}>
-      <span aria-hidden="true">{n.emoji}</span>
+      <RIcon name={n.icon} className="h-3.5 w-3.5" />
       {n.name}
     </span>
   );
@@ -321,7 +322,7 @@ export function SpotFinder({
           </button>
         ) : (
           <div className="flex items-start gap-3 rounded-3xl bg-raised p-5">
-            <span aria-hidden="true" className="text-2xl">🧭</span>
+            <RIcon name="compass" className="h-7 w-7 text-lagoon" />
             <div>
               <p className="font-semibold">Pas de « Go ! » franc cette semaine dans ce rayon.</p>
               <p className="mt-1 text-sm text-slate">
@@ -381,7 +382,7 @@ export function SpotFinder({
                   [
                     ["tous", "Tous"],
                     ["bons", `${cap(OK_WORD[kind])}s`],
-                    ["favoris", "★ Favoris"],
+                    ["favoris", "Favoris"],
                   ] as [Filter, string][]
                 ).map(([f, label]) => (
                   <button
@@ -424,7 +425,7 @@ export function SpotFinder({
               {ranked.length === 0 ? (
                 <p className="panel p-5 text-slate">
                   {filter === "favoris"
-                    ? "Aucun favori dans ce rayon. Ouvre un spot et touche ☆ pour l'ajouter."
+                    ? "Aucun favori dans ce rayon. Ouvre un spot et touche « Favori » pour l'ajouter."
                     : `Aucun spot ${OK_WORD[kind]} ce jour-là. Regarde les autres jours ou élargis le rayon.`}
                 </p>
               ) : (
@@ -439,7 +440,7 @@ export function SpotFinder({
                             <div className="flex items-start gap-3">
                               <div className="min-w-0 flex-1">
                                 <p className="truncate text-lg font-bold">
-                                  {favs.has(s.spot.id) && <span aria-label="favori" className="text-brand">★ </span>}
+                                  {favs.has(s.spot.id) && <RIcon name="star" filled label="favori" className="mr-1 h-4 w-4 text-brand" />}
                                   {s.spot.name}
                                 </p>
                                 <p className="flex flex-wrap items-center gap-x-1.5 gap-y-1 text-sm text-slate">
@@ -448,7 +449,7 @@ export function SpotFinder({
                                     {kind !== "cable" && ` · ${WATER[s.spot.water]}`}
                                   </span>
                                   <PracticeChip status={practiceFor(s.spot, sport)} />
-                                  {s.spot.rules && <span title="Règles locales : voir la fiche" className="rounded-full bg-amber-50 px-2 py-0.5 text-xs font-semibold text-amber-800">⚠ règles</span>}
+                                  {s.spot.rules && <span title="Règles locales : voir la fiche" className="inline-flex items-center gap-1 rounded-full bg-amber-50 px-2 py-0.5 text-xs font-semibold text-amber-800"><RIcon name="warning" className="h-3 w-3" />règles</span>}
                                 </p>
                               </div>
                               {(() => {
@@ -553,19 +554,19 @@ function PracticeBox({ spot, sport }: { spot: Spot; sport: SportId }) {
     <div className="mt-4 space-y-2 text-[0.95rem]">
       {l && (
         <p className={`rounded-2xl px-4 py-3 ${TONE[l.tone]}`}>
-          <span className="font-bold">{l.tone === "ok" ? "✓ " : l.tone === "warn" ? "? " : l.tone === "off" ? "✕ " : ""}{l.label}.</span>
+          <span className="font-bold">{l.tone === "ok" ? <RIcon name="check" className="mr-1 h-4 w-4" /> : l.tone === "warn" ? "? " : l.tone === "off" ? <RIcon name="cross" className="mr-1 h-4 w-4" /> : ""}{l.label}.</span>
           {l.tone === "warn" && " Les prévisions restent indicatives : vérifie le départ, le zonage et la profondeur sur place."}
           {l.tone === "mute" && " Les prévisions restent indicatives."}
         </p>
       )}
       {spot.rules && (
         <div className="rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-amber-900">
-          <p className="font-bold">⚠ Règles locales — elles priment sur la météo</p>
+          <p className="font-bold"><RIcon name="warning" className="mr-1.5 h-4 w-4" />Règles locales — elles priment sur la météo</p>
           <p className="mt-1">{spot.rules}</p>
         </div>
       )}
       {spot.position_approx && (
-        <p className="text-sm text-slate">📍 Position approximative (centre de la commune) : repère le départ exact sur place.</p>
+        <p className="text-sm text-slate"><RIcon name="pin" className="mr-1 h-4 w-4" />Position approximative (centre de la commune) : repère le départ exact sur place.</p>
       )}
       {spot.sources && spot.sources.length > 0 && (
         <p className="text-xs text-slate">Sources : {[...new Set(spot.sources)].slice(0, 4).join(" · ")}</p>
@@ -640,7 +641,8 @@ function SpotDetail({
           className={`btn !min-h-10 shrink-0 !px-4 !py-2 !text-sm ${favorite ? "btn-primary" : "btn-ghost"}`}
           title={canAlert ? "Tu reçois une alerte quand les conditions sont bonnes sur tes favoris" : undefined}
         >
-          {favorite ? "★ Favori" : "☆ Favori"}
+          <RIcon name="star" filled={favorite} className="h-4 w-4" />
+          Favori
         </button>
       </div>
 
@@ -755,7 +757,7 @@ function DayVerdict({
             </dl>
           )}
           {d.warnings.length > 0 && (
-            <p className={`mt-3 text-sm ${d.caution ? "font-semibold text-amber-800" : ""}`}>⚠ {d.warnings.join(" · ")}</p>
+            <p className={`mt-3 text-sm ${d.caution ? "font-semibold text-amber-800" : ""}`}><RIcon name="warning" className="mr-1 h-4 w-4" />{d.warnings.join(" · ")}</p>
           )}
         </>
       ) : (
@@ -813,7 +815,7 @@ function DayVerdict({
           <p className="min-w-0 flex-1">
             <span className="font-bold">
               {live.wind} nds mesurés{live.gust != null && live.gust > live.wind ? `, rafales ${live.gust}` : ""}
-              {live.dir != null && ` de ${compass(live.dir)}`} · {windName(live.wind).emoji} {windName(live.wind).name}
+              {live.dir != null && ` de ${compass(live.dir)}`} · <RIcon name={windName(live.wind).icon} className="h-4 w-4" /> {windName(live.wind).name}
             </span>
             <span className="block text-slate">
               Balise {live.station} · à {live.distanceKm.toFixed(1).replace(".", ",")} km · il y a {live.minutesAgo} min
@@ -848,7 +850,7 @@ function WindBars({ hours }: { hours: RatedHour[] }) {
         <div className="flex min-w-max items-end gap-1.5 pb-1">
           {hours.map((h) => (
             <div key={h.time} title={`${h.time.slice(11, 13)}h : ${windName(h.wind).name}`} className={`flex w-9 flex-col items-center rounded-lg py-1 text-xs ${h.ok ? (h.caution ? "bg-amber-50" : "bg-emerald-50") : ""}`}>
-              <span aria-hidden="true" className="text-sm leading-none">{windName(h.wind).emoji}</span>
+              <RIcon name={windName(h.wind).icon} className="h-4 w-4 text-deep/70" />
               <span className="font-semibold">{Math.round(h.wind)}</span>
               <div className="relative mt-1 flex h-28 w-4 items-end rounded-full bg-raised">
                 <div className={`absolute bottom-0 w-full rounded-full ${h.ok ? (h.caution ? "bg-amber-400/30" : "bg-emerald-500/25") : "bg-slate/15"}`} style={{ height: `${(h.gust / max) * 100}%` }} />

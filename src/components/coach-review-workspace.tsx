@@ -3,6 +3,7 @@
 import { useEffect, useState, useTransition, type ComponentProps } from "react";
 import { ReviewForm } from "./review-form";
 import type { ReviewDraft } from "@/lib/review-draft";
+import { RIcon } from "@/components/rideup-icons";
 
 type FormProps = Omit<ComponentProps<typeof ReviewForm>, "initial">;
 
@@ -70,7 +71,8 @@ export function CoachReviewWorkspace({
         />
         <div className="mt-3 flex flex-wrap items-center gap-3">
           <button type="button" onClick={run} disabled={pending || text.trim().length < 20} className="btn btn-primary">
-            {pending ? "Mise en forme en cours…" : draft ? "✨ Remettre en forme" : "✨ Mettre en forme avec l'IA"}
+            {!pending && <RIcon name="sparkles" className="h-4 w-4" />}
+            {pending ? "Mise en forme en cours…" : draft ? "Remettre en forme" : "Mettre en forme avec l'IA"}
           </button>
           {!showForm && (
             <button type="button" onClick={() => setManual(true)} className="text-sm font-semibold text-lagoon hover:underline">
@@ -93,7 +95,8 @@ export function CoachReviewWorkspace({
           <h2 className="mt-1 text-xl font-bold">Relis, ajuste, publie</h2>
           {draft ? (
             <p className="mt-2 rounded-2xl bg-brand-light p-3 text-sm text-deep">
-              ✨ Pré-rempli à partir de ton compte rendu. Vérifie la note, les erreurs et les exercices : c&apos;est ton nom qui part au rider.
+              <RIcon name="sparkles" className="mr-1 h-4 w-4 text-brand" />
+              Pré-rempli à partir de ton compte rendu. Vérifie la note, les erreurs et les exercices : c&apos;est ton nom qui part au rider.
             </p>
           ) : (
             <p className="mt-2 text-sm text-slate">Remplis le retour tel que le rider le recevra.</p>

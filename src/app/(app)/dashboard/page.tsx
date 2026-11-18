@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { CoachAiMark } from "@/components/rideup-icons";
+import { CoachAiMark, RIcon } from "@/components/rideup-icons";
 import Image from "next/image";
 import Link from "next/link";
 import { redirect } from "next/navigation";
@@ -48,7 +48,7 @@ export default async function Dashboard({ searchParams }: { searchParams: Promis
         <Image src={SPORT_PHOTOS[sport]} alt="" fill priority sizes="(min-width: 768px) 768px, 100vw" quality={85} className="object-cover" style={{ objectPosition: SPORT_PHOTO_POS[sport] ?? "50% 50%" }} />
         <div className="absolute inset-0 bg-gradient-to-r from-deep/90 via-deep/65 to-deep/20" />
         <div className="relative p-5 text-white sm:p-7">
-          <p className="text-sm font-bold uppercase tracking-wider text-white/80">{firstName ? `Salut ${firstName}` : "Salut"} 🤙</p>
+          <p className="text-sm font-bold uppercase tracking-wider text-white/80">{firstName ? `Salut ${firstName}` : "Salut"} <RIcon name="wave" className="ml-1 h-4 w-4" /></p>
           <h1 className="mt-1 text-3xl font-extrabold leading-tight text-white sm:text-4xl">
             Prêt pour ta session de <em className="italic">{S.name.toLowerCase()}</em> ?
           </h1>
@@ -98,7 +98,14 @@ export default async function Dashboard({ searchParams }: { searchParams: Promis
             photo: SITE_PHOTOS.cours,
             title: "Cours",
             line: "Le vent, la sécurité, chaque figure.",
-            badge: plan === "free" ? "🔒 Abonnés" : `${courseCount} cours`,
+            badge: plan === "free" ? (
+              <>
+                <RIcon name="lock" className="mr-1 h-3 w-3" />
+                Abonnés
+              </>
+            ) : (
+              `${courseCount} cours`
+            ),
             tone: plan === "free" ? "bg-white/90 text-deep" : "bg-white text-brand",
           },
           {
@@ -182,7 +189,7 @@ export default async function Dashboard({ searchParams }: { searchParams: Promis
             ].map((s, i) => (
               <li key={i} className="flex items-start gap-3">
                 <span aria-hidden="true" className={`mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-sm font-bold ${s.done ? "bg-brand text-white" : "bg-brand-light text-brand"}`}>
-                  {s.done ? "✓" : i + 1}
+                  {s.done ? <RIcon name="check" className="h-3.5 w-3.5" /> : i + 1}
                 </span>
                 <div className="min-w-0 flex-1">
                   <p className={`font-semibold ${s.done ? "text-slate line-through decoration-1" : ""}`}>{s.title}</p>

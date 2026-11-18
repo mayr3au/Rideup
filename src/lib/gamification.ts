@@ -1,5 +1,6 @@
 import { LEVEL_LABELS, LEVEL_ORDER, tricksFor, type Level, type SportId, type Trick } from "./sports";
 import type { TrickProgress } from "./types";
+import type { IconName } from "@/components/rideup-icons";
 
 /**
  * Gamification de la progression : paliers (les 4 niveaux de la roadmap), XP, badges, régularité.
@@ -37,7 +38,7 @@ export type Badge = {
   id: string;
   titre: string;
   texte: string;
-  icone: string;
+  icone: IconName;
   obtenu: boolean;
   /** 0-1, pour la barre de progression des badges non obtenus */
   progression: number;
@@ -131,25 +132,25 @@ export function computeGamification(opts: { sport: SportId; progress: TrickProgr
   const notes8 = analyses.filter((a) => a.note >= 8).length;
   const figuresAnalysees = new Set(analyses.map((a) => a.trickId).filter(Boolean)).size;
   const badges: Badge[] = [
-    { id: "first-analyse", titre: "Première analyse", texte: "Un clip envoyé, un premier retour du coach.", icone: "🎬", obtenu: n >= 1, progression: clamp(n / 1) },
-    { id: "cinq-analyses", titre: "Régulier", texte: "5 analyses : le coach commence à te connaître.", icone: "📈", obtenu: n >= 5, progression: clamp(n / 5), detail: `${Math.min(n, 5)}/5` },
-    { id: "quinze-analyses", titre: "Obsédé du détail", texte: "15 analyses. Tes erreurs n'ont plus de secret.", icone: "🔬", obtenu: n >= 15, progression: clamp(n / 15), detail: `${Math.min(n, 15)}/15` },
-    { id: "first-trick", titre: "Première figure", texte: "Ta première figure validée dans la roadmap.", icone: "✅", obtenu: totalValides >= 1, progression: clamp(totalValides / 1) },
-    { id: "note-8", titre: "Propre", texte: "Une analyse notée 8/10 ou plus.", icone: "✨", obtenu: notes8 >= 1, progression: clamp(notes8 / 1) },
-    { id: "note-9", titre: "Quasi parfait", texte: "Une analyse notée 9/10 ou plus.", icone: "🏆", obtenu: (meilleure ?? 0) >= 9, progression: clamp((meilleure ?? 0) / 9) },
-    { id: "serie", titre: "En progression", texte: "3 analyses d'affilée sans baisse de note.", icone: "🔥", obtenu: serie >= 3, progression: clamp(serie / 3), detail: `${Math.min(serie, 3)}/3` },
-    { id: "trois-figures", titre: "Explorateur", texte: "3 figures différentes analysées.", icone: "🧭", obtenu: figuresAnalysees >= 3, progression: clamp(figuresAnalysees / 3), detail: `${Math.min(figuresAnalysees, 3)}/3` },
+    { id: "first-analyse", titre: "Première analyse", texte: "Un clip envoyé, un premier retour du coach.", icone: "video", obtenu: n >= 1, progression: clamp(n / 1) },
+    { id: "cinq-analyses", titre: "Régulier", texte: "5 analyses : le coach commence à te connaître.", icone: "chart", obtenu: n >= 5, progression: clamp(n / 5), detail: `${Math.min(n, 5)}/5` },
+    { id: "quinze-analyses", titre: "Obsédé du détail", texte: "15 analyses. Tes erreurs n'ont plus de secret.", icone: "search", obtenu: n >= 15, progression: clamp(n / 15), detail: `${Math.min(n, 15)}/15` },
+    { id: "first-trick", titre: "Première figure", texte: "Ta première figure validée dans la roadmap.", icone: "checkCircle", obtenu: totalValides >= 1, progression: clamp(totalValides / 1) },
+    { id: "note-8", titre: "Propre", texte: "Une analyse notée 8/10 ou plus.", icone: "sparkles", obtenu: notes8 >= 1, progression: clamp(notes8 / 1) },
+    { id: "note-9", titre: "Quasi parfait", texte: "Une analyse notée 9/10 ou plus.", icone: "trophy", obtenu: (meilleure ?? 0) >= 9, progression: clamp((meilleure ?? 0) / 9) },
+    { id: "serie", titre: "En progression", texte: "3 analyses d'affilée sans baisse de note.", icone: "fire", obtenu: serie >= 3, progression: clamp(serie / 3), detail: `${Math.min(serie, 3)}/3` },
+    { id: "trois-figures", titre: "Explorateur", texte: "3 figures différentes analysées.", icone: "compass", obtenu: figuresAnalysees >= 3, progression: clamp(figuresAnalysees / 3), detail: `${Math.min(figuresAnalysees, 3)}/3` },
     ...paliers.map((p) => ({
       id: `palier-${p.level}`,
       titre: `Palier ${p.numero} : ${p.titre}`,
       texte: `Toutes les figures ${LEVEL_LABELS[p.level].toLowerCase()} validées.`,
-      icone: ["🌱", "🌊", "⚡", "👑"][p.numero - 1],
+      icone: (["sprout", "wave", "bolt", "crown"] as const)[p.numero - 1],
       obtenu: p.valides === p.total,
       progression: clamp(p.valides / p.total),
       detail: `${p.valides}/${p.total}`,
     })),
-    { id: "assidu", titre: "Assidu", texte: "Des analyses sur 3 mois différents.", icone: "📅", obtenu: moisActifs >= 3, progression: clamp(moisActifs / 3), detail: `${Math.min(moisActifs, 3)}/3` },
-    { id: "multi", titre: "Multi-glisse", texte: "Deux sports dans ton profil.", icone: "🪁", obtenu: sportsCount >= 2, progression: clamp(sportsCount / 2) },
+    { id: "assidu", titre: "Assidu", texte: "Des analyses sur 3 mois différents.", icone: "calendar", obtenu: moisActifs >= 3, progression: clamp(moisActifs / 3), detail: `${Math.min(moisActifs, 3)}/3` },
+    { id: "multi", titre: "Multi-glisse", texte: "Deux sports dans ton profil.", icone: "kite", obtenu: sportsCount >= 2, progression: clamp(sportsCount / 2) },
   ];
 
   return {

@@ -5,6 +5,7 @@ import { distanceKm, ORIENTATION_LABEL, summarizeDay, windName, type DaySummary,
 import { gearSizes, levelFor } from "@/lib/rider";
 import { SPORTS, type SportId } from "@/lib/sports";
 import type { Profile, Spot } from "@/lib/types";
+import { RIcon } from "@/components/rideup-icons";
 
 const MAX_SPOTS = 10;
 
@@ -131,7 +132,7 @@ export async function DashboardConditions({ profile, sport }: { profile: Profile
             <li key={o.spot.id} className="flex items-center justify-between gap-3 px-5 py-3">
               <div className="min-w-0">
                 <p className="truncate font-semibold">
-                  {S.spot !== "waves" && <span aria-hidden="true">{windName(o.day.avgWind ?? 0).emoji} </span>}
+                  {S.spot !== "waves" && <RIcon name={windName(o.day.avgWind ?? 0).icon} className="mr-1.5 h-4 w-4 text-lagoon" />}
                   {o.spot.name}
                   {i > 0 && (
                     <span className="font-normal text-slate">
@@ -149,7 +150,7 @@ export async function DashboardConditions({ profile, sport }: { profile: Profile
                   {` · ${Math.round(o.km)} km`}
                 </p>
               </div>
-              <span className={`shrink-0 rounded-full px-2.5 py-1 text-sm font-bold ${o.day.caution ? "bg-amber-100 text-amber-800" : "bg-emerald-100 text-emerald-800"}`}>{o.day.caution ? "⚠ " : "✓ "}{o.day.goodHours} h</span>
+              <span className={`shrink-0 rounded-full px-2.5 py-1 text-sm font-bold ${o.day.caution ? "bg-amber-100 text-amber-800" : "bg-emerald-100 text-emerald-800"}`}><RIcon name={o.day.caution ? "warning" : "check"} className="mr-1 h-3.5 w-3.5" />{o.day.goodHours} h</span>
             </li>
           ))}
         </ul>

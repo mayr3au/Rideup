@@ -5,6 +5,7 @@ import { createClient } from "@/lib/supabase/server";
 import { getPlanSettings } from "@/lib/usage";
 import { PLANS, REVIEW_DELAY_HOURS, type PaidPlan } from "@/lib/plans";
 import { Reveal } from "@/components/reveal";
+import { RIcon } from "@/components/rideup-icons";
 
 export const metadata: Metadata = {
   title: "Tarifs",
@@ -48,7 +49,7 @@ export default async function PricingPage() {
               <ul className="mt-5 flex-1 space-y-2.5">
                 {plan.features.map((f) => (
                   <li key={f} className="flex gap-2">
-                    <span aria-hidden="true" className="text-lagoon">✓</span>
+                    <RIcon name="check" className="mt-[0.3em] h-4 w-4 text-lagoon" />
                     {f}
                   </li>
                 ))}

@@ -7,6 +7,7 @@ import { isSport, LEVEL_LABELS, SPORTS, type Level, type SportId } from "@/lib/s
 import type { Spot } from "@/lib/types";
 import { WindArrow } from "@/components/wind-arrow";
 import { NearMeButton } from "@/components/near-me-button";
+import { RIcon } from "@/components/rideup-icons";
 
 export const metadata: Metadata = {
   title: "Les meilleurs spots du week-end",
@@ -147,7 +148,7 @@ export default async function WeekendPage({
         {here ? (
           <Link href={href({ near: false, pays: sp.pays })} className="inline-flex min-h-10 items-center gap-1.5 rounded-full bg-brand px-3.5 text-sm font-semibold text-white">
             À moins de {radius} km de toi
-            <span aria-hidden="true">✕</span>
+            <RIcon name="cross" className="h-3.5 w-3.5" />
             <span className="sr-only">(retirer)</span>
           </Link>
         ) : (
@@ -218,7 +219,7 @@ export default async function WeekendPage({
                       {r.spot.region ? `${r.spot.region}, ` : ""}
                       {r.spot.country}
                       {r.distance != null && ` · ${Math.round(r.distance)} km`}
-                      {r.spot.rules && <span className="ml-1.5 rounded-full bg-amber-50 px-2 py-0.5 text-xs font-semibold text-amber-800">⚠ règles locales</span>}
+                      {r.spot.rules && <span className="ml-1.5 inline-flex items-center gap-1 rounded-full bg-amber-50 px-2 py-0.5 text-xs font-semibold text-amber-800"><RIcon name="warning" className="h-3 w-3" />règles locales</span>}
                     </p>
                   </div>
                   {[

@@ -14,6 +14,7 @@ import { NearMeButton } from "@/components/near-me-button";
 import { RadiusSlider } from "@/components/radius-slider";
 import Image from "next/image";
 import { SITE_PHOTOS, SPORT_PHOTOS } from "@/lib/photos";
+import { RIcon } from "@/components/rideup-icons";
 
 export const metadata: Metadata = { title: "Spot Finder" };
 export const dynamic = "force-dynamic";
@@ -208,7 +209,7 @@ export default async function SpotsPage({ searchParams }: { searchParams: Promis
         </div>
       ) : nearby.length === 0 ? (
         <div className="panel mt-6 p-6 text-center">
-          <p className="text-4xl" aria-hidden="true">🏝️</p>
+          <RIcon name="island" className="mx-auto block h-11 w-11 text-lagoon" />
           <p className="mt-2 text-lg font-bold">
             {S.spot === "cable" ? "Aucun téléski nautique référencé autour de toi" : "Aucun spot référencé autour de toi"}
           </p>
@@ -218,7 +219,7 @@ export default async function SpotsPage({ searchParams }: { searchParams: Promis
         <div className="mt-6">
           {extended && (
             <div className="mb-4 flex items-start gap-3 rounded-2xl bg-amber-50 p-4">
-              <span aria-hidden="true" className="text-xl">📍</span>
+              <RIcon name="pin" className="mt-0.5 h-5 w-5 text-amber-700" />
               <p className="text-[0.95rem]">
                 <span className="font-semibold">Aucun spot à moins de {radius} km.</span> Voici les {nearby.length} plus proches, jusqu&apos;à{" "}
                 {Math.round(nearby.at(-1)!.distance)} km.

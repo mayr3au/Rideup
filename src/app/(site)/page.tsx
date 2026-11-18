@@ -7,7 +7,7 @@ import { COURSES } from "@/lib/courses";
 import { LESSONS } from "@/lib/lessons";
 import { Reveal } from "@/components/reveal";
 import { instagramUrl, TEAM } from "@/lib/coaches";
-import { CoachAiMark, IconKite, IconSafety, IconTrick } from "@/components/rideup-icons";
+import { CoachAiMark, IconKite, IconSafety, IconTrick, RIcon } from "@/components/rideup-icons";
 import { Tilt } from "@/components/tilt";
 import { PhoneScreens } from "@/components/phone-screens";
 import { SampleReport } from "@/components/sample-report";
@@ -141,7 +141,7 @@ function Hero() {
           </div>
           <div className="pop-in absolute right-0 bottom-20 hidden lg:block xl:-right-10" style={d(1.5)}>
             <div className="float flex items-center gap-2.5 rounded-2xl bg-brand px-3.5 py-2.5 text-white shadow-[0_20px_40px_-14px_rgba(22,136,200,0.75)]" style={d(1.8)}>
-              <span aria-hidden="true" className="text-xl">🔥</span>
+              <RIcon name="fire" className="h-6 w-6" />
               <span className="leading-tight">
                 <span className="block text-sm font-extrabold">+2 points</span>
                 <span className="block text-xs font-semibold text-white/85">sur ton appel</span>
@@ -350,7 +350,7 @@ function StepVisual({ n }: { n: number }) {
   if (n === 2)
     return (
       <div className="flex h-44 flex-col justify-center gap-2 bg-raised px-5">
-        <span className="w-fit rounded-full bg-white px-3 py-1 text-xs font-semibold text-deep shadow-sm">🪁 Figure : Backroll</span>
+        <span className="w-fit rounded-full bg-white px-3 py-1 text-xs font-semibold text-deep shadow-sm"><RIcon name="kite" className="mr-1 h-3.5 w-3.5 text-brand" />Figure : Backroll</span>
         <p className="ml-auto max-w-[85%] rounded-2xl rounded-br-md bg-brand px-3.5 py-2 text-sm text-white shadow-md">
           Je tourne, mais je retombe toujours sur les fesses. C&apos;est mon regard ?
         </p>

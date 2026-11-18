@@ -2,6 +2,7 @@
 
 import type { Quiver } from "@/lib/rider-details";
 import type { SportId } from "@/lib/sports";
+import { RIcon } from "@/components/rideup-icons";
 
 const chip =
   "cursor-pointer select-none rounded-full border border-line bg-spray px-3.5 py-2 text-sm font-semibold transition-colors hover:border-brand aria-pressed:border-brand aria-pressed:bg-brand aria-pressed:text-white";
@@ -113,7 +114,7 @@ export function QuiverEditor({ sport, value, onChange }: { sport: SportId; value
                   className="field"
                 />
                 <button type="button" onClick={() => set({ planches: boards.filter((_, j) => j !== i) })} aria-label="Retirer cette planche" className="rounded-xl px-3 text-slate hover:bg-raised hover:text-danger">
-                  ✕
+                  <RIcon name="cross" className="h-4 w-4" />
                 </button>
               </div>
             ))}

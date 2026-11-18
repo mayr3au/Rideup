@@ -2,6 +2,7 @@ import Link from "next/link";
 import type { Metadata } from "next";
 import { AuthForm } from "@/components/auth-form";
 import { signUp } from "../actions";
+import { RIcon } from "@/components/rideup-icons";
 
 export const metadata: Metadata = { title: "Créer un compte" };
 
@@ -13,7 +14,7 @@ export default function SignupPage() {
       <ul className="mt-5 space-y-2 text-[0.95rem]">
         {["Une analyse de ta figure, phase par phase", "Un coach qui connaît ton niveau et ton matériel", "La roadmap de tes prochaines figures"].map((t) => (
           <li key={t} className="flex gap-2.5">
-            <span aria-hidden="true" className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-brand-light text-xs font-bold text-brand">✓</span>
+            <span aria-hidden="true" className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-brand-light text-xs font-bold text-brand"><RIcon name="check" className="h-3 w-3" /></span>
             {t}
           </li>
         ))}
