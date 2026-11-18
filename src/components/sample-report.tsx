@@ -5,7 +5,7 @@
 const PHASES: [string, number, string][] = [
   ["Approche", 8, "Bonne vitesse, carre tenue jusqu'au bout."],
   ["Appel", 6, "Le kite part trop loin derrière le zénith."],
-  ["En l'air", 5, "Tête qui tourne avant les épaules : rotation freinée."],
+  ["En l'air", 5, "Regard qui part au point haut : rotation trop tardive."],
   ["Réception", 6, "Réception subie, jambes trop tendues."],
 ];
 
@@ -19,8 +19,8 @@ const ERRORS = [
   {
     level: "Moyenne",
     color: "border-kite",
-    title: "Regard qui lance la rotation trop tôt",
-    fix: "Garde le regard sur l'horizon jusqu'au sommet du saut, puis tourne la tête par-dessus l'épaule arrière.",
+    title: "Regard qui part trop tard",
+    fix: "Tourne la tête par-dessus l'épaule arrière dès le décollage, dans la continuité de la carre, pas au point haut.",
   },
 ];
 
@@ -45,7 +45,7 @@ export function SampleReport({ compact = false }: { compact?: boolean }) {
       <div className="p-5">
         <div className="flex items-end justify-between gap-4">
           <div>
-            <p className="text-sm text-slate">Kitesurf · intermédiaire</p>
+            <p className="text-sm text-slate">Kitesurf · avancé</p>
             <p className="text-2xl font-extrabold">Backroll</p>
           </div>
           <p className="text-4xl font-extrabold leading-none text-brand">
@@ -94,7 +94,7 @@ export function SampleReport({ compact = false }: { compact?: boolean }) {
             <p className="mt-5 text-sm font-bold uppercase tracking-wider text-slate">Exercices</p>
             <ul className="mt-2 space-y-1 text-sm">
               <li className="flex gap-2"><span aria-hidden="true" className="text-lagoon">•</span>5 petits sauts en envoyant le kite à 12 h, sans rotation</li>
-              <li className="flex gap-2"><span aria-hidden="true" className="text-lagoon">•</span>Rotation au sol sur la plage : épaules d&apos;abord, tête ensuite</li>
+              <li className="flex gap-2"><span aria-hidden="true" className="text-lagoon">•</span>5 sauts en tournant seulement la tête vers l&apos;épaule arrière au décollage</li>
             </ul>
           </>
         )}

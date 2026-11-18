@@ -1,9 +1,10 @@
 "use client";
 
+import Link from "next/link";
 import dynamic from "next/dynamic";
 import { useMemo, useRef, useState, useTransition } from "react";
 import { toggleFavorite } from "@/app/(app)/spots/actions";
-import { compass, confidenceFor, ORIENTATION_LABEL, weatherLabel, windName, type Confidence, type DaySummary, type HourForecast } from "@/lib/wind";
+import { compass, confidenceFor, dayStatus, LAND_WIND_CHECKLIST, ORIENTATION_LABEL, weatherLabel, windName, type Confidence, type DaySummary, type HourForecast } from "@/lib/wind";
 import type { LiveWind } from "@/lib/live-wind";
 import type { SpotKind, SportId } from "@/lib/sports";
 import type { PracticeStatus, Spot } from "@/lib/types";
@@ -17,7 +18,7 @@ const SpotMap = dynamic(() => import("./spot-map"), {
 });
 
 /** Heure de prévision, avec la note calculée pour le rider (0-100) et si elle est ridable. */
-export type RatedHour = HourForecast & { score: number; ok: boolean; caution?: boolean };
+export type RatedHour = HourForecast & { score: number; ok: boolean; caution?: boolean; land?: boolean };
 
 export type SpotData = {
   spot: Spot;
@@ -90,23 +91,11 @@ const STATUS_STYLE: Record<Status, { className: string; bar: string }> = {
   no: { className: "bg-danger text-white", bar: "bg-danger/80" },
   calm: { className: "bg-raised text-slate", bar: "bg-line" },
 };
-const CALM_REASONS = ["Pas assez de vent", "Trop petit", "Pas de prévision de houle ici"];
 
+/** Même verdict que le tableau de bord et le coach IA (dayStatus) : jamais de « Go ! » par vent de terre, rafaleux ou incertain. */
 function verdict(d: DaySummary | undefined, kind: SpotKind, dayIdx = 0): Verdict {
-  const make = (status: Status, label: string): Verdict => ({ status, label, ...STATUS_STYLE[status] });
-  if (!d) return make("calm", "–");
-  if (d.goodHours > 0) {
-    if (kind === "cable") return make("go", "Conseillé");
-    const conf = confidenceFor(d.spread, dayIdx, d.avgWind);
-    if (d.caution) return make("maybe", "Prudence");
-    if (conf === "faible") return make("maybe", "Pas sûr");
-    const q = quality(d);
-    if (q < 0.3) return make("maybe", "Court créneau");
-    return make("go", q >= 0.6 ? "Go !" : "Oui");
-  }
-  if (kind === "cable") return make("no", "Bof");
-  if (!d.reason || CALM_REASONS.includes(d.reason)) return make("calm", kind === "waves" ? "Trop petit" : "Pas de vent");
-  return make("no", "Non");
+  const s = dayStatus(d, kind, dayIdx);
+  return { status: s.status, label: s.label, ...STATUS_STYLE[s.status] };
 }
 
 /** Prévision de la journée même quand ce n'est pas ridable : on affiche toujours les chiffres. */
@@ -157,7 +146,7 @@ function Legend() {
 }
 
 const CONFIDENCE: Record<Confidence, { label: string; long: string; dot: string }> = {
-  haute: { label: "Prévision sûre", long: "Les modèles météo sont d'accord", dot: "bg-emerald-500" },
+  haute: { label: "Modèles d'accord", long: "Les modèles météo donnent la même chose (ce n'est pas une garantie)", dot: "bg-emerald-500" },
   moyenne: { label: "À confirmer", long: "Les modèles divergent un peu : revérifie la veille", dot: "bg-amber-400" },
   faible: { label: "Incertain", long: "Les modèles ne sont pas d'accord : revérifie le matin même", dot: "bg-danger" },
 };
@@ -184,7 +173,7 @@ function LiveChip({ live }: { live: LiveWind | null | undefined }) {
         <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-500 opacity-60" />
         <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-500" />
       </span>
-      {live.wind} nds mesurés{live.dir != null ? ` de ${compass(live.dir)}` : ""} · {windName(live.wind).name}
+      {live.wind} nds{live.dir != null ? ` de ${compass(live.dir)}` : ""} · balise {live.station} · il y a {live.minutesAgo} min
     </span>
   );
 }
@@ -655,7 +644,7 @@ function SpotDetail({
         </button>
       </div>
 
-      <DayVerdict d={d} dayIdx={dayIdx} date={date} kind={kind} live={dayIdx === 0 ? data.live : null} />
+      <DayVerdict d={d} dayIdx={dayIdx} date={date} kind={kind} live={dayIdx === 0 ? data.live : null} water={data.spot.water} />
 
       {/* Semaine du spot */}
       {kind !== "cable" && (
@@ -703,12 +692,14 @@ function DayVerdict({
   date,
   kind,
   live,
+  water,
 }: {
   d: DaySummary | undefined;
   dayIdx: number;
   date: string;
   kind: SpotKind;
   live: LiveWind | null | undefined;
+  water?: string;
 }) {
   const v = verdict(d, kind, dayIdx);
   const conf = d ? confidenceFor(d.spread, dayIdx, d.avgWind) : null;
@@ -745,7 +736,11 @@ function DayVerdict({
                 <>
                   <Tile label="Vent" value={`${d.avgWind} nds`} sub={d.maxGust ? `rafales ${d.maxGust}` : undefined} icon={d.dir != null ? <WindArrow deg={d.dir} size={16} /> : null} />
                   <Tile label="Direction" value={d.dir != null ? compass(d.dir) : "–"} sub={d.orientation ? ORIENTATION_LABEL[d.orientation] : undefined} />
-                  <Tile label="À sortir" value={d.gear ? `${String(d.gear).replace(".", ",")} m²` : "–"} sub={d.gearName ?? undefined} />
+                  <Tile
+                    label="À sortir"
+                    value={d.gear ? `${String(d.gear).replace(".", ",")} m²` : "–"}
+                    sub={d.gear ? d.gearName ?? undefined : d.variable ? "vent irrégulier" : d.uncertainData ? "données insuffisantes" : d.gearName ?? undefined}
+                  />
                 </>
               ) : (
                 <>
@@ -759,6 +754,14 @@ function DayVerdict({
           {d.warnings.length > 0 && (
             <p className={`mt-3 text-sm ${d.caution ? "font-semibold text-amber-800" : ""}`}><RIcon name="warning" className="mr-1 h-4 w-4" />{d.warnings.join(" · ")}</p>
           )}
+          {kind === "wind" && (d.variable || d.uncertainData) && (
+            <p className="mt-2 text-sm text-slate">
+              {d.variable
+                ? "Vent irrégulier : pas de taille d'aile conseillée, elle dépend de la rafale. Observe le plan d'eau sur place avant de choisir."
+                : "Données insuffisantes pour conseiller une taille d'aile : revérifie la prévision et observe sur place."}
+            </p>
+          )}
+          {kind === "wind" && d.landWind && <LandWindBox water={water} />}
         </>
       ) : (
         <>
@@ -766,6 +769,12 @@ function DayVerdict({
             {v.status === "no" ? "Pas pour toi ce jour-là" : kind === "waves" ? "Pas de vagues pour toi" : "Pas assez de vent"}
           </p>
           {d?.reason && <p className={`mt-1 font-semibold ${v.status === "no" ? "text-danger" : "text-slate"}`}>{d.reason}</p>}
+          {kind === "wind" && d?.reason?.startsWith("Déconseillé") && (
+            <p className="mt-2 text-sm text-slate">
+              Par vent de terre, une panne ou une chute te fait dériver vers le large. Tant que tu n&apos;es pas autonome, choisis un spot
+              où le vent rentre (side-shore ou side-on), ou rider avec une école et une assistance nautique.
+            </p>
+          )}
           {kind === "wind" && d?.peak && <WindName knots={d.peak.wind} className="mt-2 !px-3 !py-1 !text-sm" />}
           {d?.peak && kind !== "cable" && (
             <>
@@ -828,6 +837,37 @@ function DayVerdict({
   );
 }
 
+/** Vent de terre pour un rider autonome : le créneau reste visible, mais avec ce qu'il faut avoir vérifié avant de partir. */
+function LandWindBox({ water }: { water?: string }) {
+  return (
+    <div className="mt-4 rounded-2xl border-2 border-amber-400/60 bg-white p-4 text-sm">
+      <p className="font-bold text-amber-800">
+        <RIcon name="warning" className="mr-1.5 h-4 w-4" />
+        Conditions techniques · secours à confirmer
+      </p>
+      <p className="mt-1 text-slate">
+        Vent de terre : en cas de panne ou de chute, la dérive t&apos;emmène vers le large.
+        {water && water !== "vagues" ? " Le plan d'eau est souvent plus plat près du bord, mais ce n'est pas une raison de partir sans solution." : ""}
+      </p>
+      <p className="mt-3 font-semibold">Avant de partir, vérifie :</p>
+      <ul className="mt-1 space-y-1">
+        {LAND_WIND_CHECKLIST.map((c) => (
+          <li key={c} className="flex gap-2">
+            <RIcon name="check" className="mt-[0.3em] h-4 w-4 text-lagoon" />
+            <span>{c}</span>
+          </li>
+        ))}
+      </ul>
+      <p className="mt-3 font-bold text-danger">Sans solution vérifiée, renonce au créneau.</p>
+      <p className="mt-2 text-slate">
+        À relire (gratuit) :{" "}
+        <Link href="/cours/comprendre-le-vent" className="font-semibold text-lagoon hover:underline">vent de terre</Link> ·{" "}
+        <Link href="/cours/self-rescue" className="font-semibold text-lagoon hover:underline">self-rescue</Link>
+      </p>
+    </div>
+  );
+}
+
 function Tile({ label, value, sub, icon }: { label: string; value: string; sub?: string; icon?: React.ReactNode }) {
   return (
     <div className="rounded-2xl bg-white px-2 py-3">
@@ -849,8 +889,12 @@ function WindBars({ hours }: { hours: RatedHour[] }) {
       <div className="scroll-x mt-2">
         <div className="flex min-w-max items-end gap-1.5 pb-1">
           {hours.map((h) => (
-            <div key={h.time} title={`${h.time.slice(11, 13)}h : ${windName(h.wind).name}`} className={`flex w-9 flex-col items-center rounded-lg py-1 text-xs ${h.ok ? (h.caution ? "bg-amber-50" : "bg-emerald-50") : ""}`}>
-              <RIcon name={windName(h.wind).icon} className="h-4 w-4 text-deep/70" />
+            <div
+              key={h.time}
+              title={`${h.time.slice(11, 13)}h : ${windName(h.wind).name}${h.land ? " · vent de terre" : ""}`}
+              className={`flex w-9 flex-col items-center rounded-lg py-1 text-xs ${h.land ? "ring-1 ring-amber-500" : ""} ${h.ok ? (h.caution ? "bg-amber-50" : "bg-emerald-50") : ""}`}
+            >
+              {h.land ? <RIcon name="warning" label="vent de terre" className="h-4 w-4 text-amber-600" /> : <RIcon name={windName(h.wind).icon} className="h-4 w-4 text-deep/70" />}
               <span className="font-semibold">{Math.round(h.wind)}</span>
               <div className="relative mt-1 flex h-28 w-4 items-end rounded-full bg-raised">
                 <div className={`absolute bottom-0 w-full rounded-full ${h.ok ? (h.caution ? "bg-amber-400/30" : "bg-emerald-500/25") : "bg-slate/15"}`} style={{ height: `${(h.gust / max) * 100}%` }} />
@@ -862,7 +906,7 @@ function WindBars({ hours }: { hours: RatedHour[] }) {
           ))}
         </div>
       </div>
-      <p className="mt-1 text-xs text-slate">En nœuds · vert : ridable · orange : ridable avec prudence · gris : pas pour toi · clair : rafales</p>
+      <p className="mt-1 text-xs text-slate">En nœuds · vert : ridable · orange : ridable avec prudence · gris : pas pour toi · clair : rafales · cadre orange et panneau : vent de terre à cette heure</p>
     </>
   );
 }

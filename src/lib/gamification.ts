@@ -27,7 +27,10 @@ export type PalierState = {
   titre: string;
   devise: string;
   total: number;
+  /** Figures acquises : validées + déjà pratiquées (déclarées au rattrapage de niveau). */
   valides: number;
+  /** Dont figures déclarées « déjà pratiquées », non validées. */
+  dejaPratiques: number;
   enCours: number;
   pct: number;
   etat: "termine" | "actuel" | "a-venir";
@@ -74,13 +77,15 @@ export function computeGamification(opts: { sport: SportId; progress: TrickProgr
   /* Paliers */
   const paliers: PalierState[] = LEVEL_ORDER.map((level) => {
     const list = tricks.filter((t) => t.level === level);
-    const valides = list.filter((t) => status.get(t.id) === "valide").length;
+    const dejaPratiques = list.filter((t) => status.get(t.id) === "deja-pratique").length;
+    const valides = list.filter((t) => status.get(t.id) === "valide").length + dejaPratiques;
     const enCours = list.filter((t) => status.get(t.id) === "en-cours").length;
     return {
       level,
       ...PALIERS[level],
       total: list.length,
       valides,
+      dejaPratiques,
       enCours,
       pct: list.length ? Math.round((valides / list.length) * 100) : 0,
       etat: "a-venir" as PalierState["etat"],

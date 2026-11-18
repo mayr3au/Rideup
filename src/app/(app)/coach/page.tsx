@@ -43,7 +43,7 @@ export default async function CoachPage({ searchParams }: { searchParams: Promis
 
   const status = new Map((progress ?? []).map((p) => [p.trick_id, p.status]));
   const done = tricks.filter((t) => status.get(t.id) === "valide").length;
-  const firstOpen = tricks.find((t) => status.get(t.id) !== "valide")?.id;
+  const firstOpen = tricks.find((t) => status.get(t.id) !== "valide" && status.get(t.id) !== "deja-pratique")?.id;
 
   // Questions proposées : d'abord ce sur quoi le rider bosse vraiment
   const suggestions: string[] = [];
@@ -126,6 +126,7 @@ export default async function CoachPage({ searchParams }: { searchParams: Promis
                                 {t.name}
                                 {isNext && <span className="ml-2 rounded-full bg-brand-light px-2 py-0.5 text-xs font-bold text-brand">Prochaine</span>}
                                 {s === "en-cours" && <span className="ml-2 rounded-full bg-brand px-2 py-0.5 text-xs font-bold text-white">En cours</span>}
+                                {s === "deja-pratique" && <span className="ml-2 rounded-full bg-raised px-2 py-0.5 text-xs font-bold text-slate">Déjà pratiquée</span>}
                               </p>
                               <p className="text-sm text-slate">{t.summary}</p>
                             </div>
@@ -170,11 +171,16 @@ export default async function CoachPage({ searchParams }: { searchParams: Promis
                           {rest.map((t) => (
                             <li key={t.id} className="flex flex-wrap items-center justify-between gap-2 py-2.5">
                               <div className="min-w-0">
-                                <p className="font-semibold">{t.name}</p>
+                                <p className="font-semibold">
+                                  {t.name}
+                                  {status.get(t.id) === "deja-pratique" && (
+                                    <span className="ml-2 rounded-full bg-raised px-2 py-0.5 text-xs font-bold text-slate">Déjà pratiquée</span>
+                                  )}
+                                </p>
                                 <p className="text-sm text-slate">{t.summary}</p>
                               </div>
                               <div className="flex shrink-0 items-center gap-2">
-                                <TrickControls trickId={t.id} status={undefined} />
+                                <TrickControls trickId={t.id} status={status.get(t.id)} />
                               </div>
                             </li>
                           ))}

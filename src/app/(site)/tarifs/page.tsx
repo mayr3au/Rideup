@@ -9,7 +9,7 @@ import { RIcon } from "@/components/rideup-icons";
 
 export const metadata: Metadata = {
   title: "Tarifs",
-  description: "Progress à 14,99 € (20 analyses par mois) ou Elite à 29,99 € (60 analyses), sans engagement.",
+  description: "Progress à 14,99 € ou Elite à 29,99 € par mois, sans engagement : tes vidéos analysées chaque mois par un coach, retour sous 72 h ou 24 h.",
 };
 
 export default async function PricingPage() {

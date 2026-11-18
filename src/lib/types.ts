@@ -46,7 +46,8 @@ export type Profile = {
 export type TrickProgress = {
   user_id: string;
   trick_id: string;
-  status: "en-cours" | "valide";
+  /** « deja-pratique » : déclaré par le rider (rattrapage de niveau), distinct d'une validation. */
+  status: "en-cours" | "valide" | "deja-pratique";
   updated_at: string;
 };
 

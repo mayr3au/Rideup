@@ -271,6 +271,9 @@ function DayCell({ label, d, waves }: { label: string; d: DaySummary | null; wav
             <span className="rounded-md bg-brand-light px-1.5 py-0.5 text-sm font-bold text-brand">
               {d.window ? `${d.window.from.replace(":00", " h")} – ${d.window.to.replace(":00", " h")}` : `${d.goodHours} h`}
             </span>
+            {(d.landWind || d.variable) && (
+              <span className="rounded-md bg-amber-100 px-1.5 py-0.5 text-xs font-bold text-amber-800">{d.landWind ? "Vent de terre" : "Rafaleux"}</span>
+            )}
             {waves ? (
               <span className="text-sm">
                 <strong>{(d.avgWave ?? 0).toFixed(1).replace(".", ",")} m</strong>

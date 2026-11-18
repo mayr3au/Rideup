@@ -7,7 +7,7 @@ import { getProgressData } from "@/lib/progress";
 import { getRiderHistory } from "@/lib/usage";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { activeSport, levelFor } from "@/lib/rider";
-import { LEVEL_ORDER, tricksFor } from "@/lib/sports";
+import { tricksBelowLevel } from "@/lib/sports";
 
 export type ProgramState = { error?: string } | undefined;
 
@@ -41,19 +41,22 @@ export async function createProgram(_prev: ProgramState): Promise<ProgramState> 
 }
 
 /**
- * Valide d'un coup toutes les figures des paliers inférieurs au niveau déclaré dans le profil
+ * Marque « déjà pratiquées » les figures des paliers inférieurs au niveau déclaré dans le profil
  * (utile quand on s'inscrit déjà intermédiaire ou avancé : la roadmap part de zéro sinon).
+ * Ce n'est pas une validation : pas d'XP, et les fondamentaux de sécurité restent à valider un par un.
  */
 export async function validateBelowDeclaredLevel() {
   const { supabase, user, profile } = await requireSession();
   const sport = activeSport(profile);
   const declared = levelFor(profile, sport);
   if (!declared) return;
-  const toValidate = tricksFor(sport).filter((t) => LEVEL_ORDER.indexOf(t.level) < LEVEL_ORDER.indexOf(declared));
-  if (!toValidate.length) return;
-  await supabase.from("trick_progress").upsert(
-    toValidate.map((t) => ({ user_id: user.id, trick_id: t.id, status: "valide", updated_at: new Date().toISOString() })),
+  const toMark = tricksBelowLevel(sport, declared);
+  if (!toMark.length) return;
+  const { error } = await supabase.from("trick_progress").upsert(
+    toMark.map((t) => ({ user_id: user.id, trick_id: t.id, status: "deja-pratique", updated_at: new Date().toISOString() })),
     { onConflict: "user_id,trick_id", ignoreDuplicates: true },
   );
+  // 23514 : migration 0010 (statut « deja-pratique ») pas encore appliquée.
+  if (error) console.error("rattrapage de niveau", error.code, error.message);
   revalidatePath("/", "layout");
 }

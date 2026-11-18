@@ -4,8 +4,8 @@ import { notFound } from "next/navigation";
 import { Schema } from "@/components/schemas";
 import type { Course } from "@/lib/course-types";
 import { courseBySlug, courseForTrick, courseSport } from "@/lib/courses";
-import { LESSONS, LESSON_CATEGORIES, lessonBySlug, type Block, type Lesson } from "@/lib/lessons";
-import { SPORTS, tricksFor } from "@/lib/sports";
+import { LESSONS, LESSON_CATEGORIES, lessonBySlug, type Block, type Editorial, type Lesson } from "@/lib/lessons";
+import { SPORTS, tricksFor, type SportId } from "@/lib/sports";
 import { getSession, effectivePlan } from "@/lib/auth";
 import { RIcon } from "@/components/rideup-icons";
 
@@ -165,6 +165,7 @@ function LessonView({ l, locked, signedIn }: { l: Lesson; locked: boolean; signe
           {l.blocks.map((b, i) => (
             <BlockView key={i} b={b} />
           ))}
+          {l.editorial && <EditorialNote e={l.editorial} discipline={l.sports.length ? l.sports.map((s) => SPORTS[s].name).join(", ") : "toutes disciplines"} />}
 
           <section className="mt-10 rounded-2xl bg-deep p-6 text-white lg:hidden">
             <h2 className="text-xl font-bold">À retenir</h2>
@@ -395,7 +396,9 @@ function CourseView({ c, locked, signedIn }: { c: Course; locked: boolean; signe
           <aside className="mt-6 rounded-2xl border-2 border-danger/50 bg-danger/5 p-4 sm:p-5">
             <p className="text-sm font-bold uppercase tracking-wider text-danger">Sécurité</p>
             <p className="mt-1">{c.securite}</p>
+            <SafetyLinks sport={courseSport(c)} />
           </aside>
+          {c.editorial && <EditorialNote e={c.editorial} discipline={SPORTS[sportId].name} />}
 
           {c.retenir && (
             <section className="mt-10 rounded-2xl bg-deep p-6 text-white lg:hidden">
@@ -485,6 +488,59 @@ export default async function CoursePage({ params }: { params: Promise<{ slug: s
   const signedIn = Boolean(session?.profile);
   const locked = !(session?.profile && (session.profile.is_admin || effectivePlan(session.profile) !== "free"));
 
-  if (lesson) return <LessonView l={lesson} locked={locked} signedIn={signedIn} />;
+  // Les fondamentaux de sécurité restent ouverts à tous, abonnés ou non
+  if (lesson) return <LessonView l={lesson} locked={locked && !lesson.libre} signedIn={signedIn} />;
   return <CourseView c={c!} locked={locked} signedIn={signedIn} />;
+}
+
+/** Avant de sortir, de sauter ou d'essayer une figure : les cours de sécurité qui s'appliquent (gratuits). */
+function SafetyLinks({ sport }: { sport: SportId }) {
+  const list = LESSONS.filter((l) => l.libre && l.category === "securite" && (!l.sports.length || l.sports.includes(sport)));
+  if (!list.length) return null;
+  return (
+    <p className="mt-3 text-sm">
+      Avant de sortir, de sauter ou d&apos;essayer cette figure, revois :{" "}
+      {list.map((l, i) => (
+        <span key={l.slug}>
+          {i > 0 && " · "}
+          <Link href={`/cours/${l.slug}`} className="font-semibold text-lagoon hover:underline">
+            {l.title}
+          </Link>
+        </span>
+      ))}
+    </p>
+  );
+}
+
+/** Suivi éditorial : relecteur, date, sources, et ce qui reste à valider en vidéo. */
+function EditorialNote({ e, discipline }: { e: Editorial; discipline?: string }) {
+  return (
+    <aside className="mt-6 rounded-2xl bg-raised p-4 text-sm text-slate">
+      <p>
+        <span className="font-semibold text-deep">Relu par</span> {e.relecteur} · {new Date(`${e.revise}T12:00:00`).toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric" })}
+        {discipline && ` · ${discipline}`}
+      </p>
+      <p className="mt-1">
+        <span className="font-semibold text-deep">Clip de démonstration</span> :{" "}
+        {e.clip ? (
+          <a href={e.clip} className="text-lagoon underline" target="_blank" rel="noopener noreferrer">
+            voir le clip
+          </a>
+        ) : (
+          "en cours de tournage"
+        )}
+      </p>
+      {e.sources.length > 0 && (
+        <p className="mt-1">
+          <span className="font-semibold text-deep">Sources</span> : {e.sources.join(" · ")}
+        </p>
+      )}
+      {e.aValider && (
+        <p className="mt-1 font-semibold text-amber-800">
+          <RIcon name="warning" className="mr-1 h-4 w-4" />
+          À valider : {e.aValider}
+        </p>
+      )}
+    </aside>
+  );
 }

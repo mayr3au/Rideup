@@ -23,7 +23,7 @@ export function CoachAvatars({ sport, className = "" }: { sport?: SportId; class
       </span>
       <span className="text-sm leading-tight">
         <span className="font-semibold text-deep">{list}</span>
-        <span className="block text-xs text-slate">regardent tes vidéos · <span className="text-lagoon group-hover:underline">voir l&apos;équipe</span></span>
+        <span className="block text-xs text-slate">tes coachs RIDE&apos;UP · <span className="text-lagoon group-hover:underline">voir l&apos;équipe</span></span>
       </span>
     </Link>
   );

@@ -57,8 +57,11 @@ export default async function AnalysePage({ searchParams }: { searchParams: Prom
       </ul>
 
       {(pending?.length ?? 0) > 0 && (
-        <section className="mt-6">
-          <h2 className="text-sm font-bold uppercase tracking-wider text-slate">Chez ton coach</h2>
+        <section className="mt-6 rounded-2xl border border-line bg-raised/60 p-4">
+          <h2 className="text-sm font-bold uppercase tracking-wider text-slate">
+            Déjà envoyée{pending!.length > 1 ? "s" : ""} · en cours chez ton coach
+          </h2>
+          <p className="mt-1 text-sm text-slate">Ces vidéos sont traitées à part : un nouvel envoi ci-dessous ne les remplace pas.</p>
           <ul className="mt-2 space-y-2">
             {pending!.map((a) => (
               <li key={a.id}>
@@ -79,6 +82,12 @@ export default async function AnalysePage({ searchParams }: { searchParams: Prom
       )}
 
       <div className="mt-8">
+        {quota.allowed && (
+          <p className="mb-3 text-sm font-bold uppercase tracking-wider text-slate">
+            Nouvel envoi · {SPORTS[(wanted && trickById(wanted)?.sport) || sport].name}
+            {riderSports(profile).length > 1 && <span className="font-normal normal-case tracking-normal"> (tu peux changer de sport plus bas)</span>}
+          </p>
+        )}
         {quota.allowed ? (
           <AnalyseUploader
             remaining={quota.remaining}

@@ -3,8 +3,8 @@ import Link from "next/link";
 import { requireSession, effectivePlan } from "@/lib/auth";
 import { getProgressData } from "@/lib/progress";
 import { computeGamification, type PalierState } from "@/lib/gamification";
-import { courseForTrick } from "@/lib/courses";
-import { LEVEL_LABELS, LEVEL_ORDER, SPORTS } from "@/lib/sports";
+import { courseCoverage, courseForTrick } from "@/lib/courses";
+import { LEVEL_LABELS, LEVEL_ORDER, SPORTS, tricksBelowLevel } from "@/lib/sports";
 import { activeSport, levelFor, riderSports } from "@/lib/rider";
 import type { Program, TrickProgress } from "@/lib/types";
 import { Sparkline } from "@/components/sparkline";
@@ -83,10 +83,12 @@ async function renderProgression({ supabase, user, profile }: Awaited<ReturnType
   const focusTricks = g.actuel.tricks.filter((t) => t.status === "en-cours").map((t) => t.trick);
   const next = data.nextTrick;
   const nextCourse = next ? courseForTrick(next.id) : undefined;
+  const coverage = courseCoverage(sport);
   const obtenus = g.badges.filter((b) => b.obtenu);
   // Profil déclaré plus haut que le palier atteint : proposer de valider les paliers inférieurs d'un coup.
   const declaredIdx = declared ? LEVEL_ORDER.indexOf(declared) : -1;
-  const offerCatchUp = declaredIdx > LEVEL_ORDER.indexOf(g.actuel.level) && g.paliers.some((p) => LEVEL_ORDER.indexOf(p.level) < declaredIdx && p.valides < p.total);
+  const offerCatchUp =
+    declared != null && declaredIdx > LEVEL_ORDER.indexOf(g.actuel.level) && tricksBelowLevel(sport, declared).some((t) => !progressRows?.some((r) => r.trick_id === t.id));
   const maxMois = Math.max(1, ...g.mois.map((m) => m.count));
 
   return (
@@ -131,9 +133,13 @@ async function renderProgression({ supabase, user, profile }: Awaited<ReturnType
             <form action={validateBelowDeclaredLevel} className="relative mt-5 flex flex-wrap items-center justify-between gap-3 rounded-2xl bg-white/10 p-4">
               <p className="text-sm">
                 <span className="font-semibold">Ton profil dit « {LEVEL_LABELS[declared]} »</span>
-                <span className="text-white/80"> mais ta roadmap part de zéro. Valide d&apos;un coup les figures des paliers précédents.</span>
+                <span className="text-white/80">
+                  {" "}
+                  mais ta roadmap part de zéro. Marque les figures des paliers précédents comme « déjà pratiquées ». Ce n&apos;est pas une validation :
+                  les fondamentaux de sécurité restent à valider un par un, et tu peux faire valider chaque figure par un coach.
+                </span>
               </p>
-              <button className="btn btn-kite !min-h-10 !px-4 !py-2 !text-sm">Valider les paliers précédents</button>
+              <button className="btn btn-kite !min-h-10 !px-4 !py-2 !text-sm">Marquer comme déjà pratiquées</button>
             </form>
           )}
           <dl className="relative mt-6 grid grid-cols-2 gap-2 sm:grid-cols-5">
@@ -164,7 +170,10 @@ async function renderProgression({ supabase, user, profile }: Awaited<ReturnType
         <div className="flex items-end justify-between gap-4">
           <div>
             <h2 className="text-2xl font-bold">Où tu en es</h2>
-            <p className="mt-1 text-slate">Les 4 paliers de la roadmap {sportName}. Chaque point est une figure.</p>
+            <p className="mt-1 text-slate">
+              Les 4 paliers de la roadmap {sportName}. Chaque point est une figure ; {coverage.withCourse} sur {coverage.total} ont un cours dédié, les autres
+              ont leurs points clés et l&apos;analyse vidéo.
+            </p>
           </div>
           <Link href="/coach" className="shrink-0 text-sm font-semibold text-lagoon hover:underline">
             Gérer ma roadmap
@@ -193,10 +202,12 @@ async function renderProgression({ supabase, user, profile }: Awaited<ReturnType
               ))}
             </ul>
             <div className="mt-4 flex flex-wrap gap-2">
-              {nextCourse && (
+              {nextCourse ? (
                 <Link href={`/cours/${nextCourse.slug}`} className="btn btn-primary !min-h-10 !px-4 !py-2 !text-sm">
                   Lire le cours
                 </Link>
+              ) : (
+                <span className="self-center text-sm text-slate">Pas encore de cours dédié : appuie-toi sur les points clés et l&apos;analyse vidéo.</span>
               )}
               <Link href={`/analyse?figure=${next.id}`} className="btn btn-ghost !min-h-10 !px-4 !py-2 !text-sm">
                 Analyser ma tentative
@@ -508,10 +519,10 @@ function PalierCard({ p }: { p: PalierState }) {
             <li
               key={trick.id}
               title={trick.name}
-              className={`h-3 w-3 rounded-full ${status === "valide" ? "bg-brand" : status === "en-cours" ? "bg-kite/40 ring-2 ring-brand" : "border-2 border-line bg-white"}`}
+              className={`h-3 w-3 rounded-full ${status === "valide" ? "bg-brand" : status === "deja-pratique" ? "bg-brand/35" : status === "en-cours" ? "bg-kite/40 ring-2 ring-brand" : "border-2 border-line bg-white"}`}
             >
               <span className="sr-only">
-                {trick.name} : {status === "valide" ? "validée" : status === "en-cours" ? "en cours" : "à faire"}
+                {trick.name} : {status === "valide" ? "validée" : status === "deja-pratique" ? "déjà pratiquée" : status === "en-cours" ? "en cours" : "à faire"}
               </span>
             </li>
           ))}
@@ -521,6 +532,7 @@ function PalierCard({ p }: { p: PalierState }) {
           {p.etat === "actuel" && <span className="text-brand">● Tu es ici{p.enCours ? ` · ${p.enCours} en cours` : ""}</span>}
           {p.etat === "a-venir" && <span className="text-slate">À débloquer</span>}
         </p>
+        {p.dejaPratiques > 0 && <p className="mt-1 text-xs text-slate">dont {p.dejaPratiques} déjà pratiquée{p.dejaPratiques > 1 ? "s" : ""} (non validée{p.dejaPratiques > 1 ? "s" : ""})</p>}
       </Link>
     </li>
   );

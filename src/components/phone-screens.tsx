@@ -26,7 +26,7 @@ const SCREENS = [
   { id: "analyse", tab: 2, title: "Retour de ton coach", sub: "Backroll · analysé par Anil" },
   { id: "ia", tab: 2, title: "Coach IA", sub: "Kitesurf · en ligne 24/7" },
   { id: "spots", tab: 4, title: "Spot Finder", sub: "Samedi · autour de Hyères" },
-  { id: "roadmap", tab: 2, title: "Roadmap kitesurf", sub: "54 figures à débloquer" },
+  { id: "roadmap", tab: 2, title: "Roadmap kitesurf", sub: "54 figures · 13 cours dédiés" },
   { id: "progres", tab: 3, title: "Ta progression", sub: "Palier 3 · Shredder" },
 ] as const;
 
@@ -82,7 +82,7 @@ export function PhoneScreens() {
           <p className="text-[0.62rem] text-slate">{s.sub}</p>
           <p className="text-[0.95rem] font-bold leading-tight">{s.title}</p>
         </div>
-        <span className="rounded-full bg-brand-light px-2 py-0.5 text-[0.6rem] font-bold text-lagoon">Elite</span>
+        <span className="rounded-full bg-raised px-2 py-0.5 text-[0.6rem] font-bold text-slate">Exemple</span>
       </div>
 
       {/* écrans empilés en fondu */}
@@ -186,7 +186,7 @@ function AnalyseScreen() {
       <div className={`${card} mx-3 mt-2 space-y-1.5 p-2.5`}>
         <p className="flex gap-2 text-[0.68rem] leading-snug">
           <span aria-hidden="true" className="flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-danger/10 text-[0.55rem] font-bold text-danger">1</span>
-          <span><b>Regard trop tôt vers l&apos;avant.</b> Tourne la tête vers l&apos;épaule arrière dès le décollage.</span>
+          <span><b>Regard qui part trop tard.</b> Tourne la tête vers l&apos;épaule arrière dès le décollage.</span>
         </p>
         <p className="flex gap-2 text-[0.68rem] leading-snug">
           <span aria-hidden="true" className="flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-amber-100 text-[0.55rem] font-bold text-amber-700">2</span>
@@ -195,7 +195,7 @@ function AnalyseScreen() {
       </div>
       <div className="mx-3 mt-2 rounded-2xl bg-brand p-2.5 text-white">
         <p className="text-[0.55rem] font-bold uppercase tracking-wider text-white/75">Ta priorité · prochaine session</p>
-        <p className="mt-0.5 text-[0.7rem] font-semibold leading-snug">5 sauts en regardant l&apos;aile jusqu&apos;au sommet, puis backroll en 15 nds.</p>
+        <p className="mt-0.5 text-[0.7rem] font-semibold leading-snug">5 sauts en tournant la tête vers l&apos;épaule arrière au décollage, puis backrolls bas en vent modéré.</p>
       </div>
     </div>
   );
@@ -219,8 +219,8 @@ function AiScreen() {
         Demain 22 nds à l&apos;Almanarre, je fais 72 kg. Quelle aile ?
       </div>
       <div className={`${card} max-w-[92%] rounded-bl-md px-3 py-2 text-[0.68rem] leading-snug`}>
-        Ton <b>9 m²</b>. Vent side-on l&apos;après-midi : parfait pour ton <b>backroll</b>.
-        <p className="mt-1">Rappel d&apos;Anil : regarde l&apos;aile au décollage, pas l&apos;horizon.</p>
+        Modèles d&apos;accord, vent régulier side-on : ton <b>9 m²</b>. Bon créneau pour ton <b>backroll</b>.
+        <p className="mt-1">Rappel d&apos;Anil : au décollage, regard par-dessus l&apos;épaule arrière.</p>
       </div>
       <div className="flex flex-wrap gap-1">
         {["Et à 28 nds ?", "Un exercice ?"].map((o) => (
@@ -328,7 +328,7 @@ function RoadmapScreen() {
           </li>
         ))}
       </ul>
-      <p className="mt-2 text-center text-[0.55rem] text-slate">Chaque figure : cours, points clés, vidéo au coach</p>
+      <p className="mt-2 text-center text-[0.55rem] text-slate">Chaque figure : points clés et vidéo au coach · cours pour les figures clés</p>
     </div>
   );
 }

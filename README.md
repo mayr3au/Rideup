@@ -40,7 +40,7 @@ La page publique **/week-end** classe les spots par sport : vent prévu pour kit
 
 ### 1. Supabase
 1. Crée un projet (région Europe).
-2. **SQL Editor** : exécute les migrations de `supabase/migrations/` dans l'ordre (0001 à 0004), puis `supabase/seed_spots.sql` (61 spots de vent et 19 spots de surf ; pas de téléski).
+2. **SQL Editor** : exécute les migrations de `supabase/migrations/` dans l'ordre (0001 à 0010), puis `supabase/seed_spots.sql` (61 spots de vent et 19 spots de surf ; pas de téléski).
 3. **Authentication → URL Configuration** : *Site URL* = l'URL du site, et ajoute `https://TON-DOMAINE/auth/callback` (et `http://localhost:3000/auth/callback`) dans *Redirect URLs*.
 4. **Project Settings → API** : URL, clé `anon`, clé `service_role`.
 5. Inscris-toi sur le site, puis **Table Editor → profiles** : passe `is_admin` à `true` sur ton compte.

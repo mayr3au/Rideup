@@ -379,7 +379,7 @@ function StepVisual({ n }: { n: number }) {
         </div>
         <ul className="mt-2.5 space-y-1 text-xs">
           <li className="flex items-center gap-1.5"><span className="h-1.5 w-1.5 rounded-full bg-emerald-500" /> Bon envoi du kite</li>
-          <li className="flex items-center gap-1.5"><span className="h-1.5 w-1.5 rounded-full bg-danger" /> Regard trop tôt vers l&apos;avant</li>
+          <li className="flex items-center gap-1.5"><span className="h-1.5 w-1.5 rounded-full bg-danger" /> Regard qui part trop tard</li>
           <li className="flex items-center gap-1.5 font-semibold text-brand"><span className="h-1.5 w-1.5 rounded-full bg-brand" /> 2 exercices pour ta session</li>
         </ul>
       </div>
@@ -479,7 +479,7 @@ function Team() {
           </h2>
         </div>
         <p className="max-w-sm text-[0.95rem] text-slate sm:text-right">
-          Ce sont eux qui analysent tes vidéos. Et si tu veux aller plus loin, ils proposent aussi des coachings privés sur l&apos;eau.
+          La qualification de chacun est indiquée sous son nom. Les analyses vidéo sont faites par des moniteurs diplômés d&apos;État de ta discipline ; les riders de l&apos;équipe apportent démonstrations et conseils. Coachings privés possibles sur l&apos;eau.
         </p>
       </Reveal>
       <ul className={`mt-8 grid gap-5 sm:grid-cols-2 ${team.length >= 4 ? "lg:grid-cols-4" : team.length === 3 ? "lg:grid-cols-3" : "lg:max-w-3xl"}`}>
@@ -585,6 +585,7 @@ function AiCoach() {
                   <p className="font-bold leading-tight">Coach IA kitesurf</p>
                   <p className="text-xs text-emerald-700">En ligne · répond en quelques secondes</p>
                 </div>
+                <span className="ml-auto rounded-full bg-raised px-2.5 py-1 text-xs font-semibold text-slate">Exemple</span>
               </div>
               <div className="space-y-3 pt-4 text-[0.92rem]">
                 <p className="ml-auto w-fit max-w-[85%] rounded-2xl rounded-br-md bg-brand px-3.5 py-2 text-white">
@@ -592,10 +593,10 @@ function AiCoach() {
                 </p>
                 <div className="max-w-[90%] rounded-2xl rounded-bl-md bg-salt px-3.5 py-2.5">
                   <p>
-                    Avec ton <strong>9 m²</strong> tu seras bien. Le vent est side-on l&apos;après-midi : parfait pour bosser ton{" "}
-                    <strong>backroll</strong>.
+                    Les modèles sont d&apos;accord sur 20-22 nœuds réguliers, side-on l&apos;après-midi : avec ton <strong>9 m²</strong> tu seras bien.
+                    Bon créneau pour bosser ton <strong>backroll</strong>.
                   </p>
-                  <p className="mt-1.5">Rappel de ton coach : regarde l&apos;aile au décollage, pas l&apos;horizon.</p>
+                  <p className="mt-1.5">Rappel de ton coach : au décollage, regard par-dessus l&apos;épaule arrière.</p>
                 </div>
                 <div className="flex flex-wrap gap-2">
                   {["Et si ça monte à 28 nœuds ?", "Un exercice pour le backroll ?"].map((o) => (
