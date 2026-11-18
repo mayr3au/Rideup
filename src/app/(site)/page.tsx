@@ -453,6 +453,17 @@ function Coachs() {
   );
 }
 
+/** Petit drapeau français (en SVG : les émojis drapeaux ne s'affichent pas sous Windows). */
+function FrenchFlag() {
+  return (
+    <svg viewBox="0 0 3 2" className="h-[0.42em] w-auto shrink-0 rounded-[1px] opacity-75" role="img" aria-label="Français">
+      <rect width="1" height="2" fill="#002654" />
+      <rect x="1" width="1" height="2" fill="#fff" />
+      <rect x="2" width="1" height="2" fill="#ce1126" />
+    </svg>
+  );
+}
+
 /* ───────────── 3 bis bis. L'équipe : visages, sports, coachings privés ───────────── */
 function Team() {
   const team = TEAM.filter((c) => c.name);
@@ -470,7 +481,7 @@ function Team() {
           Ce sont eux qui analysent tes vidéos. Et si tu veux aller plus loin, ils proposent aussi des coachings privés sur l&apos;eau.
         </p>
       </Reveal>
-      <ul className={`mt-8 grid gap-5 sm:grid-cols-2 ${team.length >= 3 ? "lg:grid-cols-3" : "lg:max-w-3xl"}`}>
+      <ul className={`mt-8 grid gap-5 sm:grid-cols-2 ${team.length >= 4 ? "lg:grid-cols-4" : team.length === 3 ? "lg:grid-cols-3" : "lg:max-w-3xl"}`}>
         {team.map((c, i) => (
           <Reveal as="li" key={c.photo} delay={i * 0.1} className="panel lift flex flex-col overflow-hidden">
             <div className="relative aspect-[4/5] overflow-hidden">
@@ -482,7 +493,10 @@ function Team() {
                 ))}
               </div>
               <div className="absolute inset-x-0 bottom-0 p-4 text-white">
-                <p className="text-2xl font-extrabold leading-tight">{c.name}</p>
+                <p className="flex items-center gap-1.5 text-2xl font-extrabold leading-tight">
+                  {c.name}
+                  <FrenchFlag />
+                </p>
                 <p className="mt-0.5 flex items-center gap-1.5 text-sm font-semibold text-white/90">
                   {c.title}
                 </p>
@@ -492,6 +506,7 @@ function Team() {
               {c.bio && <p className="text-[0.95rem] text-slate">{c.bio}</p>}
               {c.instagram ? (
                 <div className="mt-auto pt-4">
+                <p className="mb-2 text-xs font-bold uppercase tracking-wider text-slate">Coaching privé</p>
                 <a
                   href={instagramUrl(c.instagram)}
                   target="_blank"
@@ -503,7 +518,7 @@ function Team() {
                     <circle cx="12" cy="12" r="4" />
                     <circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none" />
                   </svg>
-                  Coaching privé · @{c.instagram.replace(/^@/, "")}
+                  @{c.instagram.replace(/^@/, "")}
                 </a>
                 </div>
               ) : null}
