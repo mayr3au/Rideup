@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { CoachAiMark } from "@/components/rideup-icons";
 import Image from "next/image";
 import Link from "next/link";
 import { redirect } from "next/navigation";
@@ -135,9 +136,7 @@ export default async function Dashboard({ searchParams }: { searchParams: Promis
         <div aria-hidden="true" className="pointer-events-none absolute -right-10 -top-10 h-40 w-40 rounded-full bg-white/15 blur-2xl" />
         <div className="relative flex items-center gap-3">
           <span className="relative flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-white/20" aria-hidden="true">
-            <svg viewBox="0 0 24 24" className="h-6 w-6" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M12 3l1.8 4.7L18.5 9.5l-4.7 1.8L12 16l-1.8-4.7L5.5 9.5l4.7-1.8zM19 15l.8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8z" />
-            </svg>
+            <CoachAiMark className="h-8 w-8" />
             <span className="absolute -bottom-0.5 -right-0.5 h-3.5 w-3.5 rounded-full border-2 border-brand bg-emerald-400" />
           </span>
           <div className="min-w-0">

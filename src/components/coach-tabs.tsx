@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { CoachAiMark } from "@/components/rideup-icons";
 import { usePathname, useSearchParams } from "next/navigation";
 
 const ICONS = {
@@ -12,7 +13,6 @@ const ICONS = {
       <path d="M8 18h7a3 3 0 0 0 0-6H9a3 3 0 0 1 0-6h7" />
     </>
   ),
-  questions: <path d="M12 3l1.8 4.7L18.5 9.5l-4.7 1.8L12 16l-1.8-4.7L5.5 9.5l4.7-1.8zM19 15l.8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8z" />,
 };
 
 function Icon({ name }: { name: keyof typeof ICONS }) {
@@ -44,7 +44,7 @@ export function CoachTabs() {
         <span>Vidéo<span className="hidden sm:inline"> · vrai coach</span></span>
       </Link>
       <Link href="/coach?vue=chat" className={tab(onChat)} aria-current={onChat ? "page" : undefined}>
-        <span className={onChat ? "text-brand" : "text-brand/80"}><Icon name="questions" /></span>
+        <span className={onChat ? "text-brand" : "text-brand/80"}><CoachAiMark className="h-[18px] w-[18px] shrink-0" /></span>
         Coach IA
         <span className="rounded-full bg-emerald-500 px-1.5 py-0.5 text-[0.65rem] font-bold leading-none text-white">24/7</span>
       </Link>

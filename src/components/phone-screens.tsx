@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import { CoachAiMark } from "@/components/rideup-icons";
 import { useEffect, useState } from "react";
 
 const TABS = ["Accueil", "Cours", "Coach", "Progrès", "Spots"];
@@ -205,9 +206,7 @@ function AiScreen() {
     <div className="flex h-full flex-col gap-2 px-3">
       <div className={`${card} flex items-center gap-2 px-2.5 py-2`}>
         <span className="relative flex h-7 w-7 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-brand to-lagoon text-white" aria-hidden="true">
-          <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M12 3l1.8 4.7L18.5 9.5l-4.7 1.8L12 16l-1.8-4.7L5.5 9.5l4.7-1.8z" />
-          </svg>
+          <CoachAiMark className="h-5 w-5" />
           <span className="absolute -bottom-0.5 -right-0.5 h-2.5 w-2.5 rounded-full border-2 border-white bg-emerald-500" />
         </span>
         <div className="min-w-0">

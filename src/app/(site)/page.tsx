@@ -7,6 +7,7 @@ import { COURSES } from "@/lib/courses";
 import { LESSONS } from "@/lib/lessons";
 import { Reveal } from "@/components/reveal";
 import { instagramUrl, TEAM } from "@/lib/coaches";
+import { CoachAiMark, IconKite, IconSafety, IconTrick } from "@/components/rideup-icons";
 import { Tilt } from "@/components/tilt";
 import { PhoneScreens } from "@/components/phone-screens";
 import { SampleReport } from "@/components/sample-report";
@@ -532,10 +533,10 @@ function Team() {
 
 /* ───────────── 3 ter. Le coach IA, disponible 24 h/24 ───────────── */
 function AiCoach() {
-  const points = [
-    ["🎯", "Débloque une figure", "Pourquoi tu retombes, quoi changer à ta prochaine tentative."],
-    ["🪁", "Choisis ton matériel", "La taille d'aile ou de planche selon le vent, ton poids et ton niveau."],
-    ["🛟", "Ride en sécurité", "Vent offshore, courant, priorités : les bons réflexes avant d'aller à l'eau."],
+  const points: [typeof IconTrick, string, string][] = [
+    [IconTrick, "Débloque une figure", "Pourquoi tu retombes, quoi changer à ta prochaine tentative."],
+    [IconKite, "Choisis ton matériel", "La taille d'aile ou de planche selon le vent, ton poids et ton niveau."],
+    [IconSafety, "Ride en sécurité", "Vent offshore, courant, priorités : les bons réflexes avant d'aller à l'eau."],
   ];
   return (
     <section className="mx-auto max-w-6xl px-5 pt-14 sm:px-6 sm:pt-20">
@@ -555,9 +556,11 @@ function AiCoach() {
               coachs, et te répond en quelques secondes, même à 23 h la veille d&apos;une session.
             </p>
             <ul className="mt-6 space-y-3">
-              {points.map(([e, t, d]) => (
+              {points.map(([Ico, t, d]) => (
                 <li key={t} className="flex gap-3">
-                  <span aria-hidden="true" className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white/10 text-lg">{e}</span>
+                  <span aria-hidden="true" className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white/10 text-sky-300 ring-1 ring-white/10">
+                    <Ico className="h-6 w-6" />
+                  </span>
                   <div>
                     <p className="font-bold">{t}</p>
                     <p className="text-sm text-white/75">{d}</p>
@@ -575,9 +578,7 @@ function AiCoach() {
             <div className="mx-auto max-w-md rounded-[24px] bg-white p-4 text-deep shadow-2xl">
               <div className="flex items-center gap-3 border-b border-line pb-3">
                 <span className="relative flex h-10 w-10 items-center justify-center rounded-2xl bg-gradient-to-br from-brand to-lagoon text-white" aria-hidden="true">
-                  <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M12 3l1.8 4.7L18.5 9.5l-4.7 1.8L12 16l-1.8-4.7L5.5 9.5l4.7-1.8zM19 15l.8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8z" />
-                  </svg>
+                  <CoachAiMark className="h-7 w-7" />
                   <span className="absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full border-2 border-white bg-emerald-500" />
                 </span>
                 <div>
