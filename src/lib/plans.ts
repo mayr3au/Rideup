@@ -1,7 +1,10 @@
 export type Plan = "free" | "progress" | "elite";
 export type PaidPlan = Exclude<Plan, "free">;
 
-/** Contenu commercial des formules. Les quotas, eux, viennent de la table plan_settings (admin). */
+/**
+ * Contenu commercial des formules. Les quotas, eux, viennent de la table plan_settings (admin) :
+ * ne jamais écrire un nombre d'analyses en dur ici, il est affiché à part depuis les réglages.
+ */
 export const PLANS = {
   progress: {
     name: "Progress",
@@ -9,7 +12,6 @@ export const PLANS = {
     priceEnv: "STRIPE_PRICE_PROGRESS",
     tagline: "Pour progresser chaque semaine.",
     features: [
-      "2 vidéos analysées par un coach diplômé d'État chaque mois",
       "Erreurs techniques et corrections, phase par phase",
       "Exercices et priorité pour ta prochaine session",
       "Historique et suivi des analyses",
@@ -26,7 +28,6 @@ export const PLANS = {
     tagline: "Pour les riders qui s'entraînent sérieusement.",
     features: [
       "Tout ce qui est inclus dans Progress",
-      "6 vidéos analysées par un coach diplômé d'État chaque mois",
       "Retour du coach sous 24 h, tes vidéos passent en priorité",
       "Ton coach compare avec tes tentatives précédentes",
       "Détection de l'évolution de tes erreurs",

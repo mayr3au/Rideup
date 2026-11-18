@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { getConditions } from "@/lib/weather";
-import { distanceKm, ORIENTATION_LABEL, summarizeDay, windName, type DaySummary, type Rider } from "@/lib/wind";
+import { dayStatus, distanceKm, ORIENTATION_LABEL, summarizeDay, windName, type DaySummary, type Rider, type SpotStatus } from "@/lib/wind";
 import { gearSizes, levelFor } from "@/lib/rider";
 import { SPORTS, type SportId } from "@/lib/sports";
 import type { Profile, Spot } from "@/lib/types";
@@ -9,7 +9,7 @@ import { RIcon } from "@/components/rideup-icons";
 
 const MAX_SPOTS = 10;
 
-type Option = { spot: Spot; km: number; day: DaySummary; quality: number };
+type Option = { spot: Spot; km: number; day: DaySummary; status: { status: SpotStatus; label: string }; quality: number };
 
 const quality = (d: DaySummary) => (d.goodHours === 0 ? 0 : d.goodHours * 10 + d.bestScore / 10);
 
@@ -88,7 +88,9 @@ export async function DashboardConditions({ profile, sport }: { profile: Profile
       const dates = [...new Set(hours.map((h) => h.time.slice(0, 10)))].slice(0, 7);
       return dates.map((d) => {
         const day = summarizeDay(hours, d, s, rider);
-        return { spot: s, km, day, quality: quality(day) };
+        const st = dayStatus(day, S.spot, Math.round((Date.parse(d) - Date.parse(today)) / 86_400_000));
+        // Même statut que le Spot Finder et le coach IA : un créneau technique, rafaleux ou incertain passe après les « Go ! »
+        return { spot: s, km, day, status: st, quality: quality(day) * (st.status === "go" ? 1 : 0.5) };
       });
     });
   } catch (e) {
@@ -150,7 +152,10 @@ export async function DashboardConditions({ profile, sport }: { profile: Profile
                   {` · ${Math.round(o.km)} km`}
                 </p>
               </div>
-              <span className={`shrink-0 rounded-full px-2.5 py-1 text-sm font-bold ${o.day.caution ? "bg-amber-100 text-amber-800" : "bg-emerald-100 text-emerald-800"}`}><RIcon name={o.day.caution ? "warning" : "check"} className="mr-1 h-3.5 w-3.5" />{o.day.goodHours} h</span>
+              <span className={`shrink-0 rounded-full px-2.5 py-1 text-sm font-bold ${o.status.status !== "go" ? "bg-amber-100 text-amber-800" : "bg-emerald-100 text-emerald-800"}`}>
+                <RIcon name={o.status.status !== "go" ? "warning" : "check"} className="mr-1 h-3.5 w-3.5" />
+                {o.status.status !== "go" ? o.status.label : `${o.day.goodHours} h`}
+              </span>
             </li>
           ))}
         </ul>

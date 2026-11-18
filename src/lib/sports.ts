@@ -205,7 +205,7 @@ export const SPORTS: Record<SportId, Sport> = {
     },
     gear: { label: "Ta planche et tes chausses", placeholder: "Ex. planche 140 cm câble, chausses ouvertes" },
     expertise:
-      "wakeboard au téléski nautique (câble) : départ du ponton, virages du câble, gestion de la poignée et de la tension, carre, ollie, surface 180, kickers, box et rails, grabs, inverts (backroll, frontflip, tantrum), spins",
+      "wakeboard au téléski nautique (câble) : départ du ponton, virages du câble, gestion de la poignée et de la tension, carre, ollie, surface 180, kickers, box et rails, grabs, inverts (backroll, frontflip, Bel Air depuis le plat), spins",
     checklist:
       "position de la poignée (près des hanches ou bras tendus), tension du câble, carre et vitesse à l'approche du module, alignement avec le module, pop, position du corps et regard en l'air ou sur le module, réception jambes souples",
     errors: {
@@ -231,6 +231,30 @@ export function isSport(v: unknown): v is SportId {
 
 export function tricksFor(sport: SportId) {
   return TRICKS.filter((t) => t.sport === sport);
+}
+
+/**
+ * Fondamentaux de sécurité de chaque roadmap : jamais marqués « déjà pratiqué » en bloc,
+ * le rider les valide un par un (audit avant lancement).
+ */
+export const SAFETY_TRICK_IDS = new Set([
+  "fenetre-vent",
+  "kite-securite",
+  "body-drag",
+  "kite-bodydrag-planche",
+  "wing-securite",
+  "wing-lire-vent",
+  "wing-chute-sure",
+  "foil-securite",
+  "foil-bodydrag",
+  "foil-chutes",
+  "surf-securite",
+  "wake-tomber",
+]);
+
+/** Figures des paliers inférieurs au niveau déclaré, hors fondamentaux de sécurité. */
+export function tricksBelowLevel(sport: SportId, level: Level) {
+  return tricksFor(sport).filter((t) => LEVEL_ORDER.indexOf(t.level) < LEVEL_ORDER.indexOf(level) && !SAFETY_TRICK_IDS.has(t.id));
 }
 
 export function trickById(id: string) {

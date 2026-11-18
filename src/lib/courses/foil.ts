@@ -1,4 +1,12 @@
 import type { Course } from "@/lib/course-types";
+import type { Editorial } from "@/lib/lessons";
+
+const ed = (aValider?: string): Editorial => ({
+  revise: "2026-11-18",
+  relecteur: "Équipe pédagogique RIDE'UP (révision après audit)",
+  sources: ["IKO, Assistant Manual V7"],
+  aValider,
+});
 
 /**
  * Cours « figure par figure » du FOIL (kitefoil : kite + planche de foil).
@@ -15,7 +23,7 @@ export const COURSES_FOIL: Course[] = [
     intro:
       "Avant de voler, tu dois tenir la planche de foil à plat, collée à l'eau. C'est le displacement : tu apprivoises le mât et le poids sous tes pieds.",
     conditions:
-      "10 à 14 nœuds réguliers, plan d'eau plat et profond (le mât fait 60 à 90 cm), kite 2 à 3 m² plus petit que ton kite de twin-tip, grande aile avant (1 000 cm² ou plus).",
+      "10 à 14 nœuds réguliers, plan d'eau plat et plus profond que ton mât sur toute la zone, kite qui te donne une traction régulière sans surpuissance (souvent plus petit qu'en twin-tip : à choisir avec ton moniteur selon ton poids, le vent et le foil), grande aile avant.",
     prerequis: [
       "Autonome en kitesurf : remonter au vent, transitions, water start des deux côtés",
       "Pilotage du kite d'une main, sans le regarder",
@@ -26,7 +34,7 @@ export const COURSES_FOIL: Course[] = [
       { phase: "approche", cle: "Kite au zénith, planche en travers, pied avant chaussé" },
       { phase: "appel", cle: "Passe douce à 45°, lever en poussant la jambe avant" },
       { phase: "vol", cle: "Pied avant sur le mât, planche à plat, regard loin" },
-      { phase: "reception", cle: "Kite qui remonte, planche posée, s'asseoir sans tomber sur le foil" },
+      { phase: "reception", cle: "Kite qui remonte, s'asseoir sur le côté, loin du foil" },
     ],
     schema: "wing-pieds",
     etapes: [
@@ -43,7 +51,7 @@ export const COURSES_FOIL: Course[] = [
       {
         titre: "Bloquer la planche à plat",
         texte:
-          "Dès que tu glisses, mets 60 % du poids sur le pied avant. Genoux fléchis, bassin au-dessus du mât, barre près du corps. Tu dois sentir la planche coller à l'eau sans chercher à monter.",
+          "Dès que tu glisses, mets un peu plus de poids sur le pied avant, juste assez pour que la planche reste collée à l'eau sans chercher à monter. Genoux fléchis, bassin au-dessus du mât, barre près du corps. Le bon dosage dépend de la place des straps et de ton foil.",
       },
       {
         titre: "Caler le kite",
@@ -53,7 +61,7 @@ export const COURSES_FOIL: Course[] = [
       {
         titre: "Garder le cap et s'arrêter",
         texte:
-          "Regarde un point à l'horizon, pas la planche. Pour t'arrêter, remonte le kite au zénith, laisse la vitesse tomber et assieds-toi vers l'arrière, jamais vers l'avant.",
+          "Regarde un point à l'horizon, pas la planche. Pour t'arrêter, remonte le kite vers le zénith (vent modéré, espace libre), laisse la vitesse tomber et assieds-toi dans l'eau sur le côté arrière de la planche, loin du foil, jamais vers l'avant. Selon le montage, sors d'abord le pied arrière du strap (strap arrière fermé) ou garde les pieds en place (straps ouverts) : demande à ton moniteur la méthode adaptée à ta planche.",
       },
     ],
     erreurs: [
@@ -84,7 +92,7 @@ export const COURSES_FOIL: Course[] = [
       "Le foil est tranchant : en tombant, pousse la planche loin de toi avec les pieds et tombe sur le côté, jamais vers l'avant. Casque, gilet d'impact, combinaison longue, et 50 m de distance avec les autres.",
     retenir: [
       "Pied avant au-dessus du mât",
-      "60 % du poids devant",
+      "Juste assez de poids devant pour coller à l'eau",
       "Kite immobile à 10-11 h",
       "Regard à l'horizon, jamais sur la planche",
     ],
@@ -93,6 +101,7 @@ export const COURSES_FOIL: Course[] = [
       { q: "Pourquoi n'as-tu pas besoin de carre ?", a: "Le mât joue le rôle de dérive : la planche reste à plat." },
       { q: "La planche se soulève sans que tu le veuilles : que fais-tu ?", a: "Je choque la barre, je charge le pied avant et je remonte un peu le kite." },
     ],
+    editorial: ed("Arrêt assis et sortie des straps à valider selon les montages du parc."),
   },
 
   {
@@ -113,7 +122,7 @@ export const COURSES_FOIL: Course[] = [
     ],
     phases: [
       { phase: "approche", cle: "Vitesse régulière à plat, kite calé, barre bordée" },
-      { phase: "appel", cle: "Recule les hanches de 5 cm, pas plus" },
+      { phase: "appel", cle: "Planche légère : petit recul des hanches" },
       { phase: "vol", cle: "Revenir neutre dès que la planche décolle" },
       { phase: "reception", cle: "Charger le pied avant, planche posée à plat" },
     ],
@@ -122,12 +131,12 @@ export const COURSES_FOIL: Course[] = [
       {
         titre: "Prendre la bonne vitesse",
         texte:
-          "Navigue à plat, kite à 10-11 h, légèrement abattu pour gagner de la vitesse. Borde la barre sans à-coup. Le foil commence à porter vers 7-8 nœuds de vitesse : tu sens la planche devenir légère.",
+          "Navigue à plat, kite à 10-11 h, légèrement abattu pour gagner de la vitesse. Garde une traction régulière pendant toute l'accélération : barre bordée progressivement, kite stable, sans à-coup ni passe. Les signes que la vitesse suffit : la planche devient légère sous tes pieds, le bruit de l'eau change et le nez a tendance à monter tout seul.",
       },
       {
         titre: "Déclencher",
         texte:
-          "Recule les hanches de 5 cm vers le pied arrière. Pas de coup de pied, pas de saut : une pression progressive. La planche se décolle de quelques centimètres.",
+          "Quand ces signes apparaissent, recule légèrement les hanches vers le pied arrière. Pas de coup de pied, pas de saut : une pression progressive, à doser jusqu'à sentir la planche se décoller de quelques centimètres.",
       },
       {
         titre: "Revenir neutre tout de suite",
@@ -154,12 +163,12 @@ export const COURSES_FOIL: Course[] = [
       {
         erreur: "Tu piques du nez à la redescente",
         correction:
-          "Trop de pied avant d'un coup. Charge l'avant progressivement sur 2 secondes, genoux fléchis, et garde le kite à 45°.",
+          "Trop de pied avant d'un coup. Charge l'avant progressivement, genoux fléchis, et garde le kite stable."
       },
       {
         erreur: "Tu fais une passe de kite pour décoller",
         correction:
-          "Le kite n'a rien à faire dans le décollage. Garde-le immobile ; c'est la vitesse et le pied arrière qui soulèvent la planche.",
+          "Pendant le décollage, le kite donne une traction régulière : garde-le stable. C'est la vitesse, puis la pression arrière, qui soulèvent la planche.",
       },
     ],
     exercices: [
@@ -173,15 +182,17 @@ export const COURSES_FOIL: Course[] = [
       "Vol bas, jamais plus de 20 cm au début : une chute d'un breach est violente. Casque, gilet, et pousse la planche loin de toi en tombant. Reste à 50 m minimum des autres riders.",
     retenir: [
       "La vitesse décolle, pas le pied arrière",
-      "5 cm de hanches, pas plus",
+      "Planche légère = signal du décollage",
       "Neutre dès que l'eau lâche",
       "Redescendre en chargeant l'avant",
     ],
     quiz: [
       { q: "Qu'est-ce qui fait décoller la planche ?", a: "La vitesse. Le pied arrière ne fait que déclencher." },
       { q: "Quand reviens-tu neutre ?", a: "Dès que la planche quitte l'eau, pas une seconde après." },
-      { q: "Que fait le kite pendant le décollage ?", a: "Rien : il reste calé à 10-11 h." },
+      { q: "Que fait le kite pendant l'accélération et le décollage ?", a: "Il donne une traction régulière, sans à-coup : stable vers 10-11 h, barre bordée progressivement." },
+      { q: "Comment sais-tu que tu as assez de vitesse ?", a: "La planche devient légère sous tes pieds, le bruit de l'eau change et le nez tend à monter." },
     ],
+    editorial: ed(),
   },
 
   /* ───────────────────────── Intermédiaire ───────────────────────── */
@@ -227,7 +238,7 @@ export const COURSES_FOIL: Course[] = [
       {
         titre: "Kite calé, barre près du corps",
         texte:
-          "Kite à 10-11 h, barre bordée à 70 %, mains au centre. Une passe de kite modifie la traction et donc l'assiette (l'inclinaison de la planche, nez haut ou nez bas) : tu ne pilotes plus, tu tiens. Si ça tire trop, remonte le kite d'une demi-heure plutôt que de choquer.",
+          "Kite à 10-11 h, mains au centre. Deux choses distinctes : la traction se gère avec la barre et la position du kite (choquer un peu, ou ajuster la hauteur du kite si tu as l'espace) ; l'assiette (l'inclinaison de la planche, nez haut ou nez bas) se règle avec les pieds et les hanches. Une passe de kite change la traction et dérègle l'assiette : en vol stable, le kite bouge le moins possible. Monter le kite n'est pas un réflexe à avoir par vent fort : il peut te soulever."
       },
       {
         titre: "Regard et épaules",
@@ -265,13 +276,15 @@ export const COURSES_FOIL: Course[] = [
       "Hauteur = moitié du mât",
       "Corrections aux chevilles, 2 cm",
       "Genoux qui respirent",
-      "Kite immobile, mains au centre",
+      "Traction à la barre, assiette aux pieds",
     ],
     quiz: [
       { q: "À quelle hauteur voles-tu en croisière ?", a: "À la moitié du mât." },
       { q: "La planche monte de 5 cm : quel geste ?", a: "Un peu d'orteils sur le pied avant, sans bouger les épaules." },
-      { q: "Ça tire trop pendant le vol : barre ou kite ?", a: "Je remonte le kite d'une demi-heure, je ne choque pas d'un coup." },
+      { q: "Ça tire trop pendant le vol : que fais-tu ?", a: "Je gère la traction : je choque un peu la barre, progressivement. L'assiette, elle, se corrige avec les pieds." },
+      { q: "Quelle différence entre traction et assiette ?", a: "La traction vient du kite et se règle à la barre ; l'assiette est l'inclinaison de la planche et se règle aux pieds et aux hanches." },
     ],
+    editorial: ed(),
   },
 
   {
@@ -281,7 +294,7 @@ export const COURSES_FOIL: Course[] = [
     level: "Intermédiaire",
     minutes: 8,
     intro:
-      "Le kitefoil remonte au vent comme aucun autre support : la planche pointe presque face au vent, kite haut, presque pas de carre.",
+      "Le kitefoil remonte très bien au vent : le foil fait office de dérive, il faut peu de carre. Mais l'angle reste un compromis avec la vitesse : trop serré, le foil ne porte plus.",
     conditions:
       "8 à 14 nœuds, kite plutôt petit, eau plate, un repère fixe au vent (bouée, cap) pour mesurer ton angle.",
     prerequis: [
@@ -293,7 +306,7 @@ export const COURSES_FOIL: Course[] = [
     phases: [
       { phase: "approche", cle: "Vol stable au travers, vitesse installée" },
       { phase: "appel", cle: "Kite à 11 h, hanches vers l'avant" },
-      { phase: "vol", cle: "Nez de la planche au près, 5° de carre" },
+      { phase: "vol", cle: "Nez au près, carre légère et dosée" },
       { phase: "reception", cle: "Abattre un peu pour garder la vitesse" },
     ],
     schema: "trajet-navigation",
@@ -314,21 +327,21 @@ export const COURSES_FOIL: Course[] = [
           "Avance les hanches au-dessus du pied avant, épaules tournées vers le kite. Le pied avant pousse la planche au près, le pied arrière suit. Ne te penche pas en arrière comme en twin-tip.",
       },
       {
-        titre: "Presque pas de carre",
+        titre: "Peu de carre",
         texte:
-          "Incline la planche de 5° côté talons, pas plus. Le mât dérive pour toi. Trop de carre couche la planche, le foil fait de la traînée et tu ralentis.",
+          "Incline légèrement la planche côté talons : juste assez pour qu'elle ne dérape pas. L'angle dépend du foil, du vent et de ta vitesse. Le mât dérive pour toi : trop de carre couche la planche, le foil fait de la traînée et tu ralentis.",
       },
       {
         titre: "Trouver la limite",
         texte:
-          "Lofe degré par degré jusqu'à sentir la vitesse chuter ou le kite reculer dans la fenêtre. À ce moment, abats de 5° et reprends de la vitesse. C'est ton angle maximal.",
+          "Lofe progressivement jusqu'à sentir la vitesse chuter ou le kite reculer dans la fenêtre. À ce moment, abats un peu et reprends de la vitesse. Ton bon cap est juste en dessous : celui où le foil porte encore bien.",
       },
     ],
     erreurs: [
       {
         erreur: "Tu loffes trop et tu retombes à l'eau",
         correction:
-          "Tu perds la vitesse qui fait porter le foil. Abats 5° dès que la planche s'enfonce, kite à 11 h, barre bordée.",
+          "Tu perds la vitesse qui fait porter le foil. Abats un peu dès que la planche s'enfonce, kite stable, barre bordée.",
       },
       {
         erreur: "Tu te couches sur la carre arrière",
@@ -342,25 +355,27 @@ export const COURSES_FOIL: Course[] = [
       },
     ],
     exercices: [
-      "Vise une bouée au vent : note à chaque bord l'angle gagné, objectif 45° par rapport à l'axe du vent",
-      "Un bord en loffant par paliers de 5° toutes les 10 secondes jusqu'à décrocher, puis abattre de 5°",
+      "Vise un repère fixe au vent : note à chaque aller-retour si tu reviens au vent de ton point de départ",
+      "Un bord en loffant par petits paliers jusqu'à sentir la vitesse chuter, puis abattre légèrement",
       "Remonter 300 m au vent en 4 bords, puis en 3",
     ],
     filmer:
       "20 s de côté, caméra au vent du rider, plein cadre. On doit voir l'angle de la planche par rapport aux vagues, l'inclinaison de la carre et la hauteur du kite.",
     securite:
-      "Au près, tu croises la route des autres riders : garde la priorité tribord en tête, lève le kite pour céder. Casque et gilet, chute sur le côté, loin du foil.",
+      "Au près, tu croises la route des autres riders. Règles d'évitement : celui qui a le vent sur la droite (tribord amures) est prioritaire ; quand deux riders se croisent, celui au vent monte son kite et celui sous le vent le baisse ; celui qui rattrape un autre s'écarte ; dans le doute, tu t'écartes tôt et franchement. Casque et gilet, chute sur le côté, loin du foil.",
     retenir: [
       "Vitesse avant angle",
       "Kite à 11 h, barre bordée",
       "Hanches vers l'avant",
-      "5° de carre, pas plus",
+      "Carre légère, compromis cap-vitesse",
     ],
     quiz: [
       { q: "Pourquoi monter le kite pour remonter au vent ?", a: "Il tire moins vers le côté et laisse la planche pointer au près." },
-      { q: "Combien de carre ?", a: "Environ 5° : le mât fait la dérive." },
-      { q: "La planche s'enfonce au près : réflexe ?", a: "J'abats de 5° pour relancer la vitesse." },
+      { q: "Combien de carre ?", a: "Peu : juste assez pour ne pas déraper. Le mât fait la dérive, et l'angle dépend du foil et de la vitesse." },
+      { q: "La planche s'enfonce au près : réflexe ?", a: "J'abats un peu pour relancer la vitesse." },
+      { q: "Tu croises un rider sous le vent de toi : que fait ton kite ?", a: "Je le monte : le rider au vent monte son kite, celui sous le vent baisse le sien." },
     ],
+    editorial: ed(),
   },
 
   {
@@ -398,14 +413,19 @@ export const COURSES_FOIL: Course[] = [
           "Planche posée, kite au zénith, barre choquée. Reste debout si la planche est assez volumineuse, sinon assieds-toi vers l'arrière, pieds toujours dans les straps.",
       },
       {
-        titre: "Changer de pieds",
+        titre: "Changer de pieds selon ta configuration",
         texte:
-          "À l'arrêt, sors le pied arrière et place-le dans le strap avant. L'ancien pied avant va dans le strap arrière. Sur une planche à deux straps avant, c'est simple ; sinon, fais-le assis dans l'eau.",
+          "Ça dépend de tes straps. Configuration 1, straps avant et arrière (un strap avant central) : sors d'abord le pied avant du strap, puis fais glisser le pied arrière vers l'avant pour qu'il prenne la place dans le strap avant ; l'ancien pied avant va dans le strap arrière. Les deux pieds ne sont jamais ensemble dans le strap avant. Configuration 2, deux straps avant (un par bord) : le pied arrière va dans le strap avant libre du nouveau bord, puis l'autre recule. Configuration 3, sans strap arrière : le pied arrière se place librement. Si tu n'y arrives pas debout, utilise la version avec retour à l'eau.",
+      },
+      {
+        titre: "Version avec retour à l'eau",
+        texte:
+          "Plus simple pour commencer : pose la planche, assieds-toi dans l'eau sur le côté loin du foil, kite stable au zénith (vent modéré). Change de pieds assis, ou retourne la planche, puis repars d'un water start sur le nouveau bord.",
       },
       {
         titre: "Redécoller sur le nouveau bord",
         texte:
-          "Passe de kite douce vers 45° du nouveau côté, lève-toi en poussant la jambe avant, planche à plat. Reprends de la vitesse à plat puis décolle avec 5 cm de hanches.",
+          "Passe de kite douce du nouveau côté, lève-toi en poussant la jambe avant, planche à plat. Reprends de la vitesse à plat puis décolle quand la planche s'allège.",
       },
     ],
     erreurs: [
@@ -436,15 +456,17 @@ export const COURSES_FOIL: Course[] = [
       "À l'arrêt, le foil est sous toi et la planche flotte librement : garde les pieds dans les straps ou éloigne la planche avant de nager. Vérifie l'espace sous le vent avant de poser.",
     retenir: [
       "Lofer, kite à 12 h, poser à plat",
-      "Pieds changés à l'arrêt",
-      "3 secondes à plat avant de redécoller",
+      "Pieds changés selon ta configuration de straps",
+      "Retour à l'eau possible : c'est une vraie option",
       "Jamais de passe forte",
     ],
     quiz: [
       { q: "Où est le kite pendant le changement de pieds ?", a: "Au zénith, barre choquée." },
       { q: "Comment poser la planche sans piquer ?", a: "En loffant pour perdre la vitesse avant de charger l'avant." },
-      { q: "Quand redécoller ?", a: "Après 3 secondes de navigation à plat sur le nouveau bord." },
+      { q: "Quand redécoller ?", a: "Après avoir repris de la vitesse à plat, quand la planche s'allège." },
+      { q: "Avec un seul strap avant, les deux pieds y passent-ils en même temps ?", a: "Non. Le pied avant sort d'abord, puis le pied arrière prend sa place." },
     ],
+    editorial: ed("Un schéma par configuration de straps à produire et filmer."),
   },
 
   /* ───────────────────────── Avancé ───────────────────────── */
@@ -455,7 +477,7 @@ export const COURSES_FOIL: Course[] = [
     level: "Avancé",
     minutes: 10,
     intro:
-      "Empanner sans retoucher l'eau : tu abats, le kite passe au-dessus de toi, tu changes de pieds pendant la courbe. Le tout en gardant la même hauteur de vol.",
+      "Empanner sans retoucher l'eau : tu abats, tu pilotes le kite de l'autre côté de la fenêtre, et tu changes de pieds pendant ou après la courbe. Variante enseignée ici : jibe heelside vers heelside, changement de pieds plein vent arrière.",
     conditions:
       "8 à 14 nœuds réguliers, eau plate, kite plutôt petit pour ne pas être surpuissant plein vent arrière, 100 m d'espace sous le vent.",
     prerequis: [
@@ -471,16 +493,17 @@ export const COURSES_FOIL: Course[] = [
       { phase: "reception", cle: "Kite redescend à 1 h, finir sur les talons" },
     ],
     schema: "wing-jibe",
+    variante: "Jibe heelside vers heelside, changement de pieds plein vent arrière",
     etapes: [
       {
         titre: "Préparer",
         texte:
-          "Vol stable au travers, à la moitié du mât, vitesse moyenne. Monte le kite à 12 h : plein vent arrière, un kite bas te tirerait trop fort. Regarde déjà la sortie du virage.",
+          "Vol stable au travers, hauteur de croisière, vitesse moyenne. Monte le kite à 12 h : plein vent arrière, un kite bas te tirerait trop fort. Regarde déjà la sortie du virage.",
       },
       {
         titre: "Abattre sur les orteils",
         texte:
-          "Appuie sur les orteils des deux pieds, épaules tournées vers l'intérieur. La planche s'incline de 5 à 10° et dessine une courbe large. Pas de coup de barre : le kite passe seul vers l'autre côté.",
+          "Appuie sur les orteils des deux pieds, épaules tournées vers l'intérieur. La planche s'incline et dessine une courbe large. Le kite ne passe pas seul : pilote-le activement, d'un mouvement doux de la barre, de 12 h vers le nouveau côté de la fenêtre, au rythme de ta courbe.",
       },
       {
         titre: "Changer de pieds plein vent arrière",
@@ -495,7 +518,7 @@ export const COURSES_FOIL: Course[] = [
       {
         titre: "Variante : changer les pieds avant",
         texte:
-          "Si le changement en courbe est trop instable, passe en toeside en ligne droite avant d'abattre, puis jibe en toeside et sors directement sur les talons. Même kite, mêmes hauteurs.",
+          "Si le changement en courbe est trop instable : change de pieds en ligne droite avant d'abattre (tu passes en toeside, en switch), jibe sur les talons et sors en heelside sur le nouveau bord. Autre option : jibe sans changer de pieds et sortie en toeside, changement de pieds ensuite. À travailler sur les deux bords.",
       },
     ],
     erreurs: [
@@ -523,18 +546,20 @@ export const COURSES_FOIL: Course[] = [
     filmer:
       "20 s de côté depuis l'extérieur de la courbe, plein cadre. On doit voir la hauteur de la planche pendant toute la courbe, le moment du changement de pieds et le kite qui passe.",
     securite:
-      "Plein vent arrière, la planche est sous le kite : si tu tombes, lâche la barre pour que le kite monte et pousse la planche loin. 100 m libres sous le vent, casque et gilet.",
+      "Plein vent arrière, le kite peut se retrouver sans tension et tomber. Si tu tombes, garde le contrôle de la barre pour piloter le kite hors de l'eau, ou largue si la situation l'exige ; éloigne-toi du foil. Lâcher la barre ne fait pas monter le kite. 100 m libres sous le vent, casque et gilet.",
     retenir: [
       "Kite à 12 h avant d'abattre",
       "Courbe large sur les orteils",
+      "Kite piloté activement d'un côté à l'autre",
       "Pieds changés plein vent arrière, hanches sur le mât",
-      "Kite redescend lentement",
     ],
     quiz: [
       { q: "Pourquoi monter le kite à 12 h avant le jibe ?", a: "Plein vent arrière, un kite bas tire trop fort." },
-      { q: "Quand changer de pieds ?", a: "Planche plein vent arrière, kite au-dessus de toi." },
+      { q: "Quand changer de pieds ?", a: "Dans cette variante, planche plein vent arrière, kite au-dessus de toi. Autre option : passer en toeside avant d'abattre." },
+      { q: "Le kite passe-t-il seul de l'autre côté ?", a: "Non : tu le pilotes activement, d'un mouvement doux de la barre, au rythme de ta courbe." },
       { q: "La planche breache dans la courbe : cause ?", a: "Trop de pied arrière pendant le changement de pieds." },
     ],
+    editorial: ed("Variante à filmer sur les deux bords, avec les options de changement de pieds."),
   },
 
   {
@@ -544,7 +569,7 @@ export const COURSES_FOIL: Course[] = [
     level: "Avancé",
     minutes: 10,
     intro:
-      "Virer de bord par le vent sans toucher l'eau. Le tack est plus court que le jibe mais la planche traverse une zone sans traction : tout est dans l'élan et le timing du kite.",
+      "Virer de bord par le vent sans toucher l'eau. Face au vent, le kite ne tire plus : c'est la vitesse de la planche qui entretient la portance du foil pendant le passage. Il en faut assez, sans arriver à fond.",
     conditions:
       "10 à 14 nœuds réguliers, eau plate, kite réactif, remontée au vent déjà efficace.",
     prerequis: [
@@ -554,7 +579,7 @@ export const COURSES_FOIL: Course[] = [
       "Kite passé d'un côté à l'autre par le zénith sans le regarder",
     ],
     phases: [
-      { phase: "approche", cle: "Vitesse maximale au près, kite à 11 h" },
+      { phase: "approche", cle: "Bonne vitesse au près, kite à 11 h" },
       { phase: "appel", cle: "Lofer franchement, kite envoyé au zénith" },
       { phase: "vol", cle: "Nez dans le vent, pieds changés, kite bascule" },
       { phase: "reception", cle: "Kite redescend à 13 h, abattre pour relancer" },
@@ -564,7 +589,7 @@ export const COURSES_FOIL: Course[] = [
       {
         titre: "Emmagasiner de la vitesse",
         texte:
-          "Au près, à la moitié du mât, vitesse maximale, kite à 11 h. Plus tu arrives vite, plus tu traverses le vent facilement. Regarde déjà l'autre bord.",
+          "Au près, hauteur de croisière, bonne vitesse, kite à 11 h. Pourquoi la vitesse compte : le foil porte tant que l'eau le traverse assez vite. Pendant le passage face au vent, la traction disparaît et la planche ralentit ; c'est la vitesse emmagasinée qui garde le foil porteur jusqu'à ce que le kite tire à nouveau. Pas besoin d'arriver à vitesse maximale : trop vite, le virage devient brutal et tu risques le breach.",
       },
       {
         titre: "Lofer franchement",
@@ -591,7 +616,7 @@ export const COURSES_FOIL: Course[] = [
       {
         erreur: "La planche s'arrête face au vent et tu tombes",
         correction:
-          "Pas assez de vitesse à l'entrée ou loffade trop molle. Arrive plus vite et pousse le nez dans le vent plus franchement.",
+          "Pas assez de vitesse à l'entrée ou loffade trop molle : la vitesse tombe sous le seuil de portance. Arrive un peu plus vite et pousse le nez dans le vent plus franchement.",
       },
       {
         erreur: "Le kite est passé trop tôt et te tire en arrière",
@@ -614,16 +639,18 @@ export const COURSES_FOIL: Course[] = [
     securite:
       "Face au vent, la planche perd toute portance : la chute est devant toi, sur le foil. Casque et gilet, et tombe sur le côté en poussant la planche. 50 m libres au vent et sous le vent.",
     retenir: [
-      "Vitesse maximale avant de lofer",
+      "Assez de vitesse pour garder la portance",
       "Kite au zénith pendant le passage",
       "Pieds changés nez dans le vent",
       "Kite redescend après, puis abattre",
     ],
     quiz: [
       { q: "Quand le kite bascule-t-il sur l'autre bord ?", a: "Une fois que le nez a passé le lit du vent, pas avant." },
-      { q: "Pourquoi arriver vite ?", a: "La planche n'a plus de traction face au vent : seul l'élan la fait passer." },
+      { q: "Pourquoi faut-il de la vitesse ?", a: "Face au vent, le kite ne tire plus : c'est la vitesse de la planche qui garde le foil porteur pendant le passage." },
+      { q: "Faut-il arriver à vitesse maximale ?", a: "Non : une bonne vitesse suffit. Trop vite, le virage devient brutal." },
       { q: "La planche touche juste après le tack : réflexe ?", a: "Un peu de pied arrière et abattre pour relancer la vitesse." },
     ],
+    editorial: ed(),
   },
 
   {
@@ -633,7 +660,7 @@ export const COURSES_FOIL: Course[] = [
     level: "Avancé",
     minutes: 8,
     intro:
-      "Voler sur la carre avant, dos au kite. Le toeside débloque les jibes, les tacks propres et la plupart des figures. En foil, il se tient presque à plat.",
+      "Trois notions à ne pas confondre. Le toeside : tu navigues sur la carre orteils, dos au kite, avec le même pied devant. Le switch (stance switch) : ton autre pied est devant, tu peux être en heelside ou en toeside. Le changement de pieds : le geste qui inverse les pieds. En foil, le toeside se tient presque à plat.",
     conditions:
       "8 à 14 nœuds réguliers, eau plate, kite calé un peu plus haut qu'en heelside (11 h 30).",
     prerequis: [
@@ -644,7 +671,7 @@ export const COURSES_FOIL: Course[] = [
     ],
     phases: [
       { phase: "approche", cle: "Vol stable heelside, kite à 11 h 30" },
-      { phase: "appel", cle: "Changer de pieds en vol, hanches sur le mât" },
+      { phase: "appel", cle: "Pivot du buste, planche qui passe sur les orteils" },
       { phase: "vol", cle: "Orteils, épaules dans l'axe, regard par-dessus l'épaule" },
       { phase: "reception", cle: "Rechanger de pieds ou finir en jibe" },
     ],
@@ -653,7 +680,7 @@ export const COURSES_FOIL: Course[] = [
       {
         titre: "Passer en toeside",
         texte:
-          "En vol stable, kite à 11 h 30, abats légèrement puis change de pieds en un mouvement bas et rapide : le pied arrière vient devant, hanches au-dessus du mât. La planche ne doit pas changer de hauteur.",
+          "En vol stable, kite un peu plus haut qu'en heelside, abats légèrement et fais pivoter le buste : ta poitrine passe vers l'avant, la planche bascule sur la carre orteils. Tes pieds ne bougent pas. Une autre façon d'arriver dos au kite est de changer de pieds en vol : tu es alors en switch, ce qui est une autre position. La planche ne doit pas changer de hauteur.",
       },
       {
         titre: "Ouvrir les épaules dans l'axe",
@@ -663,7 +690,7 @@ export const COURSES_FOIL: Course[] = [
       {
         titre: "Doser les orteils",
         texte:
-          "Appuie légèrement sur les orteils des deux pieds, surtout le pied avant. 5° d'inclinaison suffisent : plus que ça, la planche se couche et le foil ventile côté extérieur.",
+          "Appuie légèrement sur les orteils des deux pieds, surtout le pied avant. Une petite inclinaison suffit : trop, la planche se couche et le foil peut ventiler.",
       },
       {
         titre: "Le regard tient le cap",
@@ -673,7 +700,7 @@ export const COURSES_FOIL: Course[] = [
       {
         titre: "Sortir",
         texte:
-          "Pour revenir en heelside, rechange de pieds en ligne droite, ou abats et finis en jibe sur les talons. Dans les deux cas, hanches sur le mât et kite immobile.",
+          "Pour revenir en heelside, refais le pivot du buste dans l'autre sens, ou abats et finis en jibe. Dans les deux cas, hanches sur le mât et kite immobile.",
       },
     ],
     erreurs: [
@@ -683,9 +710,9 @@ export const COURSES_FOIL: Course[] = [
           "Tes épaules restent en travers. Ouvre le buste dans l'axe de la planche et regarde par-dessus l'épaule avant.",
       },
       {
-        erreur: "Breach au changement de pieds",
+        erreur: "Breach en passant dos au kite",
         correction:
-          "Tu lèves les pieds trop haut et tu charges l'arrière. Glisse les pieds au ras de la planche, hanches sur le mât.",
+          "Si tu passes par un changement de pieds, tu lèves les pieds trop haut et tu charges l'arrière. Glisse les pieds au ras de la planche, hanches sur le mât.",
       },
       {
         erreur: "Le kite tire trop et te déséquilibre",
@@ -703,16 +730,17 @@ export const COURSES_FOIL: Course[] = [
     securite:
       "Dos au kite, une chute te projette vers l'avant sur le foil. Casque et gilet, et commence en vol bas (10 cm) pour que la chute soit courte.",
     retenir: [
-      "Changement de pieds bas, hanches sur le mât",
+      "Toeside ≠ switch ≠ changement de pieds",
       "Épaules dans l'axe de la planche",
-      "5° d'orteils, pas plus",
+      "Inclinaison légère sur les orteils",
       "Regard par-dessus l'épaule avant",
     ],
     quiz: [
       { q: "La planche abat toute seule en toeside : cause ?", a: "Les épaules restent en travers au lieu d'être dans l'axe." },
       { q: "Où est le kite en toeside ?", a: "Un peu plus haut qu'en heelside, vers 11 h 30." },
-      { q: "Combien d'inclinaison sur les orteils ?", a: "5° : au-delà, le foil ventile." },
+      { q: "Toeside et switch, c'est pareil ?", a: "Non. Toeside : carre orteils, même pied devant. Switch : l'autre pied devant, en heelside ou en toeside." },
     ],
+    editorial: ed(),
   },
 
   /* ───────────────────────── Expert ───────────────────────── */
@@ -725,7 +753,7 @@ export const COURSES_FOIL: Course[] = [
     intro:
       "Sauter en foil, c'est un envoi de kite doux et une planche à plat en l'air. Le danger, ce n'est pas la hauteur, c'est la réception : le foil doit retrouver l'eau à plat, en vol.",
     conditions:
-      "12 à 18 nœuds réguliers, eau plate, straps bien serrés (jamais strapless pour un premier saut), kite réactif, 100 m libres sous le vent.",
+      "12 à 18 nœuds réguliers, eau plate et profonde, straps réglés à ton pied (ni trop lâches, ni serrés au point de ne pas pouvoir sortir en chute), kite réactif, 100 m libres sous le vent et 50 m au vent. Matériel vérifié avant la session.",
     prerequis: [
       "Vol stable, toeside, jibe et tack en vol",
       "Sauts maîtrisés en twin-tip avec réception propre",
@@ -784,14 +812,14 @@ export const COURSES_FOIL: Course[] = [
       },
     ],
     exercices: [
-      "10 sauts de 50 cm en ne travaillant que l'envoi doux et la planche à plat",
+      "10 petits sauts, à la hauteur où tu restes à l'aise, en ne travaillant que l'envoi doux et la planche à plat",
       "Sauts en comptant : envoi (1 s), genoux, renvoi, et réception avec reprise du vol sans toucher",
       "5 sauts enchaînés sur le même bord avec reprise du vol à chaque fois",
     ],
     filmer:
       "20 s de côté, caméra sous le vent, plein cadre avec le kite visible. On doit voir l'envoi, la planche en l'air et surtout l'angle du foil à la réception.",
     securite:
-      "Atterrir sur le foil incliné peut casser la planche ou te blesser : commence à 50 cm de hauteur. Casque, gilet, straps serrés, 100 m libres sous le vent, jamais près d'autres riders.",
+      "Atterrir sur le foil incliné peut casser le matériel ou te blesser. Avant de sauter, fais vérifier par ton moniteur : visserie du mât et du foil, réglage des straps, leash, casque, gilet. Profondeur suffisante pour un foil qui plonge à la réception. Si tu perds le contrôle en l'air : abandonne, renvoie ou lâche le kite selon la situation, et éloigne-toi du foil en tombant. 100 m libres sous le vent, 50 m au vent, jamais près d'autres riders.",
     retenir: [
       "Envoi doux sur 1 seconde, pas plus loin que 12 h",
       "Planche à plat, pieds immobiles",
@@ -803,6 +831,7 @@ export const COURSES_FOIL: Course[] = [
       { q: "Qu'est-ce qui remplace la charge de carre du twin-tip ?", a: "La portance du foil et une légère loffade : pas de carre forte." },
       { q: "Comment doit arriver le foil à la réception ?", a: "À plat, hanches neutres, pour reprendre le vol directement." },
     ],
+    editorial: ed("Matériel, straps, profondeur et conduite en cas de perte de contrôle à faire vérifier par le coach kitefoil."),
   },
 
   {
@@ -814,12 +843,13 @@ export const COURSES_FOIL: Course[] = [
     intro:
       "La première rotation en foil : la tête et les épaules lancent la rotation, le kite reste immobile, et la planche doit retrouver l'eau à plat exactement comme sur un saut droit.",
     conditions:
-      "12 à 18 nœuds réguliers, eau plate, straps serrés, kite réactif et stable, 100 m libres sous le vent.",
+      "12 à 18 nœuds réguliers, eau plate et profonde, straps réglés, kite réactif et stable, 100 m libres sous le vent et 50 m au vent.",
     prerequis: [
       "Sauts en foil réguliers avec reprise du vol à la réception",
       "Backroll maîtrisé en twin-tip",
       "Kite immobile pendant tout un saut",
       "Planche à plat en l'air sans mouvement de pieds",
+      "Démonstration vue sur place ou en vidéo avec ton coach",
     ],
     phases: [
       { phase: "approche", cle: "Même approche qu'un saut, un peu plus de vitesse" },
@@ -852,7 +882,7 @@ export const COURSES_FOIL: Course[] = [
       {
         titre: "Poser le foil à plat",
         texte:
-          "Jambes qui absorbent, hanches neutres, planche légèrement abattue. Reprends le vol sans toucher l'eau. Si la rotation est incomplète, pose quand même à plat : ne cherche jamais à finir en forçant.",
+          "Jambes qui absorbent, hanches neutres, planche légèrement abattue. Reprends le vol si tu le peux ; toucher l'eau avec la planche à plat est aussi une bonne réception. Ne cherche jamais à finir une rotation en forçant.",
       },
     ],
     erreurs: [
@@ -880,17 +910,18 @@ export const COURSES_FOIL: Course[] = [
     filmer:
       "20 s de côté, caméra sous le vent, plein cadre avec le kite. On doit voir le moment où la tête tourne, la stabilité du kite et l'angle du foil à la réception.",
     securite:
-      "Une rotation en foil se finit toujours sur le foil : si tu perds tes repères en l'air, abandonne la rotation, renvoie le kite et pose à plat. Casque, gilet, straps serrés, 100 m libres sous le vent.",
+      "Une rotation ne se finit pas toujours sur le foil. Si tu perds tes repères en l'air : groupe-toi, protège ta tête, et à la chute éloigne-toi du foil (pousse la planche loin de toi). Garde le contrôle du kite ou largue selon la situation. Casque, gilet, straps réglés, 100 m libres sous le vent et 50 m au vent.",
     retenir: [
       "C'est la tête qui lance, pas les jambes",
       "Kite immobile à 12 h, mains au centre",
       "Horizon retrouvé = renvoyer le kite",
-      "Foil posé à plat, même si la rotation est incomplète",
+      "Perte de repères : groupé, tête protégée, loin du foil",
     ],
     quiz: [
       { q: "Qu'est-ce qui lance la rotation ?", a: "La tête et les épaules, dès le décollage." },
       { q: "Pourquoi le kite ne doit-il pas bouger ?", a: "Un kite qui plonge te pose sans traction, en travers sur le foil." },
-      { q: "Tu es perdu en l'air : que fais-tu ?", a: "J'abandonne la rotation, je renvoie le kite et je pose le foil à plat." },
+      { q: "Tu perds tes repères en l'air : que fais-tu ?", a: "Je me groupe, je protège ma tête, et à la chute je m'éloigne du foil en poussant la planche. Je garde le contrôle du kite ou je largue selon la situation." },
     ],
+    editorial: ed("Démonstration à filmer et prérequis à préciser par le coach kitefoil."),
   },
 ];

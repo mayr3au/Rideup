@@ -2,7 +2,7 @@ import "server-only";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { getConditions } from "@/lib/weather";
 import { getLiveWinds } from "@/lib/live-wind";
-import { compass, confidenceFor, distanceKm, ORIENTATION_LABEL, summarizeDay, weatherLabel, type DaySummary, type Rider } from "@/lib/wind";
+import { compass, confidenceFor, dayStatus, distanceKm, LAND_WIND_CHECKLIST, ORIENTATION_LABEL, summarizeDay, weatherLabel, type DaySummary, type Rider } from "@/lib/wind";
 import { gearSizes, levelFor } from "@/lib/rider";
 import { SPORTS, type SportId } from "@/lib/sports";
 import type { Profile, Spot } from "@/lib/types";
@@ -39,6 +39,8 @@ function namedSpots(text: string, spots: Spot[]) {
   );
 }
 
+const S_KIND = Object.fromEntries(Object.entries(SPORTS).map(([id, s]) => [id, s.spot])) as Record<SportId, "wind" | "waves" | "cable">;
+
 const JOURS = ["dimanche", "lundi", "mardi", "mercredi", "jeudi", "vendredi", "samedi"];
 /** Date du jour (AAAA-MM-JJ) en France : les spots sont rendus à l'heure locale. */
 function todayIso() {
@@ -57,16 +59,22 @@ function dayLine(d: DaySummary, i: number, sport: SportId) {
   const cable = SPORTS[sport].spot === "cable";
   const conf = confidenceFor(d.spread, i, d.avgWind);
   const head = `  · ${dayName(d.date)} : `;
+  const st = dayStatus(d, S_KIND[sport], i);
   if (d.goodHours > 0) {
     const parts = [
-      `RIDABLE ${d.window ? `${d.window.from}–${d.window.to}` : `${d.goodHours} h`}${d.caution ? " (avec prudence)" : ""}`,
+      `statut « ${st.label} » (même verdict que le Spot Finder) ${d.window ? `${d.window.from}–${d.window.to}` : `${d.goodHours} h`}`,
       waves
         ? `${d.avgWave != null ? `${d.avgWave.toFixed(1)} m` : "?"}${d.period ? `, ${d.period} s` : ""}${d.avgWind != null ? `, vent ${d.avgWind} nds` : ""}`
         : cable
           ? null
           : `${d.avgWind} nds${d.maxGust != null && d.maxGust > (d.avgWind ?? 0) + 3 ? ` (rafales ${d.maxGust})` : ""}${d.dir != null ? ` de ${compass(d.dir)}` : ""}`,
       d.orientation ? ORIENTATION_LABEL[d.orientation].toLowerCase() : null,
-      d.gear ? `${d.gearName ?? "aile"} conseillée ${String(d.gear).replace(".", ",")} m²` : null,
+      d.gear
+        ? `${d.gearName ?? "aile"} conseillée ${String(d.gear).replace(".", ",")} m²`
+        : waves || cable
+          ? null
+          : `PAS de taille d'aile conseillée (${d.variable ? "vent irrégulier" : d.uncertainData ? "données insuffisantes" : "matériel non renseigné"}) : n'en donne pas`,
+      d.landWind ? `VENT DE TERRE : conditions techniques, secours à confirmer ; avant de partir : ${LAND_WIND_CHECKLIST.join(" ; ")} ; sans solution vérifiée, renoncer` : null,
       conf ? `fiabilité ${conf}` : null,
       d.warnings.length ? `attention : ${d.warnings.join(" ; ")}` : null,
     ];
@@ -78,7 +86,7 @@ function dayLine(d: DaySummary, i: number, sport: SportId) {
       ? `max ${p.wave != null ? `${p.wave.toFixed(1)} m` : "?"}${p.period ? `, ${p.period} s` : ""}, vent ${p.wind} nds`
       : `max ${p.wind} nds (rafales ${p.gust}) de ${compass(p.dir)}${p.orientation ? `, ${ORIENTATION_LABEL[p.orientation].toLowerCase()}` : ""}`
     : null;
-  return head + ["pas ridable", d.reason, peak].filter(Boolean).join(", ");
+  return head + [`statut « ${st.label} »`, "pas ridable pour ce rider", d.reason, peak].filter(Boolean).join(", ");
 }
 
 /**

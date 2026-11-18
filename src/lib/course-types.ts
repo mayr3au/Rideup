@@ -1,4 +1,5 @@
 import type { SchemaId } from "@/components/schemas";
+import type { Editorial } from "@/lib/lessons";
 
 /** Phases notées par l'analyse vidéo (mêmes clés que dans sports.ts). */
 export type Phase = "approche" | "appel" | "vol" | "reception";
@@ -30,4 +31,7 @@ export type Course = {
   securite: string;
   retenir?: string[];
   quiz?: { q: string; a: string }[];
+  /** Variante exacte enseignée (ex. « jibe avec changement de pieds à la sortie ») */
+  variante?: string;
+  editorial?: Editorial;
 };

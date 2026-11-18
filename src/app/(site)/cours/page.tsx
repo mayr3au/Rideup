@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Schema } from "@/components/schemas";
-import { COURSES, courseSport } from "@/lib/courses";
+import { COURSES, courseCoverage, courseSport } from "@/lib/courses";
 import { LESSONS, LESSON_CATEGORIES } from "@/lib/lessons";
 import { SPORT_IDS, SPORTS } from "@/lib/sports";
 import Image from "next/image";
@@ -50,7 +50,7 @@ export default async function CoursesPage() {
           <ul className="mt-5 grid gap-2 sm:grid-cols-3">
             {[
               [`${LESSONS.length} fondamentaux`, "vent, fenêtre, sécurité, priorités"],
-              [`${COURSES.length} figures`, "du water start au kiteloop, 5 sports"],
+              [`${COURSES.length} cours de figures`, "les figures clés de 5 roadmaps"],
               ["Schémas, quiz, exercices", "pour retenir et pratiquer"],
             ].map(([t, d]) => (
               <li key={t} className="rounded-2xl border border-white/20 bg-white/10 px-3 py-2.5 backdrop-blur">
@@ -63,9 +63,12 @@ export default async function CoursesPage() {
             {unlocked ? (
               <span className="inline-flex items-center gap-2 rounded-full bg-emerald-500 px-3 py-1.5 text-sm font-bold"><RIcon name="check" className="h-4 w-4" />Inclus dans ta formule</span>
             ) : (
-              <Link href="/tarifs" className="btn btn-kite !min-h-11 !px-5 !py-2 !text-sm">
-                Débloquer les {LESSONS.length + COURSES.length} cours
-              </Link>
+              <div className="flex flex-wrap items-center gap-3">
+                <Link href="/tarifs" className="btn btn-kite !min-h-11 !px-5 !py-2 !text-sm">
+                  Débloquer les {COURSES.length} cours de figures
+                </Link>
+                <span className="text-sm font-semibold text-white/90">Les {LESSONS.filter((l) => l.libre).length} fondamentaux et cours de sécurité sont gratuits.</span>
+              </div>
             )}
           </div>
         </div>
@@ -111,7 +114,10 @@ export default async function CoursesPage() {
                     <div className="flex flex-1 flex-col p-4">
                       <span className="flex items-center justify-between gap-3">
                         <span className="text-lg font-bold leading-tight">{l.title}</span>
-                        <span className="shrink-0 rounded-full bg-raised px-2.5 py-1 text-xs font-semibold text-slate">{!unlocked && <RIcon name="lock" className="mr-1 h-3 w-3" />}{l.minutes} min</span>
+                        <span className={`shrink-0 rounded-full px-2.5 py-1 text-xs font-semibold ${!unlocked && l.libre ? "bg-emerald-100 text-emerald-800" : "bg-raised text-slate"}`}>
+                          {!unlocked && !l.libre && <RIcon name="lock" className="mr-1 h-3 w-3" />}
+                          {!unlocked && l.libre ? `Gratuit · ${l.minutes} min` : `${l.minutes} min`}
+                        </span>
                       </span>
                       <span className="mt-1.5 line-clamp-2 text-[0.95rem] text-slate">{l.intro}</span>
                       <span className="mt-3 text-xs font-semibold uppercase tracking-wider text-lagoon">{sportsLabel(l.sports)}</span>
@@ -126,7 +132,10 @@ export default async function CoursesPage() {
 
       <section className="mt-14">
         <h2 className="text-2xl font-bold sm:text-3xl">Figure par figure</h2>
-        <p className="mt-1 text-slate">Les étapes, les erreurs courantes et les exercices pour chaque figure de ta roadmap.</p>
+        <p className="mt-1 text-slate">
+          Les étapes, les erreurs courantes et les exercices pour les figures clés de chaque roadmap. Les autres figures ont leurs points clés dans ta roadmap et
+          l&apos;analyse vidéo par un coach.
+        </p>
       </section>
 
       {groups.map((g) => (
@@ -136,7 +145,12 @@ export default async function CoursesPage() {
             <div className="absolute inset-0 bg-gradient-to-r from-deep/85 to-deep/10" />
             <div className="relative flex w-full items-end justify-between p-4 text-white">
               <h3 className="text-2xl font-extrabold text-white">{SPORTS[g.sport].name}</h3>
-              <span className="text-sm font-semibold text-white/85">{g.list.length} figures</span>
+              <span className="text-right text-sm font-semibold text-white/85">
+                {g.list.length} cours de figures
+                <span className="block text-xs font-medium text-white/70">
+                  {courseCoverage(g.sport).withCourse} figures sur {courseCoverage(g.sport).total} de la roadmap ont une fiche
+                </span>
+              </span>
             </div>
           </div>
           <ul className="mt-3 grid gap-3 sm:grid-cols-2">

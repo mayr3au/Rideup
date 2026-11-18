@@ -8,7 +8,10 @@ import type { SportId } from "@/lib/sports";
 export type TeamCoach = {
   name: string;
   sports: SportId[];
-  /** Ligne sous le nom : diplôme, spécialité, sponsor… */
+  /**
+   * Ligne sous le nom : qualification réelle (diplôme d'État et discipline) ou rôle (rider pro, pédagogue…).
+   * Ne jamais annoncer un diplôme non vérifié : à confirmer avec chaque intervenant.
+   */
   title: string;
   bio: string;
   instagram: string;

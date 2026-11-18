@@ -8,7 +8,7 @@ import { activeSport } from "@/lib/rider";
 import { clearThread } from "@/lib/coach-thread";
 import { geocode } from "@/lib/weather";
 import { DISCIPLINES, sportDetailsSchema, summarizeQuiver, type RiderDetails } from "@/lib/rider-details";
-import { isSport, LEVEL_ORDER, SPORTS, TRICKS, type Level, type SportId } from "@/lib/sports";
+import { isSport, LEVEL_ORDER, SPORTS, TRICKS, tricksBelowLevel, type Level, type SportId } from "@/lib/sports";
 
 export type ProfileState = { error?: string; saved?: boolean } | undefined;
 
@@ -95,16 +95,17 @@ export async function saveProfile(_: ProfileState, formData: FormData): Promise<
     .eq("id", user.id);
   if (error) return { error: "Enregistrement impossible. Réessaie." };
 
-  // Nouveau sport (ou premier profil) : on valide d'office les figures des niveaux inférieurs.
+  // Nouveau sport (ou premier profil) : les figures des niveaux inférieurs sont marquées « déjà pratiquées »
+  // (pas validées : pas d'XP), et les fondamentaux de sécurité restent à valider un par un.
   const newly = sports.filter((s) => !previousLevels[s]);
-  const toValidate = TRICKS.filter(
-    (t) => newly.includes(t.sport) && LEVEL_ORDER.indexOf(t.level) < LEVEL_ORDER.indexOf(levels[t.sport]!),
-  );
-  if (toValidate.length) {
-    await supabase.from("trick_progress").upsert(
-      toValidate.map((t) => ({ user_id: user.id, trick_id: t.id, status: "valide", updated_at: new Date().toISOString() })),
+  const toMark = newly.flatMap((s) => tricksBelowLevel(s, levels[s]!));
+  if (toMark.length) {
+    const { error: markError } = await supabase.from("trick_progress").upsert(
+      toMark.map((t) => ({ user_id: user.id, trick_id: t.id, status: "deja-pratique", updated_at: new Date().toISOString() })),
       { onConflict: "user_id,trick_id", ignoreDuplicates: true },
     );
+    // 23514 : migration 0010 (statut « deja-pratique ») pas encore appliquée.
+    if (markError) console.error("déjà pratiqué", markError.code, markError.message);
   }
 
   if (!profile.onboarded) redirect("/dashboard");
@@ -133,7 +134,7 @@ export async function setTrickStatus(formData: FormData) {
   const { supabase, user } = await requireSession();
   if (status === "aucun") {
     await supabase.from("trick_progress").delete().eq("user_id", user.id).eq("trick_id", trickId);
-  } else if (status === "en-cours" || status === "valide") {
+  } else if (status === "en-cours" || status === "valide" || status === "deja-pratique") {
     await supabase
       .from("trick_progress")
       .upsert({ user_id: user.id, trick_id: trickId, status, updated_at: new Date().toISOString() });

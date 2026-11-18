@@ -151,6 +151,10 @@ export type HourVerdict = {
   warnings: string[];
   /** Ridable, mais avec un risque à connaître (offshore, side-off) */
   caution?: boolean;
+  /** Vent de terre (offshore, side-off) pour un rider autonome : conditions techniques, secours à confirmer */
+  landWind?: boolean;
+  /** Vent trop irrégulier (rafales) : pas de verdict franc ni de taille d'aile */
+  variable?: boolean;
 };
 
 const no = (orientation: Orientation | null, warning: string): HourVerdict => ({
@@ -172,13 +176,17 @@ function rateWind(h: HourForecast, spot: SpotLike, rider: Rider, rule: WindRule)
   let score = 100;
 
   let caution = false;
+  let landWind = false;
   if (h.code >= 95) return no(o, "Orage prévu");
-  // Offshore et side-off : interdits aux débutants, possibles ensuite en connaissant le risque
+  // Vent de terre (offshore, side-off) : une panne ou une chute et la dérive emmène vers le large.
+  // Déconseillé tant qu'on n'est pas autonome ; ensuite « conditions techniques », secours à confirmer avant de partir.
   if (o === "offshore" || o === "side-off") {
-    if (LEVEL_RANK[level] < 1) return no(o, `${o === "offshore" ? "Offshore" : "Side-off"} : interdit aux débutants`);
-    warnings.push(o === "offshore" ? "Vent offshore : jamais seul, bateau de sécurité indispensable" : "Side-off : prévois une sécurité bateau");
+    const label = o === "offshore" ? "offshore" : "side-off";
+    if (LEVEL_RANK[level] < LEVEL_RANK.avance) return no(o, `Déconseillé : vent de terre (${label}), dérive vers le large`);
+    warnings.push(`Conditions techniques (vent de terre, ${label}) · secours à confirmer`);
     score -= o === "offshore" ? 35 : 20;
     caution = true;
+    landWind = true;
   }
   if (o === "onshore") {
     warnings.push("Onshore : départs plus difficiles");
@@ -190,8 +198,13 @@ function rateWind(h: HourForecast, spot: SpotLike, rider: Rider, rule: WindRule)
 
   const spread = h.gust - h.wind;
   if (spread > lim.gustSpread) return no(o, "Rafales trop fortes");
+  // Vent irrégulier : rafales nettement au-dessus du vent moyen (ex. 19 nds rafales 32).
+  // On ne donne ni verdict franc ni taille d'aile : la bonne taille dépend de la rafale, pas de la moyenne.
+  const variable = h.gust >= h.wind * 1.45 || spread >= 10;
+  if (variable && LEVEL_RANK[level] < LEVEL_RANK.avance) return no(o, "Vent trop irrégulier pour ton niveau");
   score -= Math.max(0, spread - 5) * 3;
-  if (spread > 8) warnings.push(`Rafales à ${Math.round(h.gust)} nœuds`);
+  if (variable) warnings.push(`Vent irrégulier : rafales à ${Math.round(h.gust)} nœuds`);
+  else if (spread > 8) warnings.push(`Rafales à ${Math.round(h.gust)} nœuds`);
 
   if (LEVEL_RANK[spot.min_level] > LEVEL_RANK[level]) {
     warnings.push("Spot exigeant pour ton niveau");
@@ -209,7 +222,7 @@ function rateWind(h: HourForecast, spot: SpotLike, rider: Rider, rule: WindRule)
   }
 
   score = Math.max(0, Math.min(100, Math.round(score)));
-  return { ok: score >= 40, score, gear, gearName: rule.gearName, orientation: o, warnings, caution };
+  return { ok: score >= 40, score, gear: variable ? null : gear, gearName: rule.gearName, orientation: o, warnings, caution: caution || variable, landWind, variable };
 }
 
 /* ───────────────────────── Surf ───────────────────────── */
@@ -308,8 +321,16 @@ export type DaySummary = {
   spread: number | null;
   /** Vent par modèle au milieu du créneau */
   models: Partial<Record<string, number>> | null;
-  /** Le créneau retenu comporte des heures à risque (offshore, side-off) */
+  /** Le créneau retenu comporte des heures à risque (vent de terre, vent irrégulier) */
   caution: boolean;
+  /** Vent de terre sur le créneau, pour un rider autonome : conditions techniques, secours à confirmer */
+  landWind: boolean;
+  /** Vent irrégulier sur le créneau : pas de verdict franc ni de taille d'aile */
+  variable: boolean;
+  /** Données insuffisantes (un seul modèle, ou modèles en désaccord) : pas de taille d'aile */
+  uncertainData: boolean;
+  /** Vent heure par heure sur le créneau, avec son orientation (alerte par créneau) */
+  slots: { time: string; dir: number; orientation: Orientation | null; landWind: boolean }[];
   /** Prévision de la journée, même sans créneau ridable : moyenne des 3 heures les plus ventées (8 h – 20 h) */
   peak: { wind: number; gust: number; dir: number; orientation: Orientation | null; wave: number | null; period: number | null } | null;
   /** Ce qui empêche de rider (ou le principal point d'attention) */
@@ -349,7 +370,8 @@ export function summarizeDay(hours: HourForecast[], date: string, spot: SpotLike
     dir: mid?.h.dir ?? null,
     avgWave: mean((h) => h.wave) != null ? Math.round(mean((h) => h.wave)! * 10) / 10 : null,
     period: mean((h) => h.period) != null ? Math.round(mean((h) => h.period)!) : null,
-    gear: best.length ? mode(best.map((r) => r.v.gear).filter((k): k is number => k != null)) : null,
+    // Pas de taille d'aile si le vent est irrégulier ou si les données ne suffisent pas
+    gear: best.length && !best.some((r) => r.v.variable) && !uncertain(best.map((r) => r.h)) ? mode(best.map((r) => r.v.gear).filter((k): k is number => k != null)) : null,
     gearName: mid?.v.gearName ?? null,
     orientation: mid?.v.orientation ?? null,
     warnings: [...warnings].slice(0, 3),
@@ -359,6 +381,10 @@ export function summarizeDay(hours: HourForecast[], date: string, spot: SpotLike
     })(),
     models: (mid ?? rated[Math.floor(rated.length / 2)])?.h.models ?? null,
     caution: best.some((r) => r.v.caution),
+    landWind: best.some((r) => r.v.landWind),
+    variable: best.some((r) => r.v.variable),
+    uncertainData: best.length ? uncertain(best.map((r) => r.h)) : false,
+    slots: rated.map((r) => ({ time: r.h.time.slice(11, 16), dir: r.h.dir, orientation: r.v.orientation, landWind: r.v.orientation === "offshore" || r.v.orientation === "side-off" })),
     peak: (() => {
       if (!rated.length) return null;
       const top = [...rated].sort((x, y) => (y.h.wave ?? y.h.wind) - (x.h.wave ?? x.h.wind)).slice(0, 3);
@@ -383,6 +409,53 @@ export function summarizeDay(hours: HourForecast[], date: string, spot: SpotLike
     })(),
   };
 }
+
+/** Données insuffisantes : moins de deux modèles, ou modèles franchement en désaccord sur le créneau. */
+function uncertain(hours: HourForecast[]) {
+  if (!hours.length) return true;
+  const models = hours.map((h) => Object.keys(h.models ?? {}).length);
+  if (Math.min(...models) < 2) return true;
+  const spreads = hours.map((h) => h.spread).filter((x): x is number => x != null);
+  const wind = hours.reduce((s, h) => s + h.wind, 0) / hours.length;
+  const avgSpread = spreads.length ? spreads.reduce((a, b) => a + b, 0) / spreads.length : 0;
+  return avgSpread > Math.max(9, wind * 0.45);
+}
+
+/* ───────────────────────── Statut partagé : Spot Finder, tableau de bord, coach IA ───────────────────────── */
+
+export type SpotStatus = "go" | "maybe" | "no" | "calm";
+const CALM = ["Pas assez de vent", "Trop petit", "Pas de prévision de houle ici"];
+
+/**
+ * Verdict d'une journée, identique partout : un « Go ! » n'est jamais donné par vent de terre,
+ * vent irrégulier ou données insuffisantes.
+ */
+export function dayStatus(d: DaySummary | undefined, kind: "wind" | "waves" | "cable", dayIdx = 0): { status: SpotStatus; label: string } {
+  if (!d) return { status: "calm", label: "–" };
+  if (d.goodHours > 0) {
+    if (kind === "cable") return { status: "go", label: "Conseillé" };
+    if (d.landWind) return { status: "maybe", label: "Technique" };
+    if (d.variable) return { status: "maybe", label: "Rafaleux" };
+    const conf = confidenceFor(d.spread, dayIdx, d.avgWind);
+    if (d.uncertainData || conf === "faible") return { status: "maybe", label: "Incertain" };
+    if (d.caution) return { status: "maybe", label: "Prudence" };
+    const q = Math.min(1, d.goodHours / 6) * (0.5 + d.bestScore / 200);
+    if (q < 0.3) return { status: "maybe", label: "Court créneau" };
+    return { status: "go", label: q >= 0.6 ? "Go !" : "Oui" };
+  }
+  if (kind === "cable") return { status: "no", label: "Bof" };
+  if (d.reason?.startsWith("Déconseillé")) return { status: "no", label: "Déconseillé" };
+  if (!d.reason || CALM.includes(d.reason)) return { status: "calm", label: kind === "waves" ? "Trop petit" : "Pas de vent" };
+  return { status: "no", label: "Non" };
+}
+
+/** Ce qu'il faut avoir vérifié avant de partir par vent de terre (rider autonome). */
+export const LAND_WIND_CHECKLIST = [
+  "Règles locales du spot (zones, horaires, interdictions)",
+  "Météo observée sur place, pas seulement la prévision",
+  "Une sortie de repli praticable sous le vent en cas de panne, ou une assistance nautique opérationnelle (bateau prévenu et disponible)",
+  "Un moyen d'alerte sur toi (VHF canal 16, téléphone étanche, 196 depuis un portable)",
+];
 
 function endOfHour(time: string) {
   const h = Number(time.slice(11, 13)) + 1;

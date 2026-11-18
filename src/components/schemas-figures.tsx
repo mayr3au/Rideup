@@ -21,7 +21,9 @@ export type FigureSchemaId =
   | "surf-canard"
   | "wake-kicker"
   | "wake-box"
-  | "wake-cable";
+  | "wake-cable"
+  | "wake-180"
+  | "wake-bel-air";
 
 /* ───────────────────────── Fenêtre réutilisable (vue de derrière le rider) ───────────────────────── */
 
@@ -80,25 +82,25 @@ function TrajetWaterStart() {
   const k12 = pt(hour(12), W.R - 14);
   const k10 = pt(hour(10.3), W.R * 0.6);
   return (
-    <Window label="Water start : kite au zénith, une passe franche vers 10 h dans la zone de puissance, puis remontée à 11 h">
+    <Window label="Water start : une passe contrôlée de 12 h vers 10 h (ou de 12 h vers 2 h de l'autre bord), mise en glisse, puis kite stabilisé à 11 h (ou 1 h)">
       <Kite x={k12[0]} y={k12[1]} scale={0.8} color={C.slate} />
       <Arc from={12} to={10.3} r={W.R * 0.62} />
       <Kite x={k10[0]} y={k10[1]} rot={40} scale={0.9} />
       <Arc from={10.3} to={11} r={W.R * 0.78} color={C.lagoon} dashed />
       <Note x={W.cx} y={W.cy - W.R - 30}>
-        1. Kite parqué au zénith, planche aux pieds
+        1. Kite haut, planche aux pieds
       </Note>
       <Note x={W.cx - 118} y={W.cy - 70} anchor="middle" color={C.brand}>
         2. Passe franche
       </Note>
       <Note x={W.cx - 118} y={W.cy - 57} anchor="middle" color={C.slate} size={9.5}>
-        vers 10 h, pas plus bas
+        vers 10 h (ou 2 h de l&apos;autre bord)
       </Note>
       <Note x={W.cx - 50} y={W.cy - 128} anchor="middle" color={C.lagoon}>
-        3. Remonte à 11 h dès que tu glisses
+        3. Glisse, puis kite à 11 h et carre
       </Note>
       <Note x={W.cx} y={W.cy + 24} color={C.slate} size={10}>
-        Poids sur le talon arrière, regard vers 10 h
+        Mains au centre de la barre, regard dans ta direction
       </Note>
     </Window>
   );
@@ -136,13 +138,13 @@ function TrajetNavigation() {
 function TrajetTransition() {
   const kL = pt(hour(10.5), W.R - 12);
   const k12 = pt(hour(12), W.R - 12);
-  const kR = pt(hour(13.5), W.R - 12);
+  const kR = pt(hour(13), W.R - 12);
   return (
-    <Window label="Transition : on ralentit en montant le kite au zénith, on change de carre, puis on redescend le kite de l'autre côté">
+    <Window label="Transition talons vers talons : on ralentit en montant le kite vers le zénith, le poids passe sur l'autre pied en restant sur la carre talons, puis on envoie le kite vers 1 h">
       <Kite x={kL[0]} y={kL[1]} rot={35} scale={0.8} color={C.slate} />
       <Arc from={10.5} to={12} r={W.R - 12} color={C.lagoon} />
       <Kite x={k12[0]} y={k12[1]} scale={0.95} />
-      <Arc from={12} to={13.5} r={W.R - 12} />
+      <Arc from={12} to={13} r={W.R - 12} />
       <Kite x={kR[0]} y={kR[1]} rot={-35} scale={0.8} color={C.slate} />
       <Note x={W.cx - 150} y={W.cy - 60} anchor="start" color={C.slate}>
         1. Je remonte au vent,
@@ -151,16 +153,16 @@ function TrajetTransition() {
         je ralentis
       </Note>
       <Note x={W.cx} y={W.cy - W.R - 30} color={C.brand}>
-        2. Zénith : arrêt, changement de carre
+        2. Kite vers 12 h : la planche ralentit
       </Note>
       <Note x={W.cx + 150} y={W.cy - 60} anchor="end" color={C.slate}>
-        3. Kite envoyé de l&apos;autre
+        3. Kite envoyé vers 1 h,
       </Note>
       <Note x={W.cx + 150} y={W.cy - 47} anchor="end" color={C.slate}>
-        côté, nouveau bord
+        espace vérifié avant
       </Note>
       <Note x={W.cx} y={W.cy + 24} color={C.slate} size={10}>
-        Le poids passe sur l&apos;autre carre pendant que le kite est au zénith
+        Talons vers talons : même carre talons, le poids passe sur l&apos;autre pied
       </Note>
     </Window>
   );
@@ -233,7 +235,7 @@ function TrajetKiteloop() {
         le sens de la marche
       </Note>
       <Note x={W.cx} y={W.cy + 24} color={C.danger} size={10}>
-        La traction est violente : 50 m libres sous le vent, vent régulier
+        Traction forte : 100 m libres sous le vent, 50 m au vent, vent régulier
       </Note>
     </Window>
   );
@@ -331,7 +333,7 @@ function WingAile() {
     { x: 332, t: "CHOQUÉE", s1: "main arrière relâchée", s2: "aile ouverte = tire moins", rot: -8, wx: 6, wy: 68, full: false, arms: "M0 116 L-18 90 M0 118 L34 88", power: 1, color: C.brand },
   ];
   return (
-    <Frame label="Tenue de l'aile : neutre en drapeau au-dessus de la tête pour se reposer, bordée (main arrière tirée, aile basse et proche) pour avancer, choquée (main arrière relâchée, aile ouverte) pour couper la puissance" viewBox="0 0 400 236">
+    <Frame label="Tenue de l'aile : neutre en drapeau au-dessus de la tête pour se reposer, bordée (main arrière tirée, aile basse et proche) pour avancer, choquée (main arrière relâchée, aile ouverte) pour couper la puissance. En bas, vue de dessus : en navigation, l'aile est sur le côté au vent du rider, bord d'attaque vers l'avant" viewBox="0 0 400 330">
       <path d="M16 24 H76" stroke={C.deep} strokeWidth={2.5} markerEnd="url(#arr-deep)" />
       <Note x={46} y={16} color={C.deep} size={12}>
         VENT
@@ -355,6 +357,24 @@ function WingAile() {
           </Note>
         </g>
       ))}
+      {/* Vue de dessus : navigation au travers */}
+      <line x1="20" y1="246" x2="380" y2="246" stroke={C.line} strokeWidth={1} />
+      <Note x={20} y={262} anchor="start" color={C.deep} size={11.5}>
+        VUE DE DESSUS · en navigation
+      </Note>
+      <path d="M300 258 V292" stroke={C.deep} strokeWidth={2.5} markerEnd="url(#arr-deep)" />
+      <Note x={310} y={280} anchor="start" color={C.deep} size={11}>
+        vent
+      </Note>
+      <rect x="150" y="296" width="90" height="12" rx="6" fill={C.deep} />
+      <path d="M244 302 h30" stroke={C.ok} strokeWidth={2.5} markerEnd="url(#arr-deep)" />
+      <path d="M150 278 Q195 262 240 278" fill="none" stroke={C.brand} strokeWidth={6} strokeLinecap="round" />
+      <Note x={144} y={284} anchor="end" color={C.brand} size={10.5}>
+        aile côté au vent
+      </Note>
+      <Note x={195} y={324} color={C.slate} size={10.5}>
+        planche au travers, cap vers la droite
+      </Note>
     </Frame>
   );
 }
@@ -382,14 +402,14 @@ function TopTrack({ label, path, notes, wind = "VENT" }: { label: string; path: 
 function WingJibe() {
   return (
     <TopTrack
-      label="Jibe en vol (vue de dessus) : on abat en gardant la vitesse, on passe l'aile devant soi au vent arrière, on change de pieds, on relance sur l'autre bord"
+      label="Jibe en vol (vue de dessus) : on abat en gardant la vitesse sur la carre orteils, aile en drapeau au-dessus de la tête ; après le vent arrière, la main libre reprend l'aile et devient la main avant ; on relance en switch puis on change de pieds"
       path="M60 70 C 160 60, 240 90, 260 140 S 210 205, 130 185"
       notes={[
         { x: 100, y: 54, t: "1. Vitesse, vol stable" },
         { x: 285, y: 112, t: "2. Abats : aile en drapeau", c: C.brand, a: "start" },
         { x: 285, y: 127, t: "au-dessus de la tête", c: C.brand, a: "start" },
-        { x: 255, y: 212, t: "3. Vent arrière : mains, puis pieds" },
-        { x: 70, y: 212, t: "4. Reborde, nouveau bord", c: C.lagoon },
+        { x: 255, y: 212, t: "3. Carre orteils · après le vent arrière : mains" },
+        { x: 70, y: 212, t: "4. Relance en switch, puis pieds", c: C.lagoon },
       ]}
     />
   );
@@ -398,15 +418,15 @@ function WingJibe() {
 function WingTack() {
   return (
     <TopTrack
-      label="Tack en vol (vue de dessus, vent venant du haut) : on arrive au près avec de la vitesse, le nez passe face au vent, l'aile passe devant par-dessus la tête, et on repart au près sur l'autre bord"
+      label="Tack en vol (vue de dessus, vent venant du haut) : on arrive au près avec de la vitesse, le nez passe face au vent, l'aile passe devant par-dessus la tête, on sort en toeside et on change de pieds une fois relancé"
       path="M30 215 C 110 170, 180 130, 225 105 C 255 88, 262 62, 240 58 C 222 55, 190 70, 165 55 C 140 40, 125 25, 105 8"
       notes={[
-        { x: 95, y: 214, t: "1. Au près, vitesse max", a: "start" },
+        { x: 95, y: 214, t: "1. Au près, bonne vitesse", a: "start" },
         { x: 270, y: 120, t: "2. Face au vent :", c: C.brand, a: "start" },
         { x: 270, y: 135, t: "aile devant, par-dessus", c: C.brand, a: "start" },
-        { x: 270, y: 150, t: "la tête, pas de pieds", c: C.brand, a: "start" },
+        { x: 270, y: 150, t: "la tête, sortie toeside", c: C.brand, a: "start" },
         { x: 150, y: 90, t: "3. Reborde, abats un peu", c: C.lagoon, a: "end" },
-        { x: 150, y: 105, t: "pour relancer, puis au près", c: C.lagoon, a: "end" },
+        { x: 150, y: 105, t: "relance, puis change de pieds", c: C.lagoon, a: "end" },
       ]}
     />
   );
@@ -434,9 +454,9 @@ function FoilAssiette() {
     );
   }
   return (
-    <Frame label="Assiette en foil (inclinaison de la planche, nez à gauche) : trop de pied arrière fait monter le nez jusqu'à la ventilation, trop de pied avant le fait plonger ; on vole à 20-30 cm avec des corrections minimes" viewBox="0 0 400 184">
+    <Frame label="Assiette en foil (inclinaison de la planche, nez à gauche) : trop de pied arrière fait monter le nez jusqu'à la ventilation, trop de pied avant le fait plonger ; on vole à 20-30 cm, aile avant toujours immergée : la part de mât sous l'eau dépend de sa longueur" viewBox="0 0 400 184">
       <Board x={70} y={50} rot={14} label="Trop de pied arrière" sub="nez qui monte → ventile" color={C.danger} />
-      <Board x={200} y={50} rot={0} label="Équilibre" sub="20-30 cm, à plat" color={C.ok} />
+      <Board x={200} y={50} rot={0} label="Équilibre" sub="à plat, aile avant immergée" color={C.ok} />
       <Board x={330} y={50} rot={-12} label="Trop de pied avant" sub="nez qui plonge → touchette" color={C.danger} />
       <circle cx="100" cy="150" r="5" fill={C.brand} />
       <Note x={112} y={154} anchor="start" color={C.slate} size={11}>
@@ -454,7 +474,7 @@ function FoilAssiette() {
 
 function SurfPic() {
   return (
-    <Frame label="Anatomie d'une vague : le pic où elle casse, l'épaule encore verte, la lèvre ; on se place au pic, légèrement à l'intérieur, et on part vers l'épaule" viewBox="0 0 400 220">
+    <Frame label="Anatomie d'une vague : le pic où elle casse, l'épaule encore verte, la lèvre ; on se place un peu à l'intérieur du pic (à un ou deux mètres, côté épaule, pas loin sur l'épaule où la vague est trop plate) et on part vers l'épaule" viewBox="0 0 400 220">
       <rect x="0" y="0" width="400" height="220" fill={C.sea} />
       {/* vague en coupe oblique */}
       <path d="M0 170 C 60 160, 90 90, 150 70 C 180 60, 200 60, 230 80 C 280 110, 330 140, 400 150 L400 220 L0 220 Z" fill={C.brand} opacity={0.35} />
@@ -479,7 +499,11 @@ function SurfPic() {
         Zone de take-off
       </Note>
       <Note x={185} y={134} color={C.slate} size={9.5}>
-        juste à côté du pic, côté épaule
+        un peu à l&apos;intérieur : 1-2 m du pic
+      </Note>
+      <circle cx="382" cy="148" r="5" fill="none" stroke={C.danger} strokeWidth={2} />
+      <Note x={330} y={172} color={C.danger} size={9.5}>
+        trop loin : vague trop plate
       </Note>
       <path d="M200 96 C 250 110, 290 125, 340 140" fill="none" stroke={C.ok} strokeWidth={3} markerEnd="url(#arr)" style={{ color: C.ok }} />
       <Note x={60} y={200} color={C.slate} size={10}>
@@ -494,7 +518,7 @@ function SurfPic() {
 
 function SurfTrajectoire() {
   return (
-    <Frame label="Trajectoire sur la face : bottom turn en bas de la vague, top turn ou cutback en haut, en enchaînant bas / haut" viewBox="0 0 400 220">
+    <Frame label="Trajectoire sur la face : bottom turn en bas de la vague, top turn en haut (trait plein : sous la lèvre ; pointillé : jusqu'à la lèvre, plus engagé) ou cutback, en enchaînant bas / haut" viewBox="0 0 400 220">
       <rect x="0" y="0" width="400" height="220" fill={C.sea} />
       <path d="M0 40 L400 20 L400 220 L0 220 Z" fill={C.brand} opacity={0.3} />
       <line x1="0" y1="40" x2="400" y2="20" stroke={C.lagoon} strokeWidth={3} />
@@ -512,17 +536,21 @@ function SurfTrajectoire() {
       <Note x={110} y={162} color={C.slate} size={9.5}>
         appui rail, regard vers la lèvre
       </Note>
-      <Note x={270} y={44} color={C.brand}>
+      <path d="M200 70 C 212 40, 226 26, 236 28 C 246 30, 250 52, 240 100" fill="none" stroke={C.deep} strokeWidth={2} strokeDasharray="5 4" />
+      <Note x={262} y={44} anchor="start" color={C.brand}>
         Top turn
       </Note>
-      <Note x={290} y={57} color={C.slate} size={9.5}>
-        épaules qui ouvrent, planche vers le bas
+      <Note x={262} y={57} anchor="start" color={C.slate} size={9.5}>
+        plein : sous la lèvre
+      </Note>
+      <Note x={262} y={69} anchor="start" color={C.slate} size={9.5}>
+        pointillé : jusqu&apos;à la lèvre
       </Note>
       <Note x={330} y={205} color={C.lagoon}>
         Cutback : revenir vers l&apos;écume
       </Note>
       <path d="M380 30 L380 60" stroke={C.deep} strokeWidth={2} markerEnd="url(#arr-deep)" />
-      <Note x={380} y={75} color={C.slate} size={9}>
+      <Note x={352} y={90} color={C.slate} size={9}>
         la vague avance
       </Note>
     </Frame>
@@ -547,7 +575,7 @@ function SurfCanard() {
   }
   const wave = <path d="M-60 -10 q 20 -22 40 -8 q 15 10 30 -6" fill="none" stroke="#fff" strokeWidth={4} />;
   return (
-    <Frame label="Le canard en trois temps : enfoncer le nez avec les bras, enfoncer l'arrière avec le genou ou le pied, ressortir derrière la vague" viewBox="0 0 400 150">
+    <Frame label="Le canard en trois temps (planches courtes) : enfoncer le nez avec les bras, enfoncer l'arrière avec le genou ou le pied, ressortir derrière la vague. Avec une grosse planche, on fait la tortue : on se retourne sous la planche en serrant les rails" viewBox="0 0 400 150">
       <Step x={8} n={1} t="Nez enfoncé, bras tendus">
         {wave}
         <g transform="rotate(25)">
@@ -576,7 +604,7 @@ function SurfCanard() {
 
 function WakeKicker() {
   return (
-    <Frame label="Kicker : approche en ligne droite, carre progressive, poignée basse, pop à la lèvre sans tirer sur la poignée, réception genoux souples" viewBox="0 0 400 200">
+    <Frame label="Kicker : approche en ligne droite et alignée, planche à plat, poignée basse, passif sur la rampe sans tirer sur la poignée, réception libre genoux souples" viewBox="0 0 400 200">
       <rect x="0" y="130" width="400" height="70" fill={C.sea} />
       {/* kicker */}
       <path d="M170 130 L260 70 L262 130 Z" fill={C.deep} />
@@ -598,10 +626,10 @@ function WakeKicker() {
         poignée basse, genoux souples
       </Note>
       <Note x={230} y={54} color={C.brand} anchor="end">
-        2. Carre progressive
+        2. Passif sur la rampe
       </Note>
       <Note x={230} y={67} color={C.slate} size={9.5} anchor="end">
-        vitesse constante, on ne tire pas
+        vitesse du câble, on ne tire pas
       </Note>
       <Note x={330} y={160} color={C.deep}>
         3. Réception
@@ -665,7 +693,7 @@ function WakeCable() {
   ];
   const d = pts.map((p, i) => `${i ? "L" : "M"}${p[0]} ${p[1]}`).join(" ") + " Z";
   return (
-    <Frame label="Plan d'un téléski nautique : le câble tourne entre des pylônes ; dans chaque virage la tension chute puis revient d'un coup, on se replace et on plie les genoux" viewBox="0 0 400 230">
+    <Frame label="Plan d'un téléski nautique : le câble tourne entre des pylônes ; des bouées délimitent le tracé autorisé ; dans chaque virage la tension chute puis revient, on suit le tracé indiqué par le parc et on plie les genoux ; après une chute, on rejoint la sortie indiquée au briefing" viewBox="0 0 400 230">
       <rect x="0" y="0" width="400" height="230" rx="12" fill={C.sea} />
       <path d={d} fill="none" stroke={C.deep} strokeWidth={3} strokeDasharray="8 6" />
       {pts.map((p, i) => (
@@ -692,10 +720,119 @@ function WakeCable() {
         ponton de départ
       </Note>
       {/* rider */}
+      {/* bouées du tracé */}
+      {[
+        [300, 82],
+        [345, 120],
+        [96, 82],
+        [62, 110],
+      ].map(([x, y], i) => (
+        <circle key={i} cx={x} cy={y} r="4" fill={C.brand} />
+      ))}
       <Rider x={200} y={85} scale={0.7} />
       <Note x={200} y={110} color={C.slate} size={9.5}>
-        reste à l&apos;intérieur de la ligne du câble avant le virage
+        suis le tracé et les bouées du parc
       </Note>
+      <Note x={200} y={124} color={C.slate} size={9.5}>
+        chute : sortie indiquée au briefing
+      </Note>
+    </Frame>
+  );
+}
+
+function Wake180() {
+  /** Vue de dessus, déplacement vers la droite, câble en haut. Planche (rectangle), épaules (trait) et tête (rond) côté poitrine, poignée (point) devant. */
+  function Pose({ x, board, face, label, sub }: { x: number; board: number; face: number; label: string; sub: string }) {
+    const rad = (face * Math.PI) / 180;
+    const hx = Math.cos(rad) * 9;
+    const hy = Math.sin(rad) * 9;
+    return (
+      <g transform={`translate(${x} 112)`}>
+        <path d="M24 0 L60 -66" stroke={C.slate} strokeWidth={1.2} strokeDasharray="3 3" />
+        <g transform={`rotate(${board})`}>
+          <rect x="-30" y="-6" width="60" height="12" rx="6" fill={C.deep} opacity={0.85} />
+        </g>
+        <line x1={-hy * 1.6} y1={hx * 1.6} x2={hy * 1.6} y2={-hx * 1.6} stroke={C.lagoon} strokeWidth={4} strokeLinecap="round" />
+        <circle cx={hx} cy={hy} r="5" fill={C.lagoon} />
+        <circle cx="24" cy="0" r="4.5" fill={C.danger} stroke="#fff" strokeWidth={1.5} />
+        <Note x={0} y={50} color={C.deep} size={11}>
+          {label}
+        </Note>
+        <Note x={0} y={64} color={C.slate} size={9.5}>
+          {sub}
+        </Note>
+      </g>
+    );
+  }
+  return (
+    <Frame label="Surface 180 frontside vu de dessus, déplacement vers la droite, câble en haut : départ en stance normale sur la carre talon, poitrine vers le câble ; à mi-rotation la planche est en travers et la poitrine regarde vers l'avant, côté poignée ; sortie en switch, dos au câble, sur la carre orteils. La poignée reste devant, près des hanches, pendant tout le demi-tour" viewBox="0 0 400 200">
+      <line x1="10" y1="40" x2="390" y2="40" stroke={C.deep} strokeWidth={2.5} strokeDasharray="8 6" />
+      <Note x={200} y={30} color={C.deep} size={10.5}>
+        câble · tu avances vers la droite →
+      </Note>
+      <Pose x={70} board={0} face={-90} label="1. Départ" sub="poitrine vers le câble, talons" />
+      <Pose x={200} board={90} face={0} label="2. Mi-rotation" sub="planche en travers, à plat" />
+      <Pose x={330} board={0} face={90} label="3. Sortie switch" sub="dos au câble, orteils" />
+      <circle cx="108" cy="192" r="4" fill={C.danger} />
+      <Note x={116} y={196} anchor="start" color={C.slate} size={9.5}>
+        poignée (rouge), toujours devant · rond bleu : tête
+      </Note>
+    </Frame>
+  );
+}
+
+function WakeBelAir() {
+  function Step({ x, n, t, s, children }: { x: number; n: number; t: string; s: string; children: React.ReactNode }) {
+    return (
+      <g transform={`translate(${x} 0)`}>
+        <rect x="0" y="0" width="92" height="160" rx="12" fill={C.salt} stroke={C.line} />
+        <circle cx="14" cy="14" r="10" fill={C.brand} />
+        <text x="14" y="18" textAnchor="middle" fill="#fff" fontSize="10" style={T}>
+          {n}
+        </text>
+        <rect x="0" y="104" width="92" height="20" fill={C.sea} />
+        <g transform="translate(46 80)">{children}</g>
+        <Note x={46} y={140} color={C.deep} size={9.5}>
+          {t}
+        </Note>
+        <Note x={46} y={153} color={C.slate} size={8.5}>
+          {s}
+        </Note>
+      </g>
+    );
+  }
+  const board = (rot: number, y = 22) => (
+    <g transform={`translate(0 ${y}) rotate(${rot})`}>
+      <rect x="-26" y="-3" width="52" height="6" rx="3" fill={C.deep} />
+    </g>
+  );
+  return (
+    <Frame label="Bel Air depuis le plat, en quatre temps : carre talon qui charge le câble, bascule sur les orteils et pop vertical, rotation arrière guidée par le regard par-dessus l'épaule arrière, réception deux pieds genoux fléchis. Variante à valider en vidéo avec un coach câble" viewBox="0 0 400 160">
+      <Step x={4} n={1} t="Carre talon" s="le câble se charge">
+        {board(-14)}
+        <path d="M0 18 L-4 -6" stroke={C.deep} strokeWidth={3} strokeLinecap="round" />
+        <circle cx="-5" cy="-12" r="5" fill={C.deep} />
+        <path d="M-2 0 L30 -30" stroke={C.slate} strokeWidth={1.2} />
+      </Step>
+      <Step x={104} n={2} t="Orteils, pop" s="pousser vers le haut">
+        {board(10, 14)}
+        <path d="M0 10 L2 -14" stroke={C.deep} strokeWidth={3} strokeLinecap="round" />
+        <circle cx="2" cy="-20" r="5" fill={C.deep} />
+        <path d="M2 -4 L32 -34" stroke={C.slate} strokeWidth={1.2} />
+      </Step>
+      <Step x={204} n={3} t="Rotation arrière" s="regard épaule arrière">
+        <g transform="rotate(160)">
+          {board(0, 14)}
+          <path d="M0 10 L0 -12" stroke={C.deep} strokeWidth={3} strokeLinecap="round" />
+          <circle cx="0" cy="-18" r="5" fill={C.deep} />
+        </g>
+        <path d="M-30 -30 A 34 34 0 1 0 30 -30" fill="none" stroke={C.brand} strokeWidth={2} strokeDasharray="4 3" markerEnd="url(#arr-brand)" />
+      </Step>
+      <Step x={304} n={4} t="Réception" s="genoux fléchis">
+        {board(0)}
+        <path d="M0 18 L0 -4" stroke={C.deep} strokeWidth={3} strokeLinecap="round" />
+        <circle cx="0" cy="-10" r="5" fill={C.deep} />
+      </Step>
     </Frame>
   );
 }
@@ -718,4 +855,6 @@ export const FIGURE_SCHEMAS: Record<FigureSchemaId, () => React.ReactElement> = 
   "wake-kicker": WakeKicker,
   "wake-box": WakeBox,
   "wake-cable": WakeCable,
+  "wake-180": Wake180,
+  "wake-bel-air": WakeBelAir,
 };

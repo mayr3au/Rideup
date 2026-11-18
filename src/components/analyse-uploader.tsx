@@ -142,7 +142,8 @@ export function AnalyseUploader({
       if (analysisId) {
         await fetch(`/api/analyses/${analysisId}`, { method: "POST", body: JSON.stringify({ action: "cancel" }) }).catch(() => {});
       }
-      setError({ text: err instanceof Error ? err.message : "Une erreur est survenue. Réessaie." });
+      const msg = err instanceof Error ? err.message : "Une erreur est survenue. Réessaie.";
+      setError({ text: analysisId && !msg.includes("décompté") ? `${msg} Ton crédit d'analyse t'est rendu : rien n'est décompté.` : msg });
       setStep("idle");
     }
   }
@@ -289,7 +290,7 @@ export function AnalyseUploader({
 
       <div className="sticky bottom-20 z-10 -mx-4 border-t border-line bg-salt/95 px-4 py-3 backdrop-blur sm:static sm:mx-0 sm:border-0 sm:bg-transparent sm:p-0">
         <button disabled={busy || seg.end <= seg.start} className="btn btn-primary w-full sm:w-auto">
-          {busy ? "Envoi en cours…" : `Envoyer au coach (${(seg.end - seg.start).toFixed(1)} s)`}
+          {busy ? "Envoi en cours…" : `Envoyer au coach ${SPORTS[sport].name.toLowerCase()} (${(seg.end - seg.start).toFixed(1)} s)`}
         </button>
         {busy ? (
           <ol role="status" className="mt-3 space-y-1.5 text-sm" aria-label="Envoi au coach">
@@ -310,7 +311,8 @@ export function AnalyseUploader({
           </ol>
         ) : (
           <p className="mt-2 text-sm text-slate">
-            {remainingText} Retour du coach sous {delayHours} h.
+            Prochain envoi : <span className="font-semibold text-deep">{SPORTS[sport].name}</span>
+            {trick && trickById(trick) ? ` · ${trickById(trick)!.name}` : ""}. {remainingText} Retour du coach sous {delayHours} h.
           </p>
         )}
       </div>
