@@ -4,7 +4,7 @@ import { useActionState, useEffect, useRef, useState } from "react";
 import { saveProfile, type ProfileState } from "@/app/(app)/coach/actions";
 import { LEVEL_LABELS, LEVEL_ORDER, SPORT_IDS, SPORTS, type Level, type SportId } from "@/lib/sports";
 import { riderSports } from "@/lib/rider";
-import { DISCIPLINES, type Assessment, type Quiver, type SportDetails } from "@/lib/rider-details";
+import { DISCIPLINES, disciplineIds, type Assessment, type Quiver, type SportDetails } from "@/lib/rider-details";
 import type { Profile } from "@/lib/types";
 import { LevelQuiz } from "./level-quiz";
 import { QuiverEditor } from "./quiver-editor";
@@ -156,24 +156,29 @@ export function ProfileForm({ profile, submitLabel, showAlerts }: { profile: Pro
         return (
           <fieldset key={id} data-step={`sport:${id}`} className={`panel space-y-6 p-5 ${visible(`sport:${id}`) ? "" : "hidden"}`}>
             <legend className="sr-only">{sport.name}</legend>
-            <input type="hidden" name={`details_${id}`} value={JSON.stringify({ discipline: d.discipline, quiver, evaluation: d.evaluation })} />
+            <input type="hidden" name={`details_${id}`} value={JSON.stringify({ disciplines: disciplineIds(id, d), quiver, evaluation: d.evaluation })} />
             <div>
               <p className="text-lg font-bold">Ton {sport.name.toLowerCase()}</p>
               <p className="text-sm text-slate">Le coach adapte ses conseils, la roadmap et les spots à ta pratique.</p>
             </div>
 
             <div>
-              <p className="label">Ta discipline</p>
+              <p className="label">Tes disciplines</p>
+              <p className="-mt-1 mb-2 text-sm text-slate">Coche tout ce que tu pratiques : beaucoup de riders en font plusieurs.</p>
               <div className="grid gap-2 sm:grid-cols-2">
                 {DISCIPLINES[id].map((disc) => (
                   <label key={disc.id} className="flex cursor-pointer gap-3 rounded-2xl border border-line bg-spray p-3 has-[:checked]:border-brand has-[:checked]:bg-brand-light">
                     <input
-                      type="radio"
+                      type="checkbox"
                       name={`discipline_${id}`}
                       value={disc.id}
-                      checked={d.discipline === disc.id}
-                      onChange={() => patchDetails(id, { discipline: disc.id })}
-                      className="mt-1 accent-[var(--brand)]"
+                      checked={disciplineIds(id, d).includes(disc.id)}
+                      onChange={(e) => {
+                        const current = disciplineIds(id, d);
+                        const next = e.target.checked ? [...current, disc.id] : current.filter((x) => x !== disc.id);
+                        patchDetails(id, { disciplines: next, discipline: next[0] });
+                      }}
+                      className="mt-1 h-4 w-4 shrink-0 accent-[var(--brand)]"
                     />
                     <span>
                       <span className="font-semibold">{disc.name}</span>

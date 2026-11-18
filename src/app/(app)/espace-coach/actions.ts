@@ -218,6 +218,19 @@ export async function structureReview(id: string, draft: string): Promise<{ draf
     return { draft: result };
   } catch (e) {
     console.error("mise en forme IA", e);
-    return { error: "L'IA n'a pas répondu. Réessaie dans un instant, ou remplis le retour à la main." };
+    const status = (e as { status?: number })?.status;
+    const why =
+      !process.env.ANTHROPIC_API_KEY
+        ? "clé ANTHROPIC_API_KEY absente sur le serveur"
+        : status === 401 || status === 403
+          ? "clé Anthropic refusée"
+          : status === 429
+            ? "trop de demandes en même temps"
+            : status === 529 || status === 503
+              ? "service IA surchargé"
+              : status
+                ? `erreur ${status} du service IA`
+                : "pas de réponse du service IA";
+    return { error: `La mise en forme n'a pas abouti (${why}). Réessaie dans un instant, ou continue à la main : ton texte est déjà repris dans le résumé.` };
   }
 }

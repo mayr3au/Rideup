@@ -22,9 +22,9 @@ export type TeamCoach = {
 export const TEAM: TeamCoach[] = [
   {
     name: "Anil Garnier",
-    sports: ["kitesurf", "foil", "wingfoil", "surf"],
+    sports: ["kitesurf", "foil", "wingfoil"],
     title: "Moniteur diplômé d'État · team Eleveight",
-    bio: "Top 11 Young World Kite Foil, spécialiste du big air. Kite, foil, wing ou surf : il t'aide à voler plus haut et plus propre.",
+    bio: "Top 11 Young World Kite Foil, spécialiste du big air. Kite, foil ou wing : il t'aide à voler plus haut et plus propre.",
     instagram: "anil_garnier",
     photo: "/coachs/coach-kite.jpg",
     avatar: "/coachs/avatar-anil.jpg",
@@ -49,6 +49,16 @@ export const TEAM: TeamCoach[] = [
     photo: "/coachs/coach-yann.jpg",
     avatar: "/coachs/avatar-yann.jpg",
     pos: "50% 30%",
+  },
+  {
+    name: "Jonathan",
+    sports: ["surf"],
+    title: "Surfeur · pédagogue technique",
+    bio: "Placement, take-off, lecture de la vague : il décortique ta technique pour que chaque session te fasse progresser.",
+    instagram: "jo_srn",
+    photo: "/coachs/coach-jonathan.jpg",
+    avatar: "/coachs/avatar-jonathan.jpg",
+    pos: "50% 35%",
   },
 ];
 

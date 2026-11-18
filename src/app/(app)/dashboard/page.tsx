@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { CoachAiMark, RIcon } from "@/components/rideup-icons";
 import Image from "next/image";
 import Link from "next/link";
 import { redirect } from "next/navigation";
@@ -47,7 +48,7 @@ export default async function Dashboard({ searchParams }: { searchParams: Promis
         <Image src={SPORT_PHOTOS[sport]} alt="" fill priority sizes="(min-width: 768px) 768px, 100vw" quality={85} className="object-cover" style={{ objectPosition: SPORT_PHOTO_POS[sport] ?? "50% 50%" }} />
         <div className="absolute inset-0 bg-gradient-to-r from-deep/90 via-deep/65 to-deep/20" />
         <div className="relative p-5 text-white sm:p-7">
-          <p className="text-sm font-bold uppercase tracking-wider text-white/80">{firstName ? `Salut ${firstName}` : "Salut"} 🤙</p>
+          <p className="text-sm font-bold uppercase tracking-wider text-white/80">{firstName ? `Salut ${firstName}` : "Salut"} <RIcon name="wave" className="ml-1 h-4 w-4" /></p>
           <h1 className="mt-1 text-3xl font-extrabold leading-tight text-white sm:text-4xl">
             Prêt pour ta session de <em className="italic">{S.name.toLowerCase()}</em> ?
           </h1>
@@ -97,7 +98,14 @@ export default async function Dashboard({ searchParams }: { searchParams: Promis
             photo: SITE_PHOTOS.cours,
             title: "Cours",
             line: "Le vent, la sécurité, chaque figure.",
-            badge: plan === "free" ? "🔒 Abonnés" : `${courseCount} cours`,
+            badge: plan === "free" ? (
+              <>
+                <RIcon name="lock" className="mr-1 h-3 w-3" />
+                Abonnés
+              </>
+            ) : (
+              `${courseCount} cours`
+            ),
             tone: plan === "free" ? "bg-white/90 text-deep" : "bg-white text-brand",
           },
           {
@@ -135,9 +143,7 @@ export default async function Dashboard({ searchParams }: { searchParams: Promis
         <div aria-hidden="true" className="pointer-events-none absolute -right-10 -top-10 h-40 w-40 rounded-full bg-white/15 blur-2xl" />
         <div className="relative flex items-center gap-3">
           <span className="relative flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-white/20" aria-hidden="true">
-            <svg viewBox="0 0 24 24" className="h-6 w-6" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M12 3l1.8 4.7L18.5 9.5l-4.7 1.8L12 16l-1.8-4.7L5.5 9.5l4.7-1.8zM19 15l.8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8z" />
-            </svg>
+            <CoachAiMark className="h-8 w-8" />
             <span className="absolute -bottom-0.5 -right-0.5 h-3.5 w-3.5 rounded-full border-2 border-brand bg-emerald-400" />
           </span>
           <div className="min-w-0">
@@ -183,7 +189,7 @@ export default async function Dashboard({ searchParams }: { searchParams: Promis
             ].map((s, i) => (
               <li key={i} className="flex items-start gap-3">
                 <span aria-hidden="true" className={`mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-sm font-bold ${s.done ? "bg-brand text-white" : "bg-brand-light text-brand"}`}>
-                  {s.done ? "✓" : i + 1}
+                  {s.done ? <RIcon name="check" className="h-3.5 w-3.5" /> : i + 1}
                 </span>
                 <div className="min-w-0 flex-1">
                   <p className={`font-semibold ${s.done ? "text-slate line-through decoration-1" : ""}`}>{s.title}</p>

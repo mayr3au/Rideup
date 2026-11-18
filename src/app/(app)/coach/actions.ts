@@ -56,7 +56,15 @@ export async function saveProfile(_: ProfileState, formData: FormData): Promise<
     const parsedDetails = sportDetailsSchema.safeParse(raw ?? {});
     if (!parsedDetails.success) return { error: `Matériel en ${SPORTS[s].name.toLowerCase()} : une valeur est hors limites.` };
     const d = parsedDetails.data;
-    if (d.discipline && !DISCIPLINES[s].some((x) => x.id === d.discipline)) delete d.discipline;
+    // Plusieurs disciplines possibles ; l'ancien champ unique garde la première pour les écrans existants
+    const ids = [...new Set(d.disciplines ?? (d.discipline ? [d.discipline] : []))].filter((id) => DISCIPLINES[s].some((x) => x.id === id));
+    if (ids.length) {
+      d.disciplines = ids;
+      d.discipline = ids[0];
+    } else {
+      delete d.disciplines;
+      delete d.discipline;
+    }
     details[s] = d;
 
     // Résumé texte du matériel : ce que lisent le coach, la page compte et le Spot Finder.

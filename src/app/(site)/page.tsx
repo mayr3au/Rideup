@@ -7,6 +7,7 @@ import { COURSES } from "@/lib/courses";
 import { LESSONS } from "@/lib/lessons";
 import { Reveal } from "@/components/reveal";
 import { instagramUrl, TEAM } from "@/lib/coaches";
+import { CoachAiMark, IconKite, IconSafety, IconTrick, RIcon } from "@/components/rideup-icons";
 import { Tilt } from "@/components/tilt";
 import { PhoneScreens } from "@/components/phone-screens";
 import { SampleReport } from "@/components/sample-report";
@@ -140,7 +141,7 @@ function Hero() {
           </div>
           <div className="pop-in absolute right-0 bottom-20 hidden lg:block xl:-right-10" style={d(1.5)}>
             <div className="float flex items-center gap-2.5 rounded-2xl bg-brand px-3.5 py-2.5 text-white shadow-[0_20px_40px_-14px_rgba(22,136,200,0.75)]" style={d(1.8)}>
-              <span aria-hidden="true" className="text-xl">🔥</span>
+              <RIcon name="fire" className="h-6 w-6" />
               <span className="leading-tight">
                 <span className="block text-sm font-extrabold">+2 points</span>
                 <span className="block text-xs font-semibold text-white/85">sur ton appel</span>
@@ -349,7 +350,7 @@ function StepVisual({ n }: { n: number }) {
   if (n === 2)
     return (
       <div className="flex h-44 flex-col justify-center gap-2 bg-raised px-5">
-        <span className="w-fit rounded-full bg-white px-3 py-1 text-xs font-semibold text-deep shadow-sm">🪁 Figure : Backroll</span>
+        <span className="w-fit rounded-full bg-white px-3 py-1 text-xs font-semibold text-deep shadow-sm"><RIcon name="kite" className="mr-1 h-3.5 w-3.5 text-brand" />Figure : Backroll</span>
         <p className="ml-auto max-w-[85%] rounded-2xl rounded-br-md bg-brand px-3.5 py-2 text-sm text-white shadow-md">
           Je tourne, mais je retombe toujours sur les fesses. C&apos;est mon regard ?
         </p>
@@ -453,6 +454,17 @@ function Coachs() {
   );
 }
 
+/** Petit drapeau français (en SVG : les émojis drapeaux ne s'affichent pas sous Windows). */
+function FrenchFlag() {
+  return (
+    <svg viewBox="0 0 3 2" className="h-[0.42em] w-auto shrink-0 rounded-[1px] opacity-75" role="img" aria-label="Français">
+      <rect width="1" height="2" fill="#002654" />
+      <rect x="1" width="1" height="2" fill="#fff" />
+      <rect x="2" width="1" height="2" fill="#ce1126" />
+    </svg>
+  );
+}
+
 /* ───────────── 3 bis bis. L'équipe : visages, sports, coachings privés ───────────── */
 function Team() {
   const team = TEAM.filter((c) => c.name);
@@ -470,7 +482,7 @@ function Team() {
           Ce sont eux qui analysent tes vidéos. Et si tu veux aller plus loin, ils proposent aussi des coachings privés sur l&apos;eau.
         </p>
       </Reveal>
-      <ul className={`mt-8 grid gap-5 sm:grid-cols-2 ${team.length >= 3 ? "lg:grid-cols-3" : "lg:max-w-3xl"}`}>
+      <ul className={`mt-8 grid gap-5 sm:grid-cols-2 ${team.length >= 4 ? "lg:grid-cols-4" : team.length === 3 ? "lg:grid-cols-3" : "lg:max-w-3xl"}`}>
         {team.map((c, i) => (
           <Reveal as="li" key={c.photo} delay={i * 0.1} className="panel lift flex flex-col overflow-hidden">
             <div className="relative aspect-[4/5] overflow-hidden">
@@ -482,7 +494,10 @@ function Team() {
                 ))}
               </div>
               <div className="absolute inset-x-0 bottom-0 p-4 text-white">
-                <p className="text-2xl font-extrabold leading-tight">{c.name}</p>
+                <p className="flex items-center gap-1.5 text-2xl font-extrabold leading-tight">
+                  {c.name}
+                  <FrenchFlag />
+                </p>
                 <p className="mt-0.5 flex items-center gap-1.5 text-sm font-semibold text-white/90">
                   {c.title}
                 </p>
@@ -492,6 +507,7 @@ function Team() {
               {c.bio && <p className="text-[0.95rem] text-slate">{c.bio}</p>}
               {c.instagram ? (
                 <div className="mt-auto pt-4">
+                <p className="mb-2 text-xs font-bold uppercase tracking-wider text-slate">Coaching privé</p>
                 <a
                   href={instagramUrl(c.instagram)}
                   target="_blank"
@@ -503,7 +519,7 @@ function Team() {
                     <circle cx="12" cy="12" r="4" />
                     <circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none" />
                   </svg>
-                  Coaching privé · @{c.instagram.replace(/^@/, "")}
+                  @{c.instagram.replace(/^@/, "")}
                 </a>
                 </div>
               ) : null}
@@ -517,10 +533,10 @@ function Team() {
 
 /* ───────────── 3 ter. Le coach IA, disponible 24 h/24 ───────────── */
 function AiCoach() {
-  const points = [
-    ["🎯", "Débloque une figure", "Pourquoi tu retombes, quoi changer à ta prochaine tentative."],
-    ["🪁", "Choisis ton matériel", "La taille d'aile ou de planche selon le vent, ton poids et ton niveau."],
-    ["🛟", "Ride en sécurité", "Vent offshore, courant, priorités : les bons réflexes avant d'aller à l'eau."],
+  const points: [typeof IconTrick, string, string][] = [
+    [IconTrick, "Débloque une figure", "Pourquoi tu retombes, quoi changer à ta prochaine tentative."],
+    [IconKite, "Choisis ton matériel", "La taille d'aile ou de planche selon le vent, ton poids et ton niveau."],
+    [IconSafety, "Ride en sécurité", "Vent offshore, courant, priorités : les bons réflexes avant d'aller à l'eau."],
   ];
   return (
     <section className="mx-auto max-w-6xl px-5 pt-14 sm:px-6 sm:pt-20">
@@ -540,9 +556,11 @@ function AiCoach() {
               coachs, et te répond en quelques secondes, même à 23 h la veille d&apos;une session.
             </p>
             <ul className="mt-6 space-y-3">
-              {points.map(([e, t, d]) => (
+              {points.map(([Ico, t, d]) => (
                 <li key={t} className="flex gap-3">
-                  <span aria-hidden="true" className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white/10 text-lg">{e}</span>
+                  <span aria-hidden="true" className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white/10 text-sky-300 ring-1 ring-white/10">
+                    <Ico className="h-6 w-6" />
+                  </span>
                   <div>
                     <p className="font-bold">{t}</p>
                     <p className="text-sm text-white/75">{d}</p>
@@ -560,9 +578,7 @@ function AiCoach() {
             <div className="mx-auto max-w-md rounded-[24px] bg-white p-4 text-deep shadow-2xl">
               <div className="flex items-center gap-3 border-b border-line pb-3">
                 <span className="relative flex h-10 w-10 items-center justify-center rounded-2xl bg-gradient-to-br from-brand to-lagoon text-white" aria-hidden="true">
-                  <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M12 3l1.8 4.7L18.5 9.5l-4.7 1.8L12 16l-1.8-4.7L5.5 9.5l4.7-1.8zM19 15l.8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8z" />
-                  </svg>
+                  <CoachAiMark className="h-7 w-7" />
                   <span className="absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full border-2 border-white bg-emerald-500" />
                 </span>
                 <div>

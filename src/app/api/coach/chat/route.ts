@@ -6,6 +6,7 @@ import { activeSport } from "@/lib/rider";
 import { getRiderHistory, reserveQuota } from "@/lib/usage";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { loadThread, saveExchange } from "@/lib/coach-thread";
+import { conditionsBrief } from "@/lib/coach-conditions";
 
 export const maxDuration = 60;
 
@@ -44,11 +45,18 @@ export async function POST(request: NextRequest) {
   while (messages.length && messages[0].role !== "user") messages.shift();
   const db = createAdminClient();
 
+  // Question sur le vent, la houle, un spot ou un jour : on joint les prévisions, le coach répond lui-même
+  const lastUser = [...messages].reverse().find((m) => m.role === "user")?.content ?? "";
+  const brief = await conditionsBrief(supabase, profile, sport, parsed.data.message, lastUser);
+  const question = brief
+    ? `${parsed.data.message}\n\n---\n(Contexte joint automatiquement par RIDE'UP, non écrit par le rider)\n${brief}`
+    : parsed.data.message;
+
   const stream = streamCoachReply(
     profile,
     sport,
     history,
-    [...messages, { role: "user", content: parsed.data.message }],
+    [...messages, { role: "user", content: question }],
     async (reply) => {
       if (!reply) {
         await db.from("usage_events").delete().eq("kind", "coach").eq("ref", ref);

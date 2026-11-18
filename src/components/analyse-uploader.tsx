@@ -9,6 +9,7 @@ import { canExportClip, DIRECT_UPLOAD_MAX, exportSegment } from "@/lib/clip-expo
 import { MAX_SEGMENT_SECONDS } from "@/lib/plans";
 import { LEVEL_LABELS, LEVEL_ORDER, SPORTS, trickById, tricksFor, type SportId } from "@/lib/sports";
 import { ClipTrimmer } from "./clip-trimmer";
+import { RIcon } from "@/components/rideup-icons";
 
 const MAX_SIZE = 1024 * 1024 * 1024;
 
@@ -184,7 +185,7 @@ export function AnalyseUploader({
               ["Tout le mouvement", `L'approche, la figure et la réception : ${MAX_SEGMENT_SECONDS} s max.`],
             ].map(([t, d]) => (
               <li key={t} className="flex gap-2.5">
-                <span aria-hidden="true" className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-brand-light text-xs font-bold text-brand">✓</span>
+                <span aria-hidden="true" className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-brand-light text-xs font-bold text-brand"><RIcon name="check" className="h-3 w-3" /></span>
                 <span>
                   <span className="font-semibold">{t}.</span> <span className="text-slate">{d}</span>
                 </span>
@@ -298,7 +299,7 @@ export function AnalyseUploader({
               return (
                 <li key={x.id} className={`flex items-center gap-2 ${done ? "text-lagoon" : now ? "font-semibold" : "text-slate"}`}>
                   <span aria-hidden="true" className={`flex h-5 w-5 items-center justify-center rounded-full text-[0.65rem] font-bold ${done ? "bg-brand text-white" : now ? "border-2 border-brand" : "border-2 border-line"}`}>
-                    {done ? "✓" : ""}
+                    {done ? <RIcon name="check" className="h-3 w-3" /> : ""}
                   </span>
                   {x.label}
                   {now && x.id === "decoupe" && ` · ${Math.round(cutProgress * 100)} %, garde cette page ouverte`}

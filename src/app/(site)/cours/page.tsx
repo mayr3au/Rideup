@@ -7,6 +7,7 @@ import { SPORT_IDS, SPORTS } from "@/lib/sports";
 import Image from "next/image";
 import { SITE_PHOTOS, SPORT_PHOTOS, SPORT_PHOTO_POS } from "@/lib/photos";
 import { getSession, effectivePlan } from "@/lib/auth";
+import { RIcon } from "@/components/rideup-icons";
 
 export const metadata: Metadata = {
   title: "Cours de glisse",
@@ -60,7 +61,7 @@ export default async function CoursesPage() {
           </ul>
           <div className="mt-5">
             {unlocked ? (
-              <span className="inline-flex items-center gap-2 rounded-full bg-emerald-500 px-3 py-1.5 text-sm font-bold">✓ Inclus dans ta formule</span>
+              <span className="inline-flex items-center gap-2 rounded-full bg-emerald-500 px-3 py-1.5 text-sm font-bold"><RIcon name="check" className="h-4 w-4" />Inclus dans ta formule</span>
             ) : (
               <Link href="/tarifs" className="btn btn-kite !min-h-11 !px-5 !py-2 !text-sm">
                 Débloquer les {LESSONS.length + COURSES.length} cours
@@ -110,7 +111,7 @@ export default async function CoursesPage() {
                     <div className="flex flex-1 flex-col p-4">
                       <span className="flex items-center justify-between gap-3">
                         <span className="text-lg font-bold leading-tight">{l.title}</span>
-                        <span className="shrink-0 rounded-full bg-raised px-2.5 py-1 text-xs font-semibold text-slate">{unlocked ? "" : "🔒 "}{l.minutes} min</span>
+                        <span className="shrink-0 rounded-full bg-raised px-2.5 py-1 text-xs font-semibold text-slate">{!unlocked && <RIcon name="lock" className="mr-1 h-3 w-3" />}{l.minutes} min</span>
                       </span>
                       <span className="mt-1.5 line-clamp-2 text-[0.95rem] text-slate">{l.intro}</span>
                       <span className="mt-3 text-xs font-semibold uppercase tracking-wider text-lagoon">{sportsLabel(l.sports)}</span>
@@ -146,7 +147,7 @@ export default async function CoursesPage() {
                     <span className="text-lg font-bold leading-tight">{c.title}</span>
                     <span className="inline-flex shrink-0 items-center gap-1.5 rounded-full bg-raised px-2.5 py-1 text-xs font-semibold text-slate">
                       <span aria-hidden="true" className={`h-2 w-2 rounded-full ${LEVEL_DOT[c.level.toLowerCase()] ?? "bg-slate"}`} />
-                      {unlocked ? "" : "🔒 "}
+                      {!unlocked && <RIcon name="lock" className="mr-1 h-3.5 w-3.5" />}
                       {c.level} · {c.minutes} min
                     </span>
                   </span>

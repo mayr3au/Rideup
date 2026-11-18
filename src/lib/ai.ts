@@ -32,9 +32,10 @@ const TASKS: Record<Task, TaskConfig> = {
     thinking: { type: "disabled" },
     headroom: 0,
   },
-  // Mise en forme du compte rendu d'un coach : fidèle et soignée, sans réflexion préalable pour rester rapide.
+  // Mise en forme du compte rendu d'un coach : reformuler et ranger, pas raisonner.
+  // Haiku répond en quelques secondes (Sonnet pouvait dépasser le délai maximal d'une requête sur Vercel).
   compte_rendu: {
-    model: process.env.AI_MODEL_COMPTE_RENDU || "claude-sonnet-5-5",
+    model: process.env.AI_MODEL_COMPTE_RENDU || "claude-haiku-5-5",
     effort: (process.env.AI_EFFORT_COMPTE_RENDU as Effort) || "medium",
     thinking: { type: "disabled" },
     headroom: 0,
@@ -127,7 +128,9 @@ async function callWithTool(
     const res = await anthropic().messages.create({
       ...base,
       tools: [tool],
-      tool_choice: { type: "auto" },
+      // Sans réflexion préalable, on peut imposer l'outil : la réponse arrive toujours structurée.
+      // Avec réflexion (programme), l'API refuse l'outil forcé : on le laisse au choix du modèle.
+      tool_choice: TASKS[kind].thinking?.type === "disabled" ? { type: "tool", name: params.tool.name } : { type: "auto" },
       messages,
     });
     cost += await recordUsage(userId, kind, base.model, res.usage);
@@ -180,7 +183,7 @@ function riderContext(profile: Profile, sport: SportId, history?: RiderHistory) 
     `Prénom : ${profile.full_name || "inconnu"}`,
     `Sport concerné : ${SPORTS[sport].name}`,
     `Niveau déclaré dans ce sport : ${lvl ? LEVEL_LABELS[lvl] : "non renseigné"}${evaluation ? ` (auto-évaluation : ${evaluation.score}/100, ${LEVEL_LABELS[evaluation.level].toLowerCase()})` : ""}`,
-    `Discipline : ${disciplineFor(profile, sport) ?? "non précisée"}`,
+    `Disciplines pratiquées : ${disciplineFor(profile, sport) ?? "non précisées"}`,
     `Pied avant : ${profile.stance === "goofy" ? "droit (goofy)" : profile.stance === "regular" ? "gauche (regular)" : "?"}`,
     `Poids : ${profile.weight_kg ? `${profile.weight_kg} kg` : "non renseigné"}`,
     `Matériel : ${gearFor(profile, sport) || "non renseigné"}`,
@@ -209,7 +212,7 @@ Règles :
 - Court : 120 mots maximum par réponse (un plan détaillé peut aller jusqu'à 250). Va à l'essentiel, le rider peut te redemander des détails.
 - Adapte tout au sport, au niveau, au poids, au matériel et à l'historique du rider.
 - La sécurité passe avant tout : vent offshore, rafales, orage, houle trop grosse, courants, spot inconnu, matériel abîmé, figure trop avancée pour le niveau → dis-le clairement et conseille l'option prudente ou un moniteur.
-- Tu ne donnes pas de prévisions météo : renvoie vers le Spot Finder de RIDE'UP.
+- Conditions et météo : quand un bloc « Prévisions RIDE'UP » accompagne le message, c'est toi qui réponds, directement dans le chat. Donne le verdict (y aller ou pas), le meilleur spot et le meilleur créneau, la force et la direction du vent (ou la houle), l'orientation, l'aile ou la planche à sortir et les points de vigilance, en citant les chiffres du bloc. Compare 2 ou 3 spots si c'est utile. Ne renvoie jamais le rider vers le Spot Finder à la place de répondre. N'invente aucun chiffre absent du bloc ; si le bloc dit que les prévisions sont indisponibles, explique pourquoi en une phrase et ce qu'il peut faire. Les prévisions restent des prévisions : rappelle en quelques mots de vérifier sur place si c'est limite.
 - Si le rider parle d'un autre de ses sports, réponds pour ce sport-là.
 - Hors sports de glisse, recentre poliment.
 - Pas de titres markdown. Listes courtes et gras autorisés.

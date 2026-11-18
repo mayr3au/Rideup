@@ -11,8 +11,10 @@ import { SPORTS } from "@/lib/sports";
 import type { Spot } from "@/lib/types";
 import { SpotFinder, type SpotData } from "@/components/spot-finder";
 import { NearMeButton } from "@/components/near-me-button";
+import { RadiusSlider } from "@/components/radius-slider";
 import Image from "next/image";
 import { SITE_PHOTOS, SPORT_PHOTOS } from "@/lib/photos";
+import { RIcon } from "@/components/rideup-icons";
 
 export const metadata: Metadata = { title: "Spot Finder" };
 export const dynamic = "force-dynamic";
@@ -46,7 +48,8 @@ export default async function SpotsPage({ searchParams }: { searchParams: Promis
 
   const lat = sp.lat ? Number(sp.lat) : profile.home_lat;
   const lng = sp.lng ? Number(sp.lng) : profile.home_lng;
-  const radius = Math.min(2000, Math.max(5, Number(sp.rayon) || profile.radius_km || 100));
+  // Rayon réglable au curseur (5 à 300 km) ; par défaut, la distance max du profil
+  const radius = Math.min(300, Math.max(5, Number(sp.rayon) || profile.radius_km || 50));
 
   if (lat == null || lng == null || !Number.isFinite(lat) || !Number.isFinite(lng)) {
     return (
@@ -66,7 +69,8 @@ export default async function SpotsPage({ searchParams }: { searchParams: Promis
 
   const withDistance = (allSpots ?? []).map((s) => ({ ...s, distance: distanceKm(lat, lng, s.lat, s.lng) }));
   const inRadius = withDistance
-    .filter((s) => s.distance <= radius || favorites.has(s.id))
+    // Uniquement dans le rayon choisi, favoris compris : pas de spot à 300 km quand on a demandé 30
+    .filter((s) => s.distance <= radius)
     .sort((a, b) => a.distance - b.distance)
     .slice(0, MAX_SPOTS);
   // Rien dans le rayon : plutôt qu'une page vide, on montre les 6 spots les plus proches (jusqu'à 1 000 km)
@@ -171,8 +175,8 @@ export default async function SpotsPage({ searchParams }: { searchParams: Promis
       </section>
 
       {/* Réglages de la recherche */}
-      <div className="panel mt-4 flex flex-wrap items-center gap-x-4 gap-y-3 p-4">
-        <div className="min-w-0 flex-1">
+      <div className="panel mt-4 flex flex-wrap items-center gap-x-4 gap-y-4 p-4">
+        <div className="min-w-0 basis-full sm:basis-0 sm:flex-1">
           <p className="text-xs font-semibold uppercase tracking-wider text-slate">Autour de</p>
           <p className="truncate font-bold">
             {where}
@@ -184,22 +188,11 @@ export default async function SpotsPage({ searchParams }: { searchParams: Promis
             )}
           </p>
         </div>
-        <nav className="flex gap-1 rounded-full bg-raised p-1" aria-label="Rayon de recherche">
-          {[50, 100, 250, 500, 1000].map((r) => (
-            <Link
-              key={r}
-              href={`/spots?rayon=${r}${sp.lat && sp.lng ? `&lat=${sp.lat}&lng=${sp.lng}` : ""}`}
-              aria-current={radius === r ? "true" : undefined}
-              className={`min-h-9 whitespace-nowrap rounded-full px-3 py-1.5 text-sm font-semibold ${radius === r ? "bg-brand text-white shadow" : "text-deep hover:bg-white"}`}
-            >
-              {r} km
-            </Link>
-          ))}
-        </nav>
         <div className="flex items-center gap-3">
           <NearMeButton radius={radius} />
           <Link href="/profil" className="text-sm font-semibold text-lagoon">Mes réglages</Link>
         </div>
+        <RadiusSlider radius={radius} query={sp.lat && sp.lng ? `lat=${sp.lat}&lng=${sp.lng}` : ""} />
       </div>
 
       {needsGear && !rider.gear.length && (
@@ -216,7 +209,7 @@ export default async function SpotsPage({ searchParams }: { searchParams: Promis
         </div>
       ) : nearby.length === 0 ? (
         <div className="panel mt-6 p-6 text-center">
-          <p className="text-4xl" aria-hidden="true">🏝️</p>
+          <RIcon name="island" className="mx-auto block h-11 w-11 text-lagoon" />
           <p className="mt-2 text-lg font-bold">
             {S.spot === "cable" ? "Aucun téléski nautique référencé autour de toi" : "Aucun spot référencé autour de toi"}
           </p>
@@ -226,14 +219,14 @@ export default async function SpotsPage({ searchParams }: { searchParams: Promis
         <div className="mt-6">
           {extended && (
             <div className="mb-4 flex items-start gap-3 rounded-2xl bg-amber-50 p-4">
-              <span aria-hidden="true" className="text-xl">📍</span>
+              <RIcon name="pin" className="mt-0.5 h-5 w-5 text-amber-700" />
               <p className="text-[0.95rem]">
                 <span className="font-semibold">Aucun spot à moins de {radius} km.</span> Voici les {nearby.length} plus proches, jusqu&apos;à{" "}
                 {Math.round(nearby.at(-1)!.distance)} km.
               </p>
             </div>
           )}
-          <SpotFinder spots={spots} origin={{ lat, lng }} canAlert={plan === "elite"} kind={S.spot} sport={sport} />
+          <SpotFinder spots={spots} origin={{ lat, lng }} radiusKm={extended ? Math.ceil(nearby.at(-1)!.distance) : radius} canAlert={plan === "elite"} kind={S.spot} sport={sport} />
         </div>
       )}
 

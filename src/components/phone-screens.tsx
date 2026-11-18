@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import { CoachAiMark, RIcon } from "@/components/rideup-icons";
 import { useEffect, useState } from "react";
 
 const TABS = ["Accueil", "Cours", "Coach", "Progrès", "Spots"];
@@ -205,9 +206,7 @@ function AiScreen() {
     <div className="flex h-full flex-col gap-2 px-3">
       <div className={`${card} flex items-center gap-2 px-2.5 py-2`}>
         <span className="relative flex h-7 w-7 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-brand to-lagoon text-white" aria-hidden="true">
-          <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M12 3l1.8 4.7L18.5 9.5l-4.7 1.8L12 16l-1.8-4.7L5.5 9.5l4.7-1.8z" />
-          </svg>
+          <CoachAiMark className="h-5 w-5" />
           <span className="absolute -bottom-0.5 -right-0.5 h-2.5 w-2.5 rounded-full border-2 border-white bg-emerald-500" />
         </span>
         <div className="min-w-0">
@@ -244,10 +243,10 @@ function AiScreen() {
 
 function SpotsScreen() {
   const spots = [
-    { n: "L'Almanarre", d: "12 km", w: 26, name: "Ça charge 🔥", h: "13 h – 18 h", k: "9 m²", v: "Go !", c: "bg-emerald-500 text-white", live: 24 },
-    { n: "La Capte", d: "9 km", w: 19, name: "Ça se lève 🌬️", h: "14 h – 17 h", k: "12 m²", v: "Oui", c: "bg-emerald-100 text-emerald-800" },
-    { n: "Six-Fours", d: "38 km", w: 31, name: "Gros temps ⚡", h: "11 h – 15 h", k: "7 m²", v: "Prudence", c: "bg-amber-100 text-amber-800" },
-    { n: "Les Salins", d: "6 km", w: 5, name: "Pétole 😴", h: "—", k: "", v: "Non", c: "bg-raised text-slate" },
+    { n: "L'Almanarre", d: "12 km", w: 26, name: "Ça charge", ic: "fire" as const, h: "13 h – 18 h", k: "9 m²", v: "Go !", c: "bg-emerald-500 text-white", live: 24 },
+    { n: "La Capte", d: "9 km", w: 19, name: "Ça se lève", ic: "breeze" as const, h: "14 h – 17 h", k: "12 m²", v: "Oui", c: "bg-emerald-100 text-emerald-800" },
+    { n: "Six-Fours", d: "38 km", w: 31, name: "Gros temps", ic: "bolt" as const, h: "11 h – 15 h", k: "7 m²", v: "Prudence", c: "bg-amber-100 text-amber-800" },
+    { n: "Les Salins", d: "6 km", w: 5, name: "Pétole", ic: "calm" as const, h: "—", k: "", v: "Non", c: "bg-raised text-slate" },
   ];
   return (
     <div className="px-3">
@@ -271,6 +270,7 @@ function SpotsScreen() {
                 )}
               </p>
               <p className="truncate text-[0.56rem] text-slate">
+                <RIcon name={sp.ic} className="mr-0.5 h-2.5 w-2.5" />
                 {sp.name} · {sp.w} nds · {sp.h}
                 {sp.k && ` · ${sp.k}`}
               </p>
@@ -311,7 +311,7 @@ function RoadmapScreen() {
           <li key={x.l} className={`${card} px-3 py-2 ${x.on ? "ring-2 ring-brand" : ""}`}>
             <div className="flex items-center justify-between text-[0.68rem]">
               <span className="font-semibold">
-                {x.done === x.total ? "✓ " : x.done === 0 ? "🔒 " : ""}
+                {x.done === x.total ? <RIcon name="check" className="mr-0.5 h-2.5 w-2.5 text-brand" /> : x.done === 0 ? <RIcon name="lock" className="mr-0.5 h-2.5 w-2.5 text-slate" /> : null}
                 {x.l}
               </span>
               <span className="text-slate">{x.done}/{x.total}</span>
@@ -368,13 +368,13 @@ function ProgressScreen() {
         ))}
       </div>
       <div className="mt-2 grid grid-cols-3 gap-1.5 text-center">
-        {[
-          ["🔥", "Série de 4"],
-          ["🎯", "Premier 8/10"],
-          ["📅", "3 mois actifs"],
-        ].map(([e, t]) => (
+        {([
+          ["fire", "Série de 4"],
+          ["target", "Premier 8/10"],
+          ["calendar", "3 mois actifs"],
+        ] as const).map(([e, t]) => (
           <div key={t} className={`${card} px-1 py-2`}>
-            <p className="text-base leading-none">{e}</p>
+            <RIcon name={e} className="mx-auto block h-4 w-4 text-brand" />
             <p className="mt-1 text-[0.52rem] font-semibold leading-tight">{t}</p>
           </div>
         ))}

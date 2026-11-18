@@ -7,6 +7,7 @@
  */
 
 import { SPORTS, type Level, type SportId } from "./sports";
+import type { IconName } from "@/components/rideup-icons";
 
 export type HourForecast = {
   time: string;
@@ -25,20 +26,20 @@ export type HourForecast = {
 };
 
 /** Le nom du vent, comme on le dit sur la plage (en nœuds). */
-const WIND_NAMES: [number, string, string][] = [
-  [6, "Pétole", "😴"],
-  [14, "Petit temps", "🍃"],
-  [19, "Ça se lève", "🌬️"],
-  [24, "Ça envoie", "💨"],
-  [29, "Ça charge", "🔥"],
-  [34, "Gros temps", "⚡"],
-  [44, "Carton !", "💥"],
-  [Infinity, "To the moon", "🚀"],
+const WIND_NAMES: [number, string, IconName][] = [
+  [6, "Pétole", "calm"],
+  [14, "Petit temps", "leaf"],
+  [19, "Ça se lève", "breeze"],
+  [24, "Ça envoie", "gust"],
+  [29, "Ça charge", "fire"],
+  [34, "Gros temps", "bolt"],
+  [44, "Carton !", "burst"],
+  [Infinity, "To the moon", "rocket"],
 ];
 
 export function windName(knots: number) {
-  const [, name, emoji] = WIND_NAMES.find(([max]) => knots <= max)!;
-  return { name, emoji };
+  const [, name, icon] = WIND_NAMES.find(([max]) => knots <= max)!;
+  return { name, icon };
 }
 
 export type Confidence = "haute" | "moyenne" | "faible";

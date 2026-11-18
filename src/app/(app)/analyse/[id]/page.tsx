@@ -13,6 +13,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { REVIEW_DELAY_HOURS } from "@/lib/plans";
 import { deleteAnalysis } from "../actions";
 import { setTrickStatus } from "../../coach/actions";
+import { RIcon } from "@/components/rideup-icons";
 
 export const metadata: Metadata = { title: "Résultat d'analyse" };
 
@@ -102,7 +103,7 @@ export default async function AnalysisDetail({
             ].map(([label, done], i) => (
               <li key={i} className={`flex items-center gap-2 ${done ? "font-semibold text-lagoon" : "text-slate"}`}>
                 <span aria-hidden="true" className={`flex h-5 w-5 items-center justify-center rounded-full text-[0.65rem] font-bold ${done ? "bg-brand text-white" : "border-2 border-line"}`}>
-                  {done ? "✓" : ""}
+                  {done ? <RIcon name="check" className="h-3 w-3" /> : ""}
                 </span>
                 {label}
               </li>
@@ -234,7 +235,7 @@ export default async function AnalysisDetail({
                 <ul className="mt-3 space-y-1.5">
                   {r.points_forts.map((p) => (
                     <li key={p} className="flex gap-2">
-                      <span aria-hidden="true" className="text-lagoon">✓</span>
+                      <RIcon name="check" className="mt-[0.3em] h-4 w-4 text-lagoon" />
                       {p}
                     </li>
                   ))}

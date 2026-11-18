@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { CoachAiMark, IconKite, IconSafety, IconSession, IconTrick } from "@/components/rideup-icons";
 import { useEffect, useRef, useState, useTransition } from "react";
 import { RichText } from "./rich-text";
 import { SPORTS, type SportId } from "@/lib/sports";
@@ -161,7 +162,7 @@ export function CoachChat({
       <div className="flex items-center justify-between gap-3 border-b border-line px-4 py-3 sm:px-5">
         <div className="flex min-w-0 items-center gap-3">
           <span className="relative flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-brand to-lagoon text-white shadow-md" aria-hidden="true">
-            <AiIcon className="h-6 w-6" />
+            <AiIcon className="h-9 w-9" />
             <span className="absolute -bottom-0.5 -right-0.5 h-3.5 w-3.5 rounded-full border-2 border-white bg-emerald-500" />
           </span>
           <div className="min-w-0">
@@ -224,14 +225,16 @@ export function CoachChat({
                 roadmap et les retours de tes coachs.
               </p>
               <ul className="mt-3 grid grid-cols-2 gap-2 text-[0.82rem] font-semibold text-deep">
-                {[
-                  ["🎯", "Débloquer une figure"],
-                  ["🪁", "Choisir ta taille d'aile"],
-                  ["🛟", "Rider en sécurité"],
-                  ["📋", "Préparer ta session"],
-                ].map(([e, t]) => (
+                {(
+                  [
+                    [IconTrick, "Débloquer une figure"],
+                    [IconKite, "Choisir ta taille d'aile"],
+                    [IconSafety, "Rider en sécurité"],
+                    [IconSession, "Préparer ta session"],
+                  ] as const
+                ).map(([Ico, t]) => (
                   <li key={t} className="flex items-center gap-1.5 rounded-xl bg-white px-2.5 py-2 shadow-sm">
-                    <span aria-hidden="true">{e}</span>
+                    <Ico className="h-4 w-4 shrink-0 text-brand" />
                     {t}
                   </li>
                 ))}
@@ -267,7 +270,7 @@ export function CoachChat({
           return (
             <div key={i} className="max-w-[90%]">
               <p className="mb-1 flex items-center gap-1 text-xs font-semibold text-brand">
-                <AiIcon className="h-3.5 w-3.5" /> Coach IA
+                <AiIcon className="h-4 w-4" /> Coach IA
               </p>
               <div className="rounded-lg rounded-bl-md bg-salt px-4 py-3">
                 <RichText text={text} />
@@ -346,9 +349,5 @@ export function CoachChat({
 }
 
 function AiIcon({ className = "h-5 w-5" }: { className?: string }) {
-  return (
-    <svg viewBox="0 0 24 24" className={className} fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-      <path d="M12 3l1.8 4.7L18.5 9.5l-4.7 1.8L12 16l-1.8-4.7L5.5 9.5l4.7-1.8zM19 15l.8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8z" />
-    </svg>
-  );
+  return <CoachAiMark className={className} />;
 }

@@ -12,6 +12,7 @@ import { courseForTrick } from "@/lib/courses";
 import { CoachChat } from "@/components/coach-chat";
 import { CoachTabs } from "@/components/coach-tabs";
 import { clearChat, setTrickStatus } from "./actions";
+import { RIcon } from "@/components/rideup-icons";
 
 export const metadata: Metadata = { title: "Coach" };
 
@@ -84,7 +85,7 @@ export default async function CoachPage({ searchParams }: { searchParams: Promis
                   {validated.length > 0 && (
                     <details className="mt-3 rounded-2xl bg-raised px-4 py-2">
                       <summary className="flex min-h-9 cursor-pointer list-none items-center gap-2 text-sm font-semibold text-slate">
-                        <span aria-hidden="true" className="flex h-5 w-5 items-center justify-center rounded-full bg-brand text-[0.65rem] text-white">✓</span>
+                        <span aria-hidden="true" className="flex h-5 w-5 items-center justify-center rounded-full bg-brand text-[0.65rem] text-white"><RIcon name="check" className="h-3 w-3" /></span>
                         {validated.length === list.length ? "Niveau maîtrisé" : `${validated.length} figure${validated.length > 1 ? "s" : ""} maîtrisée${validated.length > 1 ? "s" : ""}`}
                         <span className="ml-auto text-xs font-medium">voir</span>
                       </summary>

@@ -7,6 +7,7 @@ import { courseBySlug, courseForTrick, courseSport } from "@/lib/courses";
 import { LESSONS, LESSON_CATEGORIES, lessonBySlug, type Block, type Lesson } from "@/lib/lessons";
 import { SPORTS, tricksFor } from "@/lib/sports";
 import { getSession, effectivePlan } from "@/lib/auth";
+import { RIcon } from "@/components/rideup-icons";
 
 // Le contenu dépend de l'abonnement : page rendue à chaque visite, jamais en cache statique.
 export const dynamic = "force-dynamic";
@@ -35,7 +36,7 @@ function Paywall({ signedIn, contents }: { signedIn: boolean; contents: string[]
         <ul className="mt-4 space-y-1.5">
           {contents.map((c) => (
             <li key={c} className="flex gap-2">
-              <span aria-hidden="true" className="text-lagoon">🔒</span>
+              <RIcon name="lock" className="mt-[0.2em] h-4 w-4 text-lagoon" />
               {c}
             </li>
           ))}
@@ -170,7 +171,7 @@ function LessonView({ l, locked, signedIn }: { l: Lesson; locked: boolean; signe
             <ul className="mt-3 space-y-2">
               {l.retenir.map((r) => (
                 <li key={r} className="flex gap-2">
-                  <span aria-hidden="true" className="text-brand">✓</span>
+                  <RIcon name="check" className="mt-[0.3em] h-4 w-4 text-brand" />
                   {r}
                 </li>
               ))}
@@ -207,7 +208,7 @@ function LessonView({ l, locked, signedIn }: { l: Lesson; locked: boolean; signe
               <ul className="mt-3 space-y-2 text-[0.95rem]">
                 {l.retenir.map((r) => (
                   <li key={r} className="flex gap-2">
-                    <span aria-hidden="true" className="text-brand">✓</span>
+                    <RIcon name="check" className="mt-[0.3em] h-4 w-4 text-brand" />
                     {r}
                   </li>
                 ))}
@@ -334,7 +335,7 @@ function CourseView({ c, locked, signedIn }: { c: Course; locked: boolean; signe
             <ul className="mt-3 space-y-1.5">
               {c.prerequis.map((p) => (
                 <li key={p} className="flex gap-2">
-                  <span aria-hidden="true" className="text-lagoon">✓</span>
+                  <RIcon name="check" className="mt-[0.3em] h-4 w-4 text-lagoon" />
                   {p}
                 </li>
               ))}
@@ -402,7 +403,7 @@ function CourseView({ c, locked, signedIn }: { c: Course; locked: boolean; signe
               <ul className="mt-3 space-y-2">
                 {c.retenir.map((r) => (
                   <li key={r} className="flex gap-2">
-                    <span aria-hidden="true" className="text-brand">✓</span>
+                    <RIcon name="check" className="mt-[0.3em] h-4 w-4 text-brand" />
                     {r}
                   </li>
                 ))}
@@ -447,7 +448,7 @@ function CourseView({ c, locked, signedIn }: { c: Course; locked: boolean; signe
                 <ul className="mt-3 space-y-2 text-[0.95rem]">
                   {c.retenir.map((r) => (
                     <li key={r} className="flex gap-2">
-                      <span aria-hidden="true" className="text-brand">✓</span>
+                      <RIcon name="check" className="mt-[0.3em] h-4 w-4 text-brand" />
                       {r}
                     </li>
                   ))}
